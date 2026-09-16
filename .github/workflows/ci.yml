@@ -17,3 +17,26 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run lint
       - run: bun run build
+      - name: Smoke test route API
+        shell: bash
+        run: |
+          set -euo pipefail
+          bun run dev --host 127.0.0.1 > /tmp/air-arabia-dev.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:3000/api/routes > /tmp/route-api.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          test -s /tmp/route-api.json
+          bun -e '
+            const data = await Bun.file("/tmp/route-api.json").json();
+            if (data.ok !== true) throw new Error("Route API returned ok=false");
+            if (!Array.isArray(data.routes) || data.routes.length === 0) throw new Error("Route API returned no routes");
+            if (!Array.isArray(data.airports) || data.airports.length === 0) throw new Error("Route API returned no airports");
+            console.log(`Route API OK: ${data.routes.length} routes, ${data.airports.length} airports`);
+          '
