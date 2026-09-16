@@ -1,87 +1,41 @@
 import { useEffect, useRef, useState } from "react";
-
-import {
-  fetchAirports,
-  fetchRoutes,
-  type AirportRecord,
-  type RouteRecord,
-} from "@/lib/csv";
+import { fetchAirports, fetchRoutes, type AirportRecord } from "@/lib/csv";
+import { fetchRoutes as fetchRouteRecords } from "@/lib/csv";
 
 const CARTO_API_KEY = "cb1_3nf4_1_7b20991e74f9ccb93b421f1f";
 
-/** Great-circle interpolation so long routes render as a natural arc. */
-function greatCircle(
-  from: [number, number],
-  to: [number, number],
-  segments = 48,
-): [number, number][] {
-  const toRad = Math.PI / 180;
-  const [lat1, lon1] = [from[0] * toRad, from[1] * toRad];
-  const [lat2, lon2] = [to[0] * toRad, to[1] * toRad];
-  const d =
-    2 *
-    Math.asin(
-      Math.sqrt(
-        Math.sin((lat2 - lat1) / 2) ** 2 +
-          Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon2 - lon1) / 2) ** 2,
-      ),
-    );
-  if (!Number.isFinite(d) || d === 0) return [from, to];
+type LatLng = [number, number];
 
-  const points: [number, number][] = [];
-  for (let i = 0; i <= segments; i++) {
-    const f = i / segments;
-    const a = Math.sin((1 - f) * d) / Math.sin(d);
-    const b = Math.sin(f * d) / Math.sin(d);
-    const x = a * Math.cos(lat1) * Math.cos(lon1) + b * Math.cos(lat2) * Math.cos(lon2);
-    const y = a * Math.cos(lat1) * Math.sin(lon1) + b * Math.cos(lat2) * Math.sin(lon2);
-    const z = a * Math.sin(lat1) + b * Math.sin(lat2);
-    points.push([
-      Math.atan2(z, Math.sqrt(x * x + y * y)) / toRad,
-      Math.atan2(y, x) / toRad,
-    ]);
-  }
-  return points;
+function greatCircle(from: LatLng, to: LatLng, segments = 48): LatLng[] {
+  const [lat1, lon1] = from.map((v) => (v * Math.PI) / 180) as LatLng;
+  const [lat2, lon2] = to.map((v) => (v * Math.PI) / 180) as LatLng;
+  const a = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
+  const b = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
+  const dot = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
+  const omega = Math.acos(dot);
+  if (omega < 1e-6) return [from, to];
+  const sinOmega = Math.sin(omega);
+  return Array.from({ length: segments + 1 }, (_, i) => {
+    const t = i / segments;
+    const s1 = Math.sin((1 - t) * omega) / sinOmega;
+    const s2 = Math.sin(t * omega) / sinOmega;
+    const x = s1 * a[0] + s2 * b[0];
+    const y = s1 * a[1] + s2 * b[1];
+    const z = s1 * a[2] + s2 * b[2];
+    return [(Math.atan2(z, Math.hypot(x, y)) * 180) / Math.PI, (Math.atan2(y, x) * 180) / Math.PI];
+  });
 }
 
 function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
-  );
+  return value.replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char] ?? char);
 }
 
-function routePopup(r: RouteRecord) {
-  return `
-    <div style="min-width:220px;padding:14px 16px;font-family:inherit">
-      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98">Route</div>
-      <div style="font-size:18px;font-weight:700;color:#FF0041;margin-bottom:10px">${escapeHtml(r.routeNo)}</div>
-      <div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#23262c">
-        <span>${escapeHtml(r.depIcao)}</span><span style="color:#FF0041">&#8594;</span><span>${escapeHtml(r.arrIcao)}</span>
-      </div>
-      <div style="font-size:12px;color:#6b7078;margin-top:4px;line-height:1.5">
-        ${escapeHtml(r.depAirport)}<br/>${escapeHtml(r.arrAirport)}
-      </div>
-      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #ececef;font-size:12px;color:#23262c">
-        <strong style="font-weight:600">Aircraft:</strong> ${escapeHtml(r.aircraft)}
-      </div>
-    </div>`;
+function routePopup(r: Awaited<ReturnType<typeof fetchRouteRecords>>[number]) {
+  return `<div class="route-popup"><strong>${escapeHtml(r.depIcao)} → ${escapeHtml(r.arrIcao)}</strong><div>${escapeHtml(r.depAirport)} → ${escapeHtml(r.arrAirport)}</div><div>Aircraft: ${escapeHtml(r.aircraft || "Air Arabia fleet")}</div></div>`;
 }
 
 function airportPopup(a: AirportRecord) {
-  return `
-    <div style="min-width:220px;padding:14px 16px;font-family:inherit">
-      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98">Airport</div>
-      <div style="font-size:18px;font-weight:700;color:#FF0041;margin-bottom:2px">${escapeHtml(a.icao)}</div>
-      <div style="font-size:14px;font-weight:600;color:#23262c">${escapeHtml(a.name)}</div>
-      <div style="margin-top:10px;font-size:12px;color:#23262c">
-        <strong style="font-weight:600">Flights from here:</strong> ${escapeHtml(a.flights || "—")}
-      </div>
-      ${
-        a.moreToKnow
-          ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #ececef;font-size:12px;color:#6b7078;line-height:1.5">${escapeHtml(a.moreToKnow)}</div>`
-          : ""
-      }
-    </div>`;
+  return `<div class="route-popup"><strong>${escapeHtml(a.icao)}</strong><div>${escapeHtml(a.name)}</div><div>Routes from here: ${escapeHtml(a.flights)}</div>${a.moreToKnow ? `<div>${escapeHtml(a.moreToKnow)}</div>` : ""}</div>`;
 }
 
 export function RouteMap() {
@@ -145,17 +99,17 @@ export function RouteMap() {
 
         routes.forEach((r) => {
           const path = greatCircle(r.dep, r.arr);
-          const hit = L.polyline(path, { color: "#FF0041", weight: 16, opacity: 0 }).addTo(map);
+          const hit = L.polyline(path, { color: "#FF0041", weight: 12, opacity: 0 }).addTo(map);
           const line = L.polyline(path, {
             color: "#FF0041",
-            weight: 2,
-            opacity: 0.75,
+            weight: 1.25,
+            opacity: 0.72,
           }).addTo(map);
           const popup = routePopup(r);
           [hit, line].forEach((layer) => {
             layer.bindPopup(popup, { closeButton: true, maxWidth: 300 });
-            layer.on("mouseover", () => line.setStyle({ weight: 4, opacity: 1 }));
-            layer.on("mouseout", () => line.setStyle({ weight: 2, opacity: 0.75 }));
+            layer.on("mouseover", () => line.setStyle({ weight: 2.5, opacity: 1 }));
+            layer.on("mouseout", () => line.setStyle({ weight: 1.25, opacity: 0.72 }));
           });
           bounds.extend(path[0]).extend(path[path.length - 1]);
         });
@@ -163,9 +117,9 @@ export function RouteMap() {
         airports.forEach((a) => {
           const isHub = Number(a.flights) >= 3;
           L.circleMarker(a.coords, {
-            radius: isHub ? 7 : 4.5,
+            radius: isHub ? 5 : 3,
             color: "#FF0041",
-            weight: 2,
+            weight: 1.5,
             fillColor: isHub ? "#FF0041" : "#ffffff",
             fillOpacity: 1,
           })
@@ -192,31 +146,12 @@ export function RouteMap() {
   }, []);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-soft">
-      <div className="relative">
-        <div ref={containerRef} className="h-[420px] w-full sm:h-[540px]" />
-        {status !== "ready" && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-surface text-sm text-muted-foreground">
-            {status === "loading" ? "Loading route network…" : "Route data could not be loaded."}
-          </div>
-        )}
-      </div>
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border px-4 py-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-2">
-          <span className="inline-block h-0.5 w-6 bg-primary" /> Route
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block size-3 rounded-full bg-primary" /> Hub
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block size-3 rounded-full border-2 border-primary bg-surface" />
-          Destination
-        </span>
-        {status === "ready" && (
-          <span className="ml-auto">
-            {counts.routes} routes · {counts.airports} airports
-          </span>
-        )}
+    <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
+      <div ref={containerRef} className="h-[520px] w-full md:h-[620px]" />
+      <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-black/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur">
+        {status === "loading" && "Loading route network…"}
+        {status === "error" && "Unable to load route network."}
+        {status === "ready" && `${counts.routes} routes · ${counts.airports} airports`}
       </div>
     </div>
   );
