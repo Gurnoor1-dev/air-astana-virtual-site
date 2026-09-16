@@ -53,7 +53,7 @@ function escapeHtml(value: string) {
 function routePopup(r: RouteRecord) {
   return `
     <div style="min-width:220px;padding:14px 16px;font-family:inherit">
-      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98">Flight</div>
+      <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8a8f98">Route</div>
       <div style="font-size:18px;font-weight:700;color:#FF0041;margin-bottom:10px">${escapeHtml(r.routeNo)}</div>
       <div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#23262c">
         <span>${escapeHtml(r.depIcao)}</span><span style="color:#FF0041">&#8594;</span><span>${escapeHtml(r.arrIcao)}</span>
@@ -104,7 +104,6 @@ export function RouteMap() {
 
         const airports = new Map<string, AirportRecord>();
         airportRows.forEach((a) => airports.set(a.icao, a));
-        // Any airport referenced by a route but missing from airports.csv still gets a dot.
         routes.forEach((r) => {
           if (!airports.has(r.depIcao))
             airports.set(r.depIcao, {
@@ -146,7 +145,6 @@ export function RouteMap() {
 
         routes.forEach((r) => {
           const path = greatCircle(r.dep, r.arr);
-          // Wide invisible hit line makes taps easy on mobile.
           const hit = L.polyline(path, { color: "#FF0041", weight: 16, opacity: 0 }).addTo(map);
           const line = L.polyline(path, {
             color: "#FF0041",
