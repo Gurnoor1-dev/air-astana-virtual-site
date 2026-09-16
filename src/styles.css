@@ -4,12 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Air Arabia Virtual design system.
- * Brand red #FF0041 + white / ultra light grey.
- * All colours are oklch tokens; never hardcode colours in components.
- */
-
+/* Air Arabia Virtual design system: #FF0041, white and ultra-light grey. */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -70,32 +65,21 @@
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
+  * { border-color: var(--color-border); }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
-
-  h1,
-  h2,
-  h3,
-  h4 {
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
 }
 
 @utility brand-gradient {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-primary-dark) 100%
-  );
+  background-image: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
 }
 
 @utility hairline-grid {
@@ -105,7 +89,24 @@
   background-size: 56px 56px;
 }
 
-/* Leaflet chrome tuned to the grey/white map look */
+@utility form-input {
+  width: 100%;
+  border-radius: 0.65rem;
+  border: 1px solid var(--color-input);
+  background-color: var(--color-surface);
+  padding: 0.7rem 0.85rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+@utility form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-primary) 16%, transparent);
+}
+
+/* Leaflet chrome tuned to the grey/white map look. */
 .leaflet-container {
   background: var(--color-surface);
   font-family: var(--font-sans);
@@ -117,10 +118,5 @@
   border: 1px solid var(--color-border);
 }
 
-.leaflet-popup-content {
-  margin: 0;
-}
-
-.leaflet-control-zoom a {
-  color: var(--color-foreground);
-}
+.leaflet-popup-content { margin: 0; }
+.leaflet-control-zoom a { color: var(--color-foreground); }
