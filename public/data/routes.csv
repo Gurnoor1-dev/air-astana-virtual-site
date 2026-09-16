@@ -1,0 +1,13 @@
+route_id,route_no,dep_icao,arr_icao,dep_airport,arr_airport,aircraft_used,dep_coordinates,arr_coordinates
+1,G9 501,OMSJ,OOMS,Sharjah International,Muscat International,Airbus A320,"25.3286,55.5172","23.5933,58.2844"
+2,G9 502,OMSJ,OPKC,Sharjah International,Jinnah International Karachi,Airbus A320,"25.3286,55.5172","24.9065,67.1608"
+3,G9 511,OMSJ,VABB,Sharjah International,Chhatrapati Shivaji Maharaj Intl,Airbus A320,"25.3286,55.5172","19.0887,72.8679"
+4,G9 520,OMSJ,VOCI,Sharjah International,Cochin International,Airbus A320,"25.3286,55.5172","10.1520,76.4019"
+5,G9 601,OMSJ,OERK,Sharjah International,King Khalid International,Airbus A320neo,"25.3286,55.5172","24.9576,46.6988"
+6,3O 101,GMMN,LEMD,Mohammed V Casablanca,Adolfo Suarez Madrid-Barajas,Airbus A320,"33.3675,-7.5900","40.4719,-3.5626"
+7,3O 110,GMMN,LFPO,Mohammed V Casablanca,Paris Orly,Airbus A320,"33.3675,-7.5900","48.7233,2.3794"
+8,3O 121,GMMN,GMFF,Mohammed V Casablanca,Fes-Sais,Airbus A320,"33.3675,-7.5900","33.9273,-4.9780"
+9,E5 301,HECA,OMSJ,Cairo International,Sharjah International,Airbus A320,"30.1219,31.4056","25.3286,55.5172"
+10,E5 310,HECA,OMAA,Cairo International,Abu Dhabi International,Airbus A320neo,"30.1219,31.4056","24.4330,54.6511"
+11,G9 705,OMSJ,UUEE,Sharjah International,Moscow Sheremetyevo,Airbus A321neo LR,"25.3286,55.5172","55.9726,37.4146"
+12,G9 810,OMSJ,VNKT,Sharjah International,Tribhuvan International,Airbus A320,"25.3286,55.5172","27.6966,85.3591"
