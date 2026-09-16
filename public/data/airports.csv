@@ -1,15 +1,103 @@
 airport_name,airport_icao,airport_coordinates,flights_from_this_airport,more_to_know
-Sharjah International,OMSJ,"25.3286,55.5172",8,Main hub of Air Arabia Virtual. Home base for the A320 family fleet.
-Mohammed V Casablanca,GMMN,"33.3675,-7.5900",3,North African hub serving Europe and West Africa.
-Cairo International,HECA,"30.1219,31.4056",2,Egyptian hub connecting the Gulf and the Mediterranean.
-Muscat International,OOMS,"23.5933,58.2844",1,Popular short-haul destination from Sharjah.
-Jinnah International Karachi,OPKC,"24.9065,67.1608",1,High-demand route with multiple daily rotations.
-Chhatrapati Shivaji Maharaj Intl,VABB,"19.0887,72.8679",1,Busy Indian gateway; expect heavy traffic on approach.
-Cochin International,VOCI,"10.1520,76.4019",1,Scenic arrival over the Kerala backwaters.
-King Khalid International,OERK,"24.9576,46.6988",1,Saudi capital service flown with the A320neo.
-Adolfo Suarez Madrid-Barajas,LEMD,"40.4719,-3.5626",1,European trunk route from Casablanca.
-Paris Orly,LFPO,"48.7233,2.3794",1,Slot-restricted airport; punctuality counts.
-Fes-Sais,GMFF,"33.9273,-4.9780",1,Short domestic hop within Morocco.
-Abu Dhabi International,OMAA,"24.4330,54.6511",1,Secondary UAE destination.
-Moscow Sheremetyevo,UUEE,"55.9726,37.4146",1,Longest route in the network, flown by the A321neo LR.
-Tribhuvan International,VNKT,"27.6966,85.3591",1,Challenging mountain approach into Kathmandu.
+Munich International,EDDM,"48.3538,11.7861",0,Destination airport in the published Air Arabia city-to-city network.
+London Heathrow,EGLL,"51.4700,-0.4543",0,Destination airport in the published Air Arabia city-to-city network.
+John Paul II Krakow-Balice,EPKK,"50.0777,19.7848",0,Destination airport in the published Air Arabia city-to-city network.
+Warsaw Chopin,EPWA,"52.1657,20.9671",0,Destination airport in the published Air Arabia city-to-city network.
+Mohammed V International,GMMN,"33.3675,-7.5900",0,Destination airport in the published Air Arabia city-to-city network.
+Tangier Ibn Battouta,GMTT,"35.7269,-5.9169",0,Destination airport in the published Air Arabia city-to-city network.
+Addis Ababa Bole International,HAAB,"8.9779,38.7993",0,Destination airport in the published Air Arabia city-to-city network.
+Borg El Arab International,HBEG,"30.9177,29.6964",0,Destination airport in the published Air Arabia city-to-city network.
+Bosaso International,HCMF,"11.2753,49.1494",0,Destination airport in the published Air Arabia city-to-city network.
+Assiut International,HEAT,"27.0465,31.0119",0,Destination airport in the published Air Arabia city-to-city network.
+Cairo International,HECA,"30.1219,31.4056",0,Destination airport in the published Air Arabia city-to-city network.
+Sohag International,HESG,"26.3428,31.7428",0,Destination airport in the published Air Arabia city-to-city network.
+Sphinx International,HESX,"30.1080,30.8880",0,Destination airport in the published Air Arabia city-to-city network.
+Jomo Kenyatta International,HKJK,"-1.3192,36.9278",0,Destination airport in the published Air Arabia city-to-city network.
+Entebbe International,HUEN,"0.0424,32.4435",0,Destination airport in the published Air Arabia city-to-city network.
+Athens International,LGAV,"37.9364,23.9445",0,Destination airport in the published Air Arabia city-to-city network.
+Milan Bergamo,LIME,"45.6739,9.7042",0,Destination airport in the published Air Arabia city-to-city network.
+Leonardo da Vinci-Fiumicino,LIRF,"41.8003,12.2389",0,Destination airport in the published Air Arabia city-to-city network.
+Václav Havel Prague,LKPR,"50.1008,14.2600",0,Destination airport in the published Air Arabia city-to-city network.
+Vienna International,LOWW,"48.1103,16.5697",0,Destination airport in the published Air Arabia city-to-city network.
+Sarajevo International,LQSA,"43.8246,18.3315",0,Destination airport in the published Air Arabia city-to-city network.
+Trabzon Airport,LTCG,"40.9951,39.7897",0,Destination airport in the published Air Arabia city-to-city network.
+Istanbul Airport,LTFM,"41.2753,28.7519",0,Destination airport in the published Air Arabia city-to-city network.
+Hamid Karzai International,OAKB,"34.5659,69.2125",0,Destination airport in the published Air Arabia city-to-city network.
+Bahrain International,OBBI,"26.2708,50.6336",0,Destination airport in the published Air Arabia city-to-city network.
+Abha International,OEAB,"18.2404,42.6566",0,Destination airport in the published Air Arabia city-to-city network.
+King Fahd International,OEDF,"26.4712,49.7970",0,Destination airport in the published Air Arabia city-to-city network.
+Jizan Regional,OEGN,"16.9011,42.5858",0,Destination airport in the published Air Arabia city-to-city network.
+Prince Naif bin Abdulaziz International,OEGS,"26.3028,43.7744",0,Destination airport in the published Air Arabia city-to-city network.
+Hail International,OEHL,"27.4379,41.6863",0,Destination airport in the published Air Arabia city-to-city network.
+King Abdulaziz International,OEJN,"21.6796,39.1565",0,Destination airport in the published Air Arabia city-to-city network.
+Prince Mohammad bin Abdulaziz International,OEMA,"24.5534,39.7051",0,Destination airport in the published Air Arabia city-to-city network.
+King Khalid International,OERK,"24.9576,46.6988",0,Destination airport in the published Air Arabia city-to-city network.
+Al-Jouf Domestic,OESK,"29.7851,40.1000",0,Destination airport in the published Air Arabia city-to-city network.
+Tabuk Regional,OETB,"28.3654,36.6189",0,Destination airport in the published Air Arabia city-to-city network.
+Taif International,OETF,"21.4834,40.5443",0,Destination airport in the published Air Arabia city-to-city network.
+Prince Abdul Mohsin bin Abdulaziz,OEYN,"24.1442,38.0634",0,Destination airport in the published Air Arabia city-to-city network.
+Imam Khomeini International,OIII,"35.6892,51.3134",0,Destination airport in the published Air Arabia city-to-city network.
+Mashhad International,OIMM,"36.2352,59.6410",0,Destination airport in the published Air Arabia city-to-city network.
+Lar Airport,OISL,"27.6747,54.3833",0,Destination airport in the published Air Arabia city-to-city network.
+Shiraz International,OISS,"29.5392,52.5898",0,Destination airport in the published Air Arabia city-to-city network.
+Queen Alia International,OJAI,"31.7226,35.9932",0,Destination airport in the published Air Arabia city-to-city network.
+Amman Civil / Marka,OJAM,"31.9727,35.9916",0,Destination airport in the published Air Arabia city-to-city network.
+Kuwait International,OKBK,"29.2266,47.9689",0,Destination airport in the published Air Arabia city-to-city network.
+Beirut-Rafic Hariri International,OLBA,"33.8209,35.4884",0,Destination airport in the published Air Arabia city-to-city network.
+Zayed International Abu Dhabi,OMAA,"24.4330,54.6511",38,Official Air Arabia city-to-city network listing; route availability can change by season.
+Dubai International,OMDB,"25.2532,55.3657",2,Official Air Arabia city-to-city network listing; route availability can change by season.
+Ras Al Khaimah International,OMRK,"25.6135,55.9388",8,Official Air Arabia city-to-city network listing; route availability can change by season.
+Sharjah International,OMSJ,"25.3286,55.5172",95,Official Air Arabia city-to-city network listing; route availability can change by season.
+Muscat International,OOMS,"23.5933,58.2844",0,Destination airport in the published Air Arabia city-to-city network.
+Salalah International,OOSA,"17.0387,54.0913",0,Destination airport in the published Air Arabia city-to-city network.
+Sohar Airport,OOSH,"24.3860,56.6256",0,Destination airport in the published Air Arabia city-to-city network.
+Faisalabad International,OPFA,"31.3650,72.9948",0,Destination airport in the published Air Arabia city-to-city network.
+Islamabad International,OPIS,"33.5607,72.8516",0,Destination airport in the published Air Arabia city-to-city network.
+Jinnah International,OPKC,"24.9065,67.1608",0,Destination airport in the published Air Arabia city-to-city network.
+Allama Iqbal International,OPLA,"31.5216,74.4036",0,Destination airport in the published Air Arabia city-to-city network.
+Multan International,OPMT,"30.2032,71.4191",0,Destination airport in the published Air Arabia city-to-city network.
+Bacha Khan International,OPPS,"33.9939,71.5146",0,Destination airport in the published Air Arabia city-to-city network.
+Quetta International,OPQT,"30.2514,66.9378",0,Destination airport in the published Air Arabia city-to-city network.
+Sialkot International,OPST,"32.5356,74.3639",0,Destination airport in the published Air Arabia city-to-city network.
+Baghdad International,ORBI,"33.2625,44.2346",0,Destination airport in the published Air Arabia city-to-city network.
+Erbil International,ORER,"36.2376,43.9631",0,Destination airport in the published Air Arabia city-to-city network.
+Basra International,ORMM,"30.5491,47.6621",0,Destination airport in the published Air Arabia city-to-city network.
+Najaf International,ORNI,"31.9899,44.4043",0,Destination airport in the published Air Arabia city-to-city network.
+Aleppo International,OSAP,"36.1807,37.2244",0,Destination airport in the published Air Arabia city-to-city network.
+Damascus International,OSDI,"33.4117,36.5156",0,Destination airport in the published Air Arabia city-to-city network.
+Hamad International,OTHH,"25.2731,51.6081",0,Destination airport in the published Air Arabia city-to-city network.
+Almaty International,UAAA,"43.3521,77.0405",0,Destination airport in the published Air Arabia city-to-city network.
+Heydar Aliyev International,UBBB,"40.4675,50.0467",0,Destination airport in the published Air Arabia city-to-city network.
+Manas International,UCFM,"43.0613,74.4776",0,Destination airport in the published Air Arabia city-to-city network.
+Zvartnots International,UDYZ,"40.1473,44.3959",0,Destination airport in the published Air Arabia city-to-city network.
+Tbilisi International,UGTB,"41.6692,44.9547",0,Destination airport in the published Air Arabia city-to-city network.
+Koltsovo International,USSS,"56.7431,60.8027",0,Destination airport in the published Air Arabia city-to-city network.
+Namangan International,UTFN,"40.9846,71.5567",0,Destination airport in the published Air Arabia city-to-city network.
+Tashkent International,UTTT,"41.2579,69.2812",0,Destination airport in the published Air Arabia city-to-city network.
+Sheremetyevo International,UUEE,"55.9726,37.4146",0,Destination airport in the published Air Arabia city-to-city network.
+Kazan International,UWKD,"55.6062,49.2787",0,Destination airport in the published Air Arabia city-to-city network.
+Ufa International,UWUU,"54.5575,55.8744",0,Destination airport in the published Air Arabia city-to-city network.
+Kurumoch International,UWWW,"53.5049,50.1643",0,Destination airport in the published Air Arabia city-to-city network.
+Sardar Vallabhbhai Patel International,VAAH,"23.0772,72.6347",0,Destination airport in the published Air Arabia city-to-city network.
+Chhatrapati Shivaji Maharaj International,VABB,"19.0887,72.8679",0,Destination airport in the published Air Arabia city-to-city network.
+Dr. Babasaheb Ambedkar International,VANP,"21.0922,79.0472",0,Destination airport in the published Air Arabia city-to-city network.
+Bandaranaike International,VCBI,"7.1808,79.8841",0,Destination airport in the published Air Arabia city-to-city network.
+Netaji Subhas Chandra Bose International,VECC,"22.6547,88.4467",0,Destination airport in the published Air Arabia city-to-city network.
+Shah Amanat International,VGEG,"22.2496,91.8133",0,Destination airport in the published Air Arabia city-to-city network.
+Hazrat Shahjalal International,VGHS,"23.8433,90.3978",0,Destination airport in the published Air Arabia city-to-city network.
+Indira Gandhi International,VIDP,"28.5562,77.1000",0,Destination airport in the published Air Arabia city-to-city network.
+Jaipur International,VIJP,"26.8242,75.8122",0,Destination airport in the published Air Arabia city-to-city network.
+Tribhuvan International,VNKT,"27.6966,85.3591",0,Destination airport in the published Air Arabia city-to-city network.
+Kempegowda International Bengaluru,VOBL,"13.1986,77.7066",0,Destination airport in the published Air Arabia city-to-city network.
+Coimbatore International,VOCB,"11.0300,77.0434",0,Destination airport in the published Air Arabia city-to-city network.
+Cochin International,VOCI,"10.1520,76.4019",0,Destination airport in the published Air Arabia city-to-city network.
+Calicut International,VOCL,"11.1368,75.9553",0,Destination airport in the published Air Arabia city-to-city network.
+Manohar International Goa,VOGO,"15.3808,73.8314",0,Destination airport in the published Air Arabia city-to-city network.
+Rajiv Gandhi International,VOHS,"17.2403,78.4294",0,Destination airport in the published Air Arabia city-to-city network.
+Chennai International,VOMM,"12.9941,80.1709",0,Destination airport in the published Air Arabia city-to-city network.
+Thiruvananthapuram International,VOTV,"8.4821,76.9201",0,Destination airport in the published Air Arabia city-to-city network.
+Velana International,VRMM,"4.1918,73.5291",0,Destination airport in the published Air Arabia city-to-city network.
+Suvarnabhumi Airport,VTBS,"13.6811,100.7470",0,Destination airport in the published Air Arabia city-to-city network.
+Krabi International,VTSG,"8.0991,98.9862",0,Destination airport in the published Air Arabia city-to-city network.
+Phuket International,VTSP,"8.1132,98.3169",0,Destination airport in the published Air Arabia city-to-city network.
+Kuala Lumpur International,WMKK,"2.7456,101.7099",0,Destination airport in the published Air Arabia city-to-city network.
