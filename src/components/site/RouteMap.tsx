@@ -1,10 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import { fetchAirports, fetchRoutes, type AirportRecord } from "@/lib/csv";
-import { fetchRoutes as fetchRouteRecords } from "@/lib/csv";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { fetchAirports, fetchRoutes, type AirportRecord, type RouteRecord } from "@/lib/csv";
 
 const CARTO_API_KEY = "cb1_3nf4_1_7b20991e74f9ccb93b421f1f";
 
 type LatLng = [number, number];
+type LeafletMap = import("leaflet").Map;
+type LeafletLayerGroup = import("leaflet").LayerGroup;
+
+const HUBS = [
+  { icao: "OMSJ", iata: "SHJ", name: "Sharjah", country: "UAE" },
+  { icao: "OMRK", iata: "RKT", name: "Ras Al Khaimah", country: "UAE" },
+  { icao: "GMMN", iata: "CMN", name: "Casablanca", country: "Morocco" },
+  { icao: "HEBA", iata: "HBE", name: "Alexandria", country: "Egypt" },
+  { icao: "OMAA", iata: "AUH", name: "Abu Dhabi", country: "UAE" },
+  { icao: "OPKC", iata: "KHI", name: "Karachi", country: "Pakistan" },
+] as const;
 
 function greatCircle(from: LatLng, to: LatLng, segments = 48): LatLng[] {
   const [lat1, lon1] = from.map((v) => (v * Math.PI) / 180) as LatLng;
@@ -30,7 +40,7 @@ function escapeHtml(value: string) {
   return value.replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char] ?? char);
 }
 
-function routePopup(r: Awaited<ReturnType<typeof fetchRouteRecords>>[number]) {
+function routePopup(r: RouteRecord) {
   return `<div class="route-popup"><strong>${escapeHtml(r.depIcao)} → ${escapeHtml(r.arrIcao)}</strong><div>${escapeHtml(r.depAirport)} → ${escapeHtml(r.arrAirport)}</div><div>Aircraft: ${escapeHtml(r.aircraft || "Air Arabia fleet")}</div></div>`;
 }
 
@@ -40,8 +50,17 @@ function airportPopup(a: AirportRecord) {
 
 export function RouteMap() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const networkLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const [selectedHub, setSelectedHub] = useState("ALL");
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [counts, setCounts] = useState({ routes: 0, airports: 0 });
+  const [counts, setCounts] = useState({ routes: 0, airports: 0, totalRoutes: 0, totalAirports: 0 });
+  const [mapData, setMapData] = useState<{ routes: RouteRecord[]; airports: AirportRecord[] } | null>(null);
+
+  const selectedHubData = useMemo(
+    () => HUBS.find((hub) => hub.icao === selectedHub) ?? null,
+    [selectedHub],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -49,11 +68,7 @@ export function RouteMap() {
 
     (async () => {
       try {
-        const [{ default: L }, routes, airportRows] = await Promise.all([
-          import("leaflet"),
-          fetchRoutes(),
-          fetchAirports(),
-        ]);
+        const [routes, airportRows] = await Promise.all([fetchRoutes(), fetchAirports()]);
         if (cancelled || !containerRef.current) return;
 
         const airports = new Map<string, AirportRecord>();
@@ -77,6 +92,11 @@ export function RouteMap() {
             });
         });
 
+        setMapData({ routes, airports: Array.from(airports.values()) });
+
+        const [{ default: L }] = await Promise.all([import("leaflet")]);
+        if (cancelled || !containerRef.current) return;
+
         const map = L.map(containerRef.current, {
           center: [25, 40],
           zoom: 3,
@@ -85,6 +105,7 @@ export function RouteMap() {
           scrollWheelZoom: false,
           attributionControl: true,
         });
+        mapRef.current = map;
 
         L.tileLayer(
           `https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}`,
@@ -95,44 +116,14 @@ export function RouteMap() {
           },
         ).addTo(map);
 
-        const bounds = L.latLngBounds([]);
-
-        routes.forEach((r) => {
-          const path = greatCircle(r.dep, r.arr);
-          const hit = L.polyline(path, { color: "#FF0041", weight: 12, opacity: 0 }).addTo(map);
-          const line = L.polyline(path, {
-            color: "#FF0041",
-            weight: 1.25,
-            opacity: 0.72,
-          }).addTo(map);
-          const popup = routePopup(r);
-          [hit, line].forEach((layer) => {
-            layer.bindPopup(popup, { closeButton: true, maxWidth: 300 });
-            layer.on("mouseover", () => line.setStyle({ weight: 2.5, opacity: 1 }));
-            layer.on("mouseout", () => line.setStyle({ weight: 1.25, opacity: 0.72 }));
-          });
-          bounds.extend(path[0]).extend(path[path.length - 1]);
-        });
-
-        airports.forEach((a) => {
-          const isHub = Number(a.flights) >= 3;
-          L.circleMarker(a.coords, {
-            radius: isHub ? 5 : 3,
-            color: "#FF0041",
-            weight: 1.5,
-            fillColor: isHub ? "#FF0041" : "#ffffff",
-            fillOpacity: 1,
-          })
-            .addTo(map)
-            .bindPopup(airportPopup(a), { closeButton: true, maxWidth: 300 });
-          bounds.extend(a.coords);
-        });
-
-        if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40] });
-
-        setCounts({ routes: routes.length, airports: airports.size });
+        networkLayerRef.current = L.layerGroup().addTo(map);
+        setCounts({ routes: routes.length, airports: airports.size, totalRoutes: routes.length, totalAirports: airports.size });
         setStatus("ready");
-        cleanup = () => map.remove();
+        cleanup = () => {
+          networkLayerRef.current = null;
+          mapRef.current = null;
+          map.remove();
+        };
       } catch (err) {
         console.error(err);
         if (!cancelled) setStatus("error");
@@ -145,13 +136,149 @@ export function RouteMap() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!mapData || !mapRef.current || !networkLayerRef.current) return;
+    let cancelled = false;
+
+    (async () => {
+      const { default: L } = await import("leaflet");
+      if (cancelled || !mapRef.current || !networkLayerRef.current) return;
+
+      const routes = selectedHub === "ALL"
+        ? mapData.routes
+        : mapData.routes.filter((route) => route.depIcao === selectedHub || route.arrIcao === selectedHub);
+      const routeAirports = new Set<string>();
+      routes.forEach((route) => {
+        routeAirports.add(route.depIcao);
+        routeAirports.add(route.arrIcao);
+      });
+
+      const airportMap = new Map(mapData.airports.map((airport) => [airport.icao, airport]));
+      if (selectedHubData && !airportMap.has(selectedHubData.icao)) {
+        const hubRoute = mapData.routes.find((route) => route.depIcao === selectedHubData.icao || route.arrIcao === selectedHubData.icao);
+        if (hubRoute) {
+          const hubIsDeparture = hubRoute.depIcao === selectedHubData.icao;
+          airportMap.set(selectedHubData.icao, {
+            icao: selectedHubData.icao,
+            name: selectedHubData.name,
+            coords: hubIsDeparture ? hubRoute.dep : hubRoute.arr,
+            flights: String(mapData.routes.filter((route) => route.depIcao === selectedHubData.icao).length),
+            moreToKnow: `Official Air Arabia hub in ${selectedHubData.country}.`,
+          });
+        }
+      }
+
+      const visibleAirports = selectedHub === "ALL"
+        ? Array.from(airportMap.values())
+        : Array.from(airportMap.values()).filter((airport) => routeAirports.has(airport.icao) || airport.icao === selectedHub);
+
+      networkLayerRef.current.clearLayers();
+      const bounds = L.latLngBounds([]);
+
+      routes.forEach((route) => {
+        const path = greatCircle(route.dep, route.arr);
+        const hit = L.polyline(path, { color: "#FF0041", weight: 12, opacity: 0 }).addTo(networkLayerRef.current!);
+        const line = L.polyline(path, { color: "#FF0041", weight: 1.25, opacity: 0.72 }).addTo(networkLayerRef.current!);
+        const popup = routePopup(route);
+        hit.bindPopup(popup, { closeButton: true, maxWidth: 300 });
+        line.bindPopup(popup, { closeButton: true, maxWidth: 300 });
+        hit.on("mouseover", () => line.setStyle({ weight: 2.5, opacity: 1 }));
+        hit.on("mouseout", () => line.setStyle({ weight: 1.25, opacity: 0.72 }));
+        line.on("mouseover", () => line.setStyle({ weight: 2.5, opacity: 1 }));
+        line.on("mouseout", () => line.setStyle({ weight: 1.25, opacity: 0.72 }));
+        bounds.extend(path[0]).extend(path[path.length - 1]);
+      });
+
+      visibleAirports.forEach((airport) => {
+        const isHub = HUBS.some((hub) => hub.icao === airport.icao);
+        L.circleMarker(airport.coords, {
+          radius: isHub ? 5 : 3,
+          color: "#FF0041",
+          weight: 1.5,
+          fillColor: isHub ? "#FF0041" : "#ffffff",
+          fillOpacity: 1,
+        })
+          .addTo(networkLayerRef.current!)
+          .bindPopup(airportPopup(airport), { closeButton: true, maxWidth: 300 });
+        bounds.extend(airport.coords);
+      });
+
+      if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [44, 44], maxZoom: selectedHub === "ALL" ? 4 : 7 });
+      setCounts((current) => ({ ...current, routes: routes.length, airports: visibleAirports.length }));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mapData, selectedHub, selectedHubData]);
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
-      <div ref={containerRef} className="h-[520px] w-full md:h-[620px]" />
-      <div className="pointer-events-none absolute left-3 top-3 rounded-lg border border-black/10 bg-white/95 px-3 py-2 text-xs shadow-sm backdrop-blur">
-        {status === "loading" && "Loading route network…"}
-        {status === "error" && "Unable to load route network."}
-        {status === "ready" && `${counts.routes} routes · ${counts.airports} airports`}
+    <div className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_24px_70px_-38px_rgba(20,25,40,0.35)]">
+      <div className="border-b border-black/5 bg-[linear-gradient(135deg,rgba(255,0,65,0.08),rgba(255,255,255,0.96)_48%,rgba(245,247,250,0.96))] p-3 sm:p-4">
+        <div className="mb-2 flex items-center justify-between gap-3 px-1">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Network hubs</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Filter the map by operating hub</p>
+          </div>
+          <span className="hidden rounded-full border border-primary/15 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:inline-flex">
+            {selectedHubData ? selectedHubData.iata : "Global network"}
+          </span>
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button
+            type="button"
+            aria-pressed={selectedHub === "ALL"}
+            onClick={() => setSelectedHub("ALL")}
+            className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold transition-all duration-200 ${
+              selectedHub === "ALL"
+                ? "border-primary bg-[linear-gradient(135deg,#FF0041,#C20041)] text-white shadow-[0_8px_22px_-12px_rgba(255,0,65,0.8)]"
+                : "border-black/10 bg-white text-foreground hover:border-primary/30 hover:bg-primary/5"
+            }`}
+          >
+            All Hubs
+          </button>
+          {HUBS.map((hub) => (
+            <button
+              key={hub.icao}
+              type="button"
+              aria-pressed={selectedHub === hub.icao}
+              onClick={() => setSelectedHub(hub.icao)}
+              className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold transition-all duration-200 ${
+                selectedHub === hub.icao
+                  ? "border-primary bg-[linear-gradient(135deg,#FF0041,#C20041)] text-white shadow-[0_8px_22px_-12px_rgba(255,0,65,0.8)]"
+                  : "border-black/10 bg-white text-foreground hover:border-primary/30 hover:bg-primary/5"
+              }`}
+              title={`${hub.name} — ${hub.country}`}
+            >
+              {hub.name} <span className="ml-1 opacity-70">({hub.iata})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative">
+        <div ref={containerRef} className="h-[520px] w-full md:h-[620px]" />
+        <div className="pointer-events-none absolute left-3 top-3 rounded-xl border border-white/70 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur-md">
+          {status === "loading" && "Loading route network…"}
+          {status === "error" && "Unable to load route network."}
+          {status === "ready" && `${counts.routes} routes · ${counts.airports} airports${selectedHub !== "ALL" ? ` · ${selectedHubData?.iata ?? selectedHub}` : ""}`}
+        </div>
+        {status === "ready" && selectedHub !== "ALL" && counts.routes === 0 && (
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
+            <div className="rounded-2xl border border-black/10 bg-white/95 px-6 py-5 text-center shadow-xl backdrop-blur">
+              <p className="text-sm font-bold">{selectedHubData?.name} ({selectedHubData?.iata})</p>
+              <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
+                This hub is part of Air Arabia&apos;s wider network, but there are no routes for it in the current Virtual schedule CSV.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 bg-white px-4 py-3 text-[11px] text-muted-foreground">
+        <span>{counts.totalRoutes} published routes · {counts.totalAirports} airports in the dataset</span>
+        <span className="font-medium text-primary">Click a line or airport for details</span>
       </div>
     </div>
   );
