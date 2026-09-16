@@ -7,6 +7,8 @@ import {
   type RouteRecord,
 } from "@/lib/csv";
 
+const CARTO_API_KEY = "cb1_3nf4_1_7b20991e74f9ccb93b421f1f";
+
 /** Great-circle interpolation so long routes render as a natural arc. */
 function greatCircle(
   from: [number, number],
@@ -132,7 +134,7 @@ export function RouteMap() {
         });
 
         L.tileLayer(
-          "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+          `https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png?key=${encodeURIComponent(CARTO_API_KEY)}`,
           {
             subdomains: "abcd",
             maxZoom: 18,
@@ -209,7 +211,7 @@ export function RouteMap() {
           <span className="inline-block size-3 rounded-full bg-primary" /> Hub
         </span>
         <span className="flex items-center gap-2">
-          <span className="inline-block size-3 rounded-full border-2 border-primary bg-surface" />{" "}
+          <span className="inline-block size-3 rounded-full border-2 border-primary bg-surface" />
           Destination
         </span>
         {status === "ready" && (
