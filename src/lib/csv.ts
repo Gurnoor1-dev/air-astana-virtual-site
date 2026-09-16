@@ -90,43 +90,38 @@ export type AirportRecord = {
   moreToKnow: string;
 };
 
+type RouteApiResponse = {
+  ok: boolean;
+  routes?: RouteRecord[];
+  airports?: AirportRecord[];
+  error?: string;
+};
+
+let apiDataPromise: Promise<RouteApiResponse> | undefined;
+
+async function fetchMapData(): Promise<RouteApiResponse> {
+  if (!apiDataPromise) {
+    apiDataPromise = fetch("/api/routes", { headers: { accept: "application/json" } })
+      .then(async (res) => {
+        const data = (await res.json()) as RouteApiResponse;
+        if (!res.ok || !data.ok) throw new Error(data.error || "Could not load route API");
+        return data;
+      })
+      .catch((error) => {
+        apiDataPromise = undefined;
+        throw error;
+      });
+  }
+  return apiDataPromise;
+}
+
+/** Route and airport data is served by the app API, sourced from the repository CSV files. */
 export async function fetchRoutes(): Promise<RouteRecord[]> {
-  const res = await fetch("/data/routes.csv");
-  if (!res.ok) throw new Error("Could not load routes.csv");
-  return parseCsv(await res.text())
-    .map((r) => {
-      const dep = parseCoordinates(r["dep_coordinates"]);
-      const arr = parseCoordinates(r["arr_coordinates"]);
-      if (!dep || !arr) return null;
-      return {
-        routeId: r["route_id"] || r["route_no"],
-        routeNo: r["route_no"],
-        depIcao: r["dep_icao"].toUpperCase(),
-        arrIcao: r["arr_icao"].toUpperCase(),
-        depAirport: r["dep_airport"],
-        arrAirport: r["arr_airport"],
-        aircraft: r["aircraft_used"],
-        dep,
-        arr,
-      } satisfies RouteRecord;
-    })
-    .filter((r): r is RouteRecord => r !== null);
+  const data = await fetchMapData();
+  return data.routes ?? [];
 }
 
 export async function fetchAirports(): Promise<AirportRecord[]> {
-  const res = await fetch("/data/airports.csv");
-  if (!res.ok) return [];
-  return parseCsv(await res.text())
-    .map((r) => {
-      const coords = parseCoordinates(r["airport_coordinates"]);
-      if (!coords) return null;
-      return {
-        name: r["airport_name"],
-        icao: r["airport_icao"].toUpperCase(),
-        coords,
-        flights: r["flights_from_this_airport"],
-        moreToKnow: r["more_to_know"],
-      } satisfies AirportRecord;
-    })
-    .filter((a): a is AirportRecord => a !== null);
+  const data = await fetchMapData();
+  return data.airports ?? [];
 }
