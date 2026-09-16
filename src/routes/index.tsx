@@ -1,38 +1,64 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ArrowUpRight, Globe2, Plane, Radio, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users } from "lucide-react";
 import { Section, Stat } from "@/components/site/Page";
 
-export const Route = createFileRoute("/")({ head: () => ({ meta: [{ title: "Air Arabia Virtual — Fly the network" }, { name: "description", content: "Air Arabia Virtual for Infinite Flight — network flying, pilot progression and crew operations." }] }), component: Home });
+export const Route = createFileRoute("/")({
+  head: () => ({ meta: [{ title: "Air Arabia Virtual — Infinite Flight" }, { name: "description", content: "Air Arabia Virtual — a polished Infinite Flight virtual airline built around the Air Arabia network." }] }),
+  component: Home,
+});
 
-const stats = [{ value: "140+", label: "Network routes" }, { value: "6", label: "Main hubs" }, { value: "A320", label: "Core fleet" }, { value: "7", label: "Pilot ranks" }];
+const stats = [
+  { value: "140+", label: "Network routes" },
+  { value: "6", label: "Main hubs" },
+  { value: "A320", label: "Core fleet" },
+  { value: "7", label: "Pilot ranks" },
+];
+
 const hubs = ["SHJ", "RKT", "CMN", "HBE", "AUH", "KHI"];
 
-function Home() { return <div>
-  <section className="relative min-h-[calc(100svh-72px)] overflow-hidden bg-[#0d0e12] text-white">
-    <div className="absolute inset-0 opacity-35" style={{ backgroundImage: "radial-gradient(circle at 70% 25%, #ff004150, transparent 28%), radial-gradient(circle at 20% 90%, #ff004120, transparent 30%)" }}/>
-    <div className="absolute inset-0 hairline-grid opacity-40"/>
-    <div className="absolute right-[7%] top-[16%] hidden h-[32rem] w-[32rem] rounded-full border border-white/10 md:block"/><div className="absolute right-[14%] top-[23%] hidden h-[22rem] w-[22rem] rounded-full border border-white/10 md:block"/>
-    <div className="absolute right-[9%] top-[31%] hidden w-[31rem] rotate-[-16deg] md:block"><div className="flight-line w-full"/><div className="absolute right-0 -top-1 size-2 rounded-full bg-white shadow-[0_0_18px_white]"/></div>
-    <div className="relative mx-auto grid min-h-[calc(100svh-72px)] max-w-7xl items-end gap-14 px-4 pb-14 pt-24 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-20">
-      <div className="max-w-4xl"><div className="kicker text-white/75"><span className="kicker-dot"/> Infinite Flight Virtual Airline</div>
-        <h1 className="mt-7 display-xl">Fly the<br/><span className="text-primary">network.</span><br/>Build your wings.</h1>
-        <p className="mt-7 max-w-2xl text-base leading-7 text-white/60 sm:text-lg">A virtual airline built around the Air Arabia network — structured flying, a connected crew and a progression path worth chasing.</p>
-        <div className="mt-9 flex flex-wrap gap-3"><Link to="/apply" className="group inline-flex items-center gap-3 rounded-full brand-gradient px-6 py-3.5 text-sm font-extrabold shadow-[0_20px_50px_-15px_#ff004180]">Join the crew <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link><Link to="/routes" className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 text-sm font-bold backdrop-blur transition hover:bg-white/10">Explore network <ArrowUpRight className="size-4"/></Link></div>
-        <div className="mt-10 flex items-center gap-3 text-xs text-white/45"><span className="size-2 rounded-full bg-primary shadow-[0_0_15px_#ff0041]"/> Built for Infinite Flight · Operations ready</div>
-      </div>
-      <div className="relative hidden h-[30rem] lg:block"><div className="absolute right-0 top-1/2 w-[24rem] -translate-y-1/2 rotate-[-9deg] opacity-90"><div className="rounded-[45%_55%_42%_58%] border border-white/10 bg-gradient-to-br from-white/10 to-transparent p-1 shadow-[0_40px_100px_-30px_#ff004180]"><div className="rounded-[45%_55%_42%_58%] bg-[#111319] p-8"><Plane className="mx-auto size-44 -rotate-12 text-white/80" strokeWidth={1}/><div className="mt-5 text-center text-[10px] font-bold uppercase tracking-[.3em] text-white/35">AIR ARABIA VIRTUAL</div></div></div></div><div className="absolute bottom-0 left-0 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur"><div className="flex items-center gap-3"><Radio className="size-4 text-primary"/><div><div className="text-[10px] font-bold uppercase tracking-[.15em] text-white/40">Network status</div><div className="mt-1 text-sm font-bold">Operational</div></div></div></div></div>
+function Home() {
+  return (
+    <div>
+      <section className="relative overflow-hidden bg-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#ff004112,transparent_27%),radial-gradient(circle_at_10%_90%,#ff004108,transparent_24%)]" />
+        <div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
+          <div className="max-w-3xl">
+            <div className="kicker"><span className="kicker-dot" /> Infinite Flight Virtual Airline</div>
+            <h1 className="mt-5 display-xl">Fly the <span className="text-primary">network.</span></h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">Experience Air Arabia in Infinite Flight through a connected network, structured pilot progression and a crew that enjoys every sector.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/apply" className="inline-flex items-center gap-2 rounded-lg brand-gradient px-5 py-3 text-sm font-extrabold text-white shadow-brand transition hover:-translate-y-0.5">Join the crew <ArrowRight className="size-4" /></Link>
+              <Link to="/routes" className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-5 py-3 text-sm font-extrabold transition hover:bg-muted">Explore routes <ArrowRight className="size-4" /></Link>
+            </div>
+            <div className="mt-8 flex items-center gap-3 text-xs font-semibold text-muted-foreground"><span className="size-2 rounded-full bg-emerald-500" /> Network ready · Built for Infinite Flight</div>
+          </div>
+          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] bg-[#111319] p-6 text-white sm:p-8">
+            <div className="absolute inset-0 opacity-35" style={{ backgroundImage: "radial-gradient(circle at 75% 20%,#ff004150,transparent 32%),linear-gradient(90deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%)", backgroundSize: "auto, 56px 56px, 56px 56px" }} />
+            <div className="relative flex h-full min-h-[308px] flex-col justify-between">
+              <div className="flex items-center justify-between"><div className="text-xs font-bold uppercase tracking-[.2em] text-white/45">Air Arabia Virtual</div><span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/70">Operational</span></div>
+              <div className="relative flex items-center justify-center"><div className="absolute size-56 rounded-full border border-white/10" /><div className="absolute size-40 rounded-full border border-white/10" /><Plane className="relative size-24 rotate-[-12deg] text-white/90" strokeWidth={1.2} /></div>
+              <div className="grid grid-cols-3 gap-3 border-t border-white/10 pt-5"><div><div className="text-xl font-black">140+</div><div className="text-[9px] font-bold uppercase tracking-widest text-white/40">Routes</div></div><div><div className="text-xl font-black">6</div><div className="text-[9px] font-bold uppercase tracking-widest text-white/40">Hubs</div></div><div><div className="text-xl font-black">A320</div><div className="text-[9px] font-bold uppercase tracking-widest text-white/40">Fleet</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div className="border-y border-border bg-[#fafafa]"><div className="mx-auto flex max-w-7xl items-center justify-between gap-6 overflow-hidden px-4 py-5 sm:px-6"><span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[.18em] text-muted-foreground">Our network</span><div className="flex gap-8">{hubs.map((hub) => <span key={hub} className="text-xs font-black tracking-[.2em] text-foreground/55">{hub}</span>)}</div></div></div>
+      </section>
+
+      <Section className="!py-10 sm:!py-14">
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-white md:grid-cols-4">{stats.map((stat) => <div key={stat.label} className="border-b border-border p-6 last:border-0 md:border-b-0 md:border-r md:last:border-0 sm:p-8"><Stat {...stat} /></div>)}</div>
+      </Section>
+
+      <Section eyebrow="The experience" title="Everything you need to fly." description="A simple, polished home for the network, aircraft and people behind Air Arabia Virtual.">
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="premium-card md:col-span-2 min-h-[250px] bg-[#111319] text-white"><div className="flex h-full flex-col justify-between"><div><Radio className="size-5 text-primary" /><h3 className="mt-8 text-3xl font-extrabold">A network made to explore.</h3><p className="mt-3 max-w-xl text-sm leading-6 text-white/55">Search routes, discover hubs and choose your next sector from a growing Air Arabia network.</p></div><Link to="/routes" className="mt-8 inline-flex w-fit items-center gap-2 text-sm font-extrabold text-primary">Explore the network <ArrowRight className="size-4" /></Link></div></div>
+          <div className="premium-card"><Globe2 className="size-5 text-primary" /><h3 className="mt-8 text-2xl font-extrabold">Six hubs.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Follow the network from the Gulf through Africa, Asia and beyond.</p><Link to="/hubs" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View hubs <ArrowRight className="size-4" /></Link></div>
+          <div className="premium-card"><Plane className="size-5 text-primary" /><h3 className="mt-8 text-2xl font-extrabold">Built around Airbus.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Explore the A320-family fleet and the aircraft we use across our network.</p><Link to="/fleet" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Explore fleet <ArrowRight className="size-4" /></Link></div>
+          <div className="premium-card"><Users className="size-5 text-primary" /><h3 className="mt-8 text-2xl font-extrabold">Fly with a crew.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Meet the team, take part in events and progress through our pilot ranks.</p><Link to="/staff" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Meet the crew <ArrowRight className="size-4" /></Link></div>
+          <div className="premium-card"><ShieldCheck className="size-5 text-primary" /><h3 className="mt-8 text-2xl font-extrabold">Progress your way.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">A clear rank structure gives every flight a reason to keep climbing.</p><Link to="/ranks" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View ranks <ArrowRight className="size-4" /></Link></div>
+        </div>
+      </Section>
+
+      <section className="mx-auto mb-16 max-w-7xl px-4 sm:px-6 sm:mb-20"><div className="overflow-hidden rounded-[2rem] brand-gradient text-white"><div className="relative px-7 py-12 sm:px-12 sm:py-16"><div className="absolute right-[-6rem] top-[-9rem] size-80 rounded-full border border-white/15" /><div className="relative max-w-2xl"><div className="text-[10px] font-extrabold uppercase tracking-[.2em] text-white/65">Ready for departure?</div><h2 className="mt-4 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-5xl">Your next flight starts here.</h2><p className="mt-4 max-w-xl text-sm leading-6 text-white/75">Join Air Arabia Virtual and turn every Infinite Flight sector into part of a bigger journey.</p><Link to="/apply" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold text-[#15171b]">Apply now <ArrowRight className="size-4" /></Link></div></div></div></section>
     </div>
-    <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-black/20 backdrop-blur"><div className="mx-auto flex max-w-7xl gap-10 overflow-hidden px-4 py-5 sm:px-6">{hubs.map(h=><span key={h} className="shrink-0 text-xs font-bold tracking-[.22em] text-white/35">{h}</span>)}</div></div>
-  </section>
-
-  <Section className="!py-12 sm:!py-16"><div className="grid grid-cols-2 divide-x divide-y divide-border overflow-hidden rounded-3xl border border-border bg-white md:grid-cols-4 md:divide-y-0">{stats.map(s=><div key={s.label} className="p-6 sm:p-8"><Stat {...s}/></div>)}</div></Section>
-
-  <Section eyebrow="The experience" title="Not just another VA website." description="Every part of the hub is designed to make flying feel like part of something larger."><div className="grid gap-4 md:grid-cols-12">
-    <div className="premium-card md:col-span-7 min-h-[300px] bg-[#111319] text-white"><div className="relative z-10 flex h-full flex-col justify-between"><div><div className="kicker text-white/60"><Sparkles className="size-3"/> Operations</div><h3 className="mt-5 max-w-lg text-3xl font-extrabold tracking-[-.05em] sm:text-4xl">The network is the product.</h3><p className="mt-4 max-w-xl text-sm leading-6 text-white/50">Routes, hubs and airports are connected into one living experience. Explore it, choose a sector and go fly.</p></div><Link to="/routes" className="mt-8 inline-flex w-fit items-center gap-2 text-sm font-bold text-primary">Open route network <ArrowRight className="size-4"/></Link></div><div className="absolute -right-20 -bottom-20 size-72 rounded-full border border-white/10"/></div>
-    <div className="premium-card md:col-span-5"><Globe2 className="size-6 text-primary"/><h3 className="mt-8 text-2xl font-extrabold">Go farther.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Connect the Gulf to Africa, Asia and Europe through a network built for exploration.</p></div>
-    <div className="premium-card md:col-span-5"><Users className="size-6 text-primary"/><h3 className="mt-8 text-2xl font-extrabold">Fly together.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">A crew culture where events, group flights and progression make each sector matter.</p></div>
-    <div className="premium-card md:col-span-7"><ShieldCheck className="size-6 text-primary"/><h3 className="mt-8 text-2xl font-extrabold">Progress with purpose.</h3><p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">Start as a cadet, build experience and work through a structured pilot rank system.</p><Link to="/ranks" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-primary">See progression <ArrowRight className="size-4"/></Link></div>
-  </div></Section>
-
-  <section className="mx-4 mb-20 overflow-hidden rounded-[2rem] bg-[#111319] text-white sm:mx-auto sm:max-w-7xl"><div className="relative px-7 py-14 sm:px-14 sm:py-20"><div className="absolute inset-0 opacity-50" style={{backgroundImage:"radial-gradient(circle at 80% 30%,#ff004150,transparent 30%),linear-gradient(120deg,transparent 40%,#ffffff05 40%,#ffffff05 40.2%,transparent 40.2%)"}}/><div className="relative max-w-3xl"><div className="kicker text-white/55">Ready for departure?</div><h2 className="mt-5 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-6xl">Your callsign deserves a home in our network.</h2><Link to="/apply" className="mt-8 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3.5 text-sm font-extrabold text-[#111319]">Apply to Air Arabia Virtual <ArrowRight className="size-4"/></Link></div></div></section>
-</div> }
+  );
+}
