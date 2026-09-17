@@ -41,7 +41,7 @@ function escapeHtml(value: string) {
 }
 
 function routePopup(r: RouteRecord) {
-  return `<div class="route-popup"><strong>${escapeHtml(r.depIcao)} → ${escapeHtml(r.arrIcao)}</strong><div>${escapeHtml(r.depAirport)} → ${escapeHtml(r.arrAirport)}</div><div>Aircraft: ${escapeHtml(r.aircraft || "Air Arabia fleet")}</div></div>`;
+  return `<div class="route-popup"><strong>${escapeHtml(r.depIcao)} → ${escapeHtml(r.arrIcao)}</strong><div>${escapeHtml(r.depAirport)} → ${escapeHtml(r.arrAirport)}</div><div>Aircraft: ${escapeHtml(r.aircraft || "Air Arabia fleet")}</div><div>Route: ${escapeHtml(r.routeNo)}</div></div>`;
 }
 
 function airportPopup(a: AirportRecord) {
@@ -74,7 +74,7 @@ export function RouteMap() {
         const airports = new Map<string, AirportRecord>();
         airportRows.forEach((a) => airports.set(a.icao, a));
         routes.forEach((r) => {
-          if (!airports.has(r.depIcao))
+          if (!airports.has(r.depIcao)) {
             airports.set(r.depIcao, {
               icao: r.depIcao,
               name: r.depAirport,
@@ -82,7 +82,8 @@ export function RouteMap() {
               flights: String(routes.filter((x) => x.depIcao === r.depIcao).length),
               moreToKnow: "",
             });
-          if (!airports.has(r.arrIcao))
+          }
+          if (!airports.has(r.arrIcao)) {
             airports.set(r.arrIcao, {
               icao: r.arrIcao,
               name: r.arrAirport,
@@ -90,6 +91,7 @@ export function RouteMap() {
               flights: String(routes.filter((x) => x.depIcao === r.arrIcao).length),
               moreToKnow: "",
             });
+          }
         });
 
         setMapData({ routes, airports: Array.from(airports.values()) });
@@ -144,6 +146,17 @@ export function RouteMap() {
       const { default: L } = await import("leaflet");
       if (cancelled || !mapRef.current || !networkLayerRef.current) return;
 
+      const hubIcaos = new Set(HUBS.map((hub) => hub.icao));
+      // A hub marker is earned by operating the network, not merely appearing
+      // as the destination of another hub-to-hub sector. This prevents routes
+      // such as CMN → AUH/SHJ from making CMN look like an additional hub on
+      // that sector; CMN is still a hub wherever it has its own network feed.
+      const operationalHubIcaos = new Set(
+        mapData.routes
+          .filter((route) => hubIcaos.has(route.depIcao) && !hubIcaos.has(route.arrIcao))
+          .map((route) => route.depIcao),
+      );
+
       const routes = selectedHub === "ALL"
         ? mapData.routes
         : mapData.routes.filter((route) => route.depIcao === selectedHub || route.arrIcao === selectedHub);
@@ -154,23 +167,9 @@ export function RouteMap() {
       });
 
       const airportMap = new Map(mapData.airports.map((airport) => [airport.icao, airport]));
-      if (selectedHubData && !airportMap.has(selectedHubData.icao)) {
-        const hubRoute = mapData.routes.find((route) => route.depIcao === selectedHubData.icao || route.arrIcao === selectedHubData.icao);
-        if (hubRoute) {
-          const hubIsDeparture = hubRoute.depIcao === selectedHubData.icao;
-          airportMap.set(selectedHubData.icao, {
-            icao: selectedHubData.icao,
-            name: selectedHubData.name,
-            coords: hubIsDeparture ? hubRoute.dep : hubRoute.arr,
-            flights: String(mapData.routes.filter((route) => route.depIcao === selectedHubData.icao).length),
-            moreToKnow: `Official Air Arabia hub in ${selectedHubData.country}.`,
-          });
-        }
-      }
-
       const visibleAirports = selectedHub === "ALL"
         ? Array.from(airportMap.values())
-        : Array.from(airportMap.values()).filter((airport) => routeAirports.has(airport.icao) || airport.icao === selectedHub);
+        : Array.from(airportMap.values()).filter((airport) => routeAirports.has(airport.icao));
 
       networkLayerRef.current.clearLayers();
       const bounds = L.latLngBounds([]);
@@ -190,11 +189,11 @@ export function RouteMap() {
       });
 
       visibleAirports.forEach((airport) => {
-        const isHub = HUBS.some((hub) => hub.icao === airport.icao);
+        const isHub = operationalHubIcaos.has(airport.icao);
         L.circleMarker(airport.coords, {
-          radius: isHub ? 5 : 3,
+          radius: isHub ? 5.5 : 3,
           color: "#FF0041",
-          weight: 1.5,
+          weight: isHub ? 2 : 1.5,
           fillColor: isHub ? "#FF0041" : "#ffffff",
           fillOpacity: 1,
         })
@@ -210,7 +209,7 @@ export function RouteMap() {
     return () => {
       cancelled = true;
     };
-  }, [mapData, selectedHub, selectedHubData]);
+  }, [mapData, selectedHub]);
 
   return (
     <div className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_24px_70px_-38px_rgba(20,25,40,0.35)]">
@@ -264,16 +263,6 @@ export function RouteMap() {
           {status === "error" && "Unable to load route network."}
           {status === "ready" && `${counts.routes} routes · ${counts.airports} airports${selectedHub !== "ALL" ? ` · ${selectedHubData?.iata ?? selectedHub}` : ""}`}
         </div>
-        {status === "ready" && selectedHub !== "ALL" && counts.routes === 0 && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
-            <div className="rounded-2xl border border-black/10 bg-white/95 px-6 py-5 text-center shadow-xl backdrop-blur">
-              <p className="text-sm font-bold">{selectedHubData?.name} ({selectedHubData?.iata})</p>
-              <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
-                This hub is part of Air Arabia&apos;s wider network, but there are no routes for it in the current Virtual schedule CSV.
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 bg-white px-4 py-3 text-[11px] text-muted-foreground">
