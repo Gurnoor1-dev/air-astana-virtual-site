@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Plane } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/G9VA-logo.png";
 
 export function Footer() {
   return (
