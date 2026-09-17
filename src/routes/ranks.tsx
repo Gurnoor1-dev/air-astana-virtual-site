@@ -80,29 +80,38 @@ function Ranks() {
                 {String(i + 1).padStart(2, "0")}
               </div>
               <Card className={`sm:p-7 ${i === 0 ? "border-primary/20" : ""}`}>
-                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-                  <div className="max-w-xl">
+                <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+                  <div className="max-w-md lg:max-w-lg">
                     <div className="kicker">{r.hours} hours</div>
                     <h3 className="mt-2 text-2xl font-black">{r.rank}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {r.note}
                     </p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 md:min-w-[280px]">
-                    <div className="rounded-xl bg-muted p-3">
-                      <Clock3 className="size-4 text-primary" />
-                      <div className="mt-2 text-xs font-bold">{r.hours}</div>
-                      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                        Hours
+                  
+                  {/* Expanded badge container with dedicated width for perk badge */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[110px_1fr] gap-3 w-full md:w-auto md:min-w-[360px] lg:min-w-[420px]">
+                    <div className="flex flex-col justify-between rounded-2xl bg-muted/80 p-4 border border-border/40">
+                      <div className="flex items-center gap-2">
+                        <Clock3 className="size-4 text-primary shrink-0" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Hours
+                        </span>
+                      </div>
+                      <div className="mt-3 text-sm font-extrabold text-foreground">
+                        {r.hours}
                       </div>
                     </div>
-                    <div className="rounded-xl bg-muted p-3">
-                      <Compass className="size-4 text-primary" />
-                      <div className="mt-2 text-xs font-bold line-clamp-1" title={r.perk}>
-                        {r.perk}
+
+                    <div className="flex flex-col justify-between rounded-2xl bg-muted/80 p-4 border border-border/40">
+                      <div className="flex items-center gap-2">
+                        <Compass className="size-4 text-primary shrink-0" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Unlocked Perk
+                        </span>
                       </div>
-                      <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                        Unlocked Perk
+                      <div className="mt-3 text-sm font-extrabold leading-snug text-foreground">
+                        {r.perk}
                       </div>
                     </div>
                   </div>
