@@ -11,6 +11,12 @@ const steps = ["Infinite Flight", "Discord", "Profile", "Callsign"];
 type FormState = { name: string; age: string; timezone: string; experience: string; favouriteAircraft: string; motivation: string; agreed: boolean; callsign: string };
 const initialForm: FormState = { name: "", age: "", timezone: "", experience: "", favouriteAircraft: "", motivation: "", agreed: false, callsign: "" };
 
+function decodeBase64Url(value: string): string {
+  const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
+  const padding = "=".repeat((4 - (normalized.length % 4)) % 4);
+  return atob(normalized + padding);
+}
+
 function Apply() {
   const [step, setStep] = useState(0), [ifcUsername, setIfcUsername] = useState(""), [verify, setVerify] = useState<Verify | null>(null);
   const [discordTicket, setDiscordTicket] = useState(""), [discordLinked, setDiscordLinked] = useState("");
@@ -21,8 +27,9 @@ function Apply() {
     const params = new URLSearchParams(window.location.search), ticket = params.get("discord_ticket"), oauthError = params.get("discord_error");
     if (!ticket) { if (oauthError) setError("Discord authorization was not completed. Please try again."); return; }
     try {
-      const raw = ticket.split(".")[0].replaceAll("-", "+").replaceAll("_", "/"), body = JSON.parse(atob(raw + "==="));
+      const body = JSON.parse(decodeBase64Url(ticket.split(".")[0]));
       const username = String(body.ifcUsername || "");
+      if (!username) throw new Error("Missing Infinite Flight account in Discord hand-off.");
       setDiscordTicket(ticket); setIfcUsername(username); setDiscordLinked(String(body.discordUsername || "Discord user")); setLoading(true);
       fetch(`${API}?action=verify`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) })
         .then(async (response) => { const data = await response.json(); if (!response.ok || !data.ok) throw new Error(data.error || "Infinite Flight verification failed."); setVerify(data); if (!data.eligible) setStep(0); else setStep(2); })
