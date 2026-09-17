@@ -26,7 +26,7 @@ export function Footer() {
                 <img
                   src={ifLogo}
                   alt="Infinite Flight"
-                  className="size-3.5 object-contain"
+                  className="size-3.5 object-contain invert"
                 />
                 Infinite Flight Community
               </a>
