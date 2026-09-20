@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Activity, ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, History, LayoutDashboard, LogOut, MapPin, Plane, Radio, Send, Shield, UserRound } from "lucide-react";
-import { useCrew } from "@/lib/crew";
+import { CrewProvider, useCrew } from "@/lib/crew";
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 export const Route=createFileRoute("/crew-center")({component:CrewCenter});
 
 const nav=[["dashboard","Dashboard",LayoutDashboard],["routes","Routes",MapPin],["pirep","File PIREP",FileText],["history","PIREP History",History],["events","Events",CalendarDays],["profile","Profile",UserRound]] as const;
 
-function CrewCenter(){
+function CrewCenter(){ return <CrewProvider><CrewCenterInner/></CrewProvider>; }
+
+function CrewCenterInner(){
  const {member,loading,login,logout,request}=useCrew();
  const [view,setView]=useState(new URLSearchParams(typeof window!=="undefined"?window.location.search:"").get("view")||"dashboard");
  const [data,setData]=useState<any>(); const [live,setLive]=useState<any>(); const [routes,setRoutes]=useState<RouteRecord[]>([]);
