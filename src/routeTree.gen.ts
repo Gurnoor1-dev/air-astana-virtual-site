@@ -14,6 +14,7 @@ import { Route as HubsRouteImport } from './routes/hubs'
 import { Route as RanksRouteImport } from './routes/ranks'
 import { Route as RoutesRouteImport } from './routes/routes'
 import { Route as StaffRouteImport } from './routes/staff'
+import { Route as CrewCenterRouteImport } from './routes/crew-center'
 
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 const AboutRoute = AboutRouteImport.update({ id: '/about', path: '/about', getParentRoute: () => rootRouteImport } as any)
@@ -23,6 +24,7 @@ const HubsRoute = HubsRouteImport.update({ id: '/hubs', path: '/hubs', getParent
 const RanksRoute = RanksRouteImport.update({ id: '/ranks', path: '/ranks', getParentRoute: () => rootRouteImport } as any)
 const RoutesRoute = RoutesRouteImport.update({ id: '/routes', path: '/routes', getParentRoute: () => rootRouteImport } as any)
 const StaffRoute = StaffRouteImport.update({ id: '/staff', path: '/staff', getParentRoute: () => rootRouteImport } as any)
+const CrewCenterRoute = CrewCenterRouteImport.update({ id: '/crew-center', path: '/crew-center', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -33,6 +35,7 @@ export interface FileRoutesByFullPath {
   '/ranks': typeof RanksRoute
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
+  '/crew-center': typeof CrewCenterRoute
 }
 export interface FileRoutesByTo extends FileRoutesByFullPath {}
 export interface FileRoutesById {
@@ -45,12 +48,13 @@ export interface FileRoutesById {
   '/ranks': typeof RanksRoute
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
+  '/crew-center': typeof CrewCenterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff'
+  fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff'
+  to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
   id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff'
   fileRoutesById: FileRoutesById
 }
@@ -63,6 +67,7 @@ export interface RootRouteChildren {
   RanksRoute: typeof RanksRoute
   RoutesRoute: typeof RoutesRoute
   StaffRoute: typeof StaffRoute
+  CrewCenterRoute: typeof CrewCenterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -87,6 +92,7 @@ const rootRouteChildren: RootRouteChildren = {
   RanksRoute,
   RoutesRoute,
   StaffRoute,
+  CrewCenterRoute,
 }
 
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
