@@ -80,6 +80,7 @@ declare module '@tanstack/react-router' {
     '/ranks': { id: '/ranks'; path: '/ranks'; fullPath: '/ranks'; preLoaderRoute: typeof RanksRouteImport; parentRoute: typeof rootRouteImport }
     '/routes': { id: '/routes'; path: '/routes'; fullPath: '/routes'; preLoaderRoute: typeof RoutesRouteImport; parentRoute: typeof rootRouteImport }
     '/staff': { id: '/staff'; path: '/staff'; fullPath: '/staff'; preLoaderRoute: typeof StaffRouteImport; parentRoute: typeof rootRouteImport }
+    '/crew-center': { id: '/crew-center'; path: '/crew-center'; fullPath: '/crew-center'; preLoaderRoute: typeof CrewCenterRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
