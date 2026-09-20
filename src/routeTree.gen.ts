@@ -55,7 +55,7 @@ export interface FileRouteTypes {
   fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
-  id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff'
+  id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
