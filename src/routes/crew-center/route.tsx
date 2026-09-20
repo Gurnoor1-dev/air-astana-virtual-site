@@ -1,1 +1,0 @@
-import { createFileRoute } from "@tanstack/react-router";import { CrewLayout } from "@/components/crew/CrewUI";export const Route=createFileRoute("/crew-center")({component:CrewLayout});
