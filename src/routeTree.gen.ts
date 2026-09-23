@@ -72,6 +72,7 @@ export interface RootRouteChildren {
   RoutesRoute: typeof RoutesRoute
   StaffRoute: typeof StaffRoute
   CrewCenterRoute: typeof CrewCenterRoute
+  CrewLoginRoute: typeof CrewLoginRoute
 }
 
 declare module '@tanstack/react-router' {
