@@ -428,59 +428,88 @@ function Content({ view, data, live, routes, request, member, go, pirepSeed }: C
 function Dashboard({ data, live, go }: DashboardProps) {
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-[2rem] bg-[#111b31] text-white">
-        <div className="relative h-64 w-full overflow-hidden sm:h-80">
-          <img src={ccBanner} alt="Air Astana Virtual Crew Center" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-[#111b31]/15 to-[#111b31]" />
-          <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+      <section className="overflow-hidden rounded-[2rem] bg-[#111b31] text-white shadow-2xl">
+        <div className="relative min-h-[380px] w-full overflow-hidden sm:min-h-[420px]">
+          <img
+            src={ccBanner}
+            alt="Air Astana Virtual Crew Center"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          {/* Black fade overlay from left to right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 via-50% to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#111b31] via-transparent to-black/30" />
+
+          <div className="relative z-10 flex h-full flex-col justify-between p-6 sm:p-9">
             <div className="grid gap-8 lg:grid-cols-[1.1fr_.9fr]">
               <div>
-                <div className="kicker !text-[#d9bd7b]">Operations dashboard</div>
-                <h2 className="mt-4 text-5xl font-black tracking-[-.07em]">
-                  Good day, <span className="text-[#d9bd7b]">{data.member.callsign}.</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-[#d9bd7b] px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#111b31] shadow-lg">
+                    <Plane className="size-3.5" />
+                    {data.member?.callsign || "PILOT"}
+                  </span>
+                  <div className="kicker !text-[#d9bd7b] font-bold">Operations Dashboard</div>
+                </div>
+
+                <h2 className="mt-4 text-4xl font-black tracking-[-.05em] text-white sm:text-5xl">
+                  Good day, <span className="text-[#d9bd7b]">{data.member?.callsign || "Captain"}.</span>
                 </h2>
-                <p className="mt-4 max-w-xl text-sm leading-7 text-white/60">
+
+                <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/90">
                   Dispatch a sector, monitor your Infinite Flight session and turn every approved flight into rank progress.
                 </p>
-                <div className="mt-7 flex gap-3">
-                  <button onClick={() => go("routes")} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-black text-[#17213a]">
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => go("routes")}
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-xs font-black text-[#17213a] shadow-md transition hover:bg-white/90"
+                  >
                     Dispatch a flight <ArrowRight className="size-4" />
                   </button>
-                  <button onClick={() => go("pirep")} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-black">
+                  <button
+                    onClick={() => go("pirep")}
+                    className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-black/40 px-5 py-3 text-xs font-black text-white backdrop-blur-md transition hover:bg-black/60"
+                  >
                     File PIREP <FileText className="size-4" />
                   </button>
                 </div>
               </div>
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-white/45">
+
+              <div className="rounded-3xl border border-white/20 bg-black/40 p-5 backdrop-blur-md">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-white/80">
                   <span className="flex items-center gap-2">
-                    <Activity className="size-3" /> ACARS
+                    <Activity className="size-3 text-[#d9bd7b]" /> ACARS
                   </span>
-                  <span>{live?.online ? "LIVE" : "STANDBY"}</span>
+                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-white">
+                    {live?.online ? "LIVE" : "STANDBY"}
+                  </span>
                 </div>
                 {live?.flights?.[0] ? (
                   <>
-                    <div className="mt-5 text-3xl font-black">
-                      {Math.round(live.flights[0].altitude).toLocaleString()} <span className="text-xs text-white/40">FT</span>
+                    <div className="mt-5 text-4xl font-black text-white">
+                      {Math.round(live.flights[0].altitude).toLocaleString()}{" "}
+                      <span className="text-xs text-white/70">FT</span>
                     </div>
-                    <div className="mt-2 text-xs">
-                      {Math.round(live.flights[0].speed)} KT · {Math.round(live.flights[0].heading)}° HDG · {Math.round(live.flights[0].verticalSpeed)} FPM
+                    <div className="mt-2 text-xs font-medium text-white/90">
+                      {Math.round(live.flights[0].speed)} KT · {Math.round(live.flights[0].heading)}° HDG ·{" "}
+                      {Math.round(live.flights[0].verticalSpeed)} FPM
                     </div>
                   </>
                 ) : (
-                  <div className="mt-5 text-sm text-white/45">No active Infinite Flight session detected.</div>
+                  <div className="mt-5 text-sm text-white/80">No active Infinite Flight session detected.</div>
                 )}
               </div>
             </div>
           </div>
         </div>
       </section>
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Stat icon={Clock3} value={data.stats.hours.toFixed(1) + "h"} label="approved flight time" />
         <Stat icon={FileText} value={String(data.stats.pireps)} label="approved PIREPs" />
         <Stat icon={Shield} value={data.rank?.name || "Cadet Pilot"} label="current rank" />
         <Stat icon={Activity} value={Math.round(data.progress) + "%"} label="to next rank" />
       </div>
+
       <section className="premium-card">
         <div className="flex items-center justify-between">
           <div>
@@ -497,6 +526,7 @@ function Dashboard({ data, live, go }: DashboardProps) {
           <span>{data.nextRank ? Math.max(0, data.nextRank.min_hours - data.stats.hours).toFixed(1) + "h left" : "Top rank reached"}</span>
         </div>
       </section>
+
       <section className="premium-card">
         <div className="flex items-center gap-2">
           <BellRing className="size-4 text-primary" />
@@ -523,6 +553,7 @@ function Dashboard({ data, live, go }: DashboardProps) {
           {!(data.announcements || []).length && <div className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No active NOTAMs.</div>}
         </div>
       </section>
+
       <section className="premium-card">
         <div className="kicker">Recent PIREPs</div>
         <div className="mt-5 overflow-x-auto">
@@ -960,7 +991,7 @@ function EventsView({ request }: EventsViewProps) {
       setE(d.events || []);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Event registration failed");
-    } finally {
+    } font-black finally {
       setAction("");
     }
   };
