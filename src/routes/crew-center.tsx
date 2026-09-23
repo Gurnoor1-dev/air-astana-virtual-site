@@ -21,7 +21,6 @@ function CrewCenterInner(){
  const {member,loading,login,logout,request}=useCrew();
  const [busy,setBusy]=useState(false);
  const actionRequest=useCallback(async(a:string,b:Record<string,unknown>={})=>{const mutation=/^(dispatch|cancel-dispatch|pirep|event-(register|unregister)|admin-)/.test(a);if(mutation)setBusy(true);try{return await request(a,b)}finally{if(mutation)setBusy(false)}},[request]);
- const actionRequest=useCallback(async(a:string,b:Record<string,unknown>={})=>{const mutation=/^(dispatch|cancel-dispatch|pirep|event-(register|unregister)|admin-)/.test(a);if(mutation)setBusy(true);try{return await request(a,b)}finally{if(mutation)setBusy(false)}},[request]);
  const [view,setView]=useState(new URLSearchParams(typeof window!=="undefined"?window.location.search:"").get("view")||"dashboard");
  const [data,setData]=useState<any>(); const [live,setLive]=useState<any>(); const [routes,setRoutes]=useState<RouteRecord[]>([]); const [pirepSeed,setPirepSeed]=useState<Record<string,string>>({});
  useEffect(()=>{if(member){request("dashboard").then(setData).catch(()=>{});fetchRoutes().then(setRoutes).catch(()=>{});}},[member]);
