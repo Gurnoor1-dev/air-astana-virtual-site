@@ -1,6 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
-import { Activity, ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, History, LayoutDashboard, LoaderCircle, LogOut, MapPin, Plane, Radio, Send, Shield, UserRound, Pencil, Palette, BellRing, Trophy, Target, Zap, Users, ExternalLink, Globe2, Image as ImageIcon, ClipboardList, Link2 } from "lucide-react";
+import {
+  Activity,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  History,
+  LayoutDashboard,
+  LoaderCircle,
+  LogOut,
+  MapPin,
+  Plane,
+  Radio,
+  Send,
+  Shield,
+  UserRound,
+  Pencil,
+  Palette,
+  BellRing,
+  Trophy,
+  Target,
+  Zap,
+  Users,
+  ExternalLink,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +38,17 @@ import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 export const Route = createFileRoute("/crew-center")({ component: CrewCenter });
 
-const nav = [["dashboard", "Dashboard", LayoutDashboard], ["routes", "Routes", MapPin], ["pirep", "File PIREP", FileText], ["history", "PIREP History", History], ["events", "Events", CalendarDays], ["leaderboard", "Leaderboard", Trophy], ["challenges", "Challenges", Target], ["activity", "Activity", Zap], ["profile", "Profile", UserRound]] as const;
+const nav = [
+  ["dashboard", "Dashboard", LayoutDashboard],
+  ["routes", "Routes", MapPin],
+  ["pirep", "File PIREP", FileText],
+  ["history", "PIREP History", History],
+  ["events", "Events", CalendarDays],
+  ["leaderboard", "Leaderboard", Trophy],
+  ["challenges", "Challenges", Target],
+  ["activity", "Activity", Zap],
+  ["profile", "Profile", UserRound],
+] as const;
 
 type ContentProps = {
   view: string;
@@ -187,83 +222,2116 @@ type StatProps = {
   label: string;
 };
 
-function CrewCenter(){ return <CrewProvider><CrewCenterInner/></CrewProvider>; }
-
-function CrewCenterInner(){
- const {member,loading,login,logout,request}=useCrew();
- const [busy,setBusy]=useState(false);
- const actionRequest=useCallback(async(a:string,b:Record<string,unknown>={})=>{const mutation=/^(dispatch|cancel-dispatch|pirep|event-(register|unregister)|admin-)/.test(a);if(mutation)setBusy(true);try{return await request(a,b)}finally{if(mutation)setBusy(false)}},[request]);
- const [view,setView]=useState(new URLSearchParams(typeof window!=="undefined"?window.location.search:"").get("view")||"dashboard");
- const [data,setData]=useState<any>(); const [live,setLive]=useState<any>(); const [routes,setRoutes]=useState<RouteRecord[]>([]); const [pirepSeed,setPirepSeed]=useState<Record<string,string>>({});
- useEffect(()=>{if(member){request("dashboard").then(setData).catch(()=>{});fetchRoutes().then(setRoutes).catch(()=>{});}},[member]);
- useEffect(()=>{if(member){const pull=()=>request("live").then(setLive).catch(()=>{});pull();const id=setInterval(pull,60000);return()=>clearInterval(id)}},[member,request]);
- const go=(v:string,seed:Record<string,string>={})=>{setView(v);setPirepSeed(seed);history.replaceState({},document.title,v==="dashboard"?"/crew-center":"/crew-center?view="+v)};
- if(loading)return <div className="min-h-[70vh] grid place-items-center text-sm font-bold text-muted-foreground">Connecting to Crew Center…</div>;
- if(!member)return <div className="min-h-[70vh] grid place-items-center px-4"><div className="w-full max-w-4xl rounded-[2rem] bg-[#10192d] p-8 text-white shadow-2xl sm:p-12"><div className="kicker !text-[#d9bd7b]">Restricted operations</div><h1 className="mt-5 text-5xl font-black tracking-[-.07em]">Your <span className="text-[#d9bd7b]">flight deck.</span></h1><p className="mt-5 max-w-xl text-sm leading-7 text-white/60">Crew Center connects your Air Astana Virtual membership, Discord identity and Infinite Flight profile into one operational workspace.</p><button onClick={login} className="mt-7 inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-black text-[#17213a]">Continue with Discord <ArrowRight className="size-4"/></button></div></div>;
- return <div className="min-h-[calc(100vh-72px)] bg-[#eef2f6]"><div className="bg-[#111b31] text-white"><div className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6"><div className="flex items-center justify-between"><div><div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em] text-white/45"><span className="size-2 rounded-full bg-emerald-400"/> Crew operations</div><h1 className="mt-2 text-2xl font-black">Air Astana <span className="text-[#d9bd7b]">Crew Center</span></h1></div><button onClick={logout} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold"><LogOut className="size-4"/> Exit</button></div></div></div><div className="mx-auto grid max-w-[1500px] gap-5 px-3 py-5 sm:px-6 lg:grid-cols-[240px_1fr]"><aside className="rounded-3xl border border-border bg-[#f9fbfd] p-3 shadow-soft lg:sticky lg:top-24 lg:h-fit"><div className="mb-3 rounded-2xl brand-gradient p-4 text-white"><div className="flex items-center gap-3"><div className="grid size-10 place-items-center rounded-xl bg-white/10"><Plane className="size-5"/></div><div><div className="text-xs font-black">{member.callsign}</div><div className="text-[9px] uppercase tracking-wider text-white/50">{member.ifc_username}</div></div></div></div><nav className="grid gap-1">{nav.map(([id,label,Icon])=><button key={id} onClick={()=>go(id)} className={"flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-extrabold "+(view===id?"bg-[#17213a] text-white":"text-muted-foreground hover:bg-muted")}><Icon className="size-4"/>{label}</button>)}</nav>{member.is_admin&&<button onClick={()=>go("admin")} className={"mt-3 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-extrabold "+(view==="admin"?"bg-[#17213a] text-white":"text-primary")}><Shield className="size-4"/> Admin Control</button>}<div className="mt-4 rounded-2xl bg-muted p-3"><div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-muted-foreground"><Radio className="size-3"/> ACARS link</div><div className="mt-2 flex items-center gap-2 text-xs font-bold"><span className="size-2 rounded-full bg-emerald-500"/>{live?.online?"IF Live connected":"Standby"}</div></div></aside><main className="min-w-0"><Content view={view} data={data} live={live} routes={routes} request={actionRequest} member={member} go={go} pirepSeed={pirepSeed}/></main></div>{busy&&<div className="fixed inset-0 z-[200] flex items-start justify-center bg-slate-900/45 px-4 pt-20 backdrop-blur-[2px]" role="status" aria-live="polite"><div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#111b31] px-5 py-4 text-sm font-black text-white shadow-2xl"><LoaderCircle className="size-5 animate-spin text-[#d9bd7b]"/><span>Saving changes…</span></div></div>}
-}
-
-function Content({view,data,live,routes,request,member,go,pirepSeed}: ContentProps){
- if(!data)return <div className="grid min-h-[60vh] place-items-center text-sm font-bold text-muted-foreground">Loading your flight deck…</div>;
- if(view==="routes")return <RoutesView routes={routes} request={request} go={go}/>;
- if(view==="pirep")return <PirepView request={request} go={go} seed={pirepSeed}/>;
- if(view==="history")return <HistoryView request={request}/>;
- if(view==="events")return <EventsView request={request}/>;
- if(view==="leaderboard")return <LeaderboardView request={request}/>;
- if(view==="challenges")return <ChallengesView request={request}/>;
- if(view==="activity")return <ActivityView request={request}/>;
- if(view==="profile")return <ProfileView data={data} member={member}/>;
- if(view==="admin"&&member.is_admin)return <AdminView request={request}/>;
- return <Dashboard data={data} live={live} go={go}/>;
-}
-function Dashboard({data,live,go}: DashboardProps){return <div className="space-y-5"><section className="overflow-hidden rounded-[2rem] bg-[#111b31] text-white"><div className="relative h-64 w-full overflow-hidden sm:h-80"><img src={ccBanner} alt="Air Astana Virtual Crew Center" className="absolute inset-0 h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-b from-black/5 via-[#111b31]/15 to-[#111b31]"/><div className="absolute inset-x-0 bottom-0 p-7 sm:p-9"><div className="grid gap-8 lg:grid-cols-[1.1fr_.9fr]"><div><div className="kicker !text-[#d9bd7b]">Operations dashboard</div><h2 className="mt-4 text-5xl font-black tracking-[-.07em]">Good day, <span className="text-[#d9bd7b]">{data.member.callsign}.</span></h2><p className="mt-4 max-w-xl text-sm leading-7 text-white/60">Dispatch a sector, monitor your Infinite Flight session and turn every approved flight into rank progress.</p><div className="mt-7 flex gap-3"><button onClick={()=>go("routes")} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-black text-[#17213a]">Dispatch a flight <ArrowRight className="size-4"/></button><button onClick={()=>go("pirep")} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-black">File PIREP <FileText className="size-4"/></button></div></div><div className="rounded-3xl border border-white/10 bg-white/5 p-5"><div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-white/45"><span className="flex items-center gap-2"><Activity className="size-3"/> ACARS</span><span>{live?.online?"LIVE":"STANDBY"}</span></div>{live?.flights?.[0]?<><div className="mt-5 text-3xl font-black">{Math.round(live.flights[0].altitude).toLocaleString()} <span className="text-xs text-white/40">FT</span></div><div className="mt-2 text-xs">{Math.round(live.flights[0].speed)} KT · {Math.round(live.flights[0].heading)}° HDG · {Math.round(live.flights[0].verticalSpeed)} FPM</div></>:<div className="mt-5 text-sm text-white/45">No active Infinite Flight session detected.</div>}</div></div></div></div></section><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Stat icon={Clock3} value={data.stats.hours.toFixed(1)+"h"} label="approved flight time"/><Stat icon={FileText} value={String(data.stats.pireps)} label="approved PIREPs"/><Stat icon={Shield} value={data.rank?.name||"Cadet Pilot"} label="current rank"/><Stat icon={Activity} value={Math.round(data.progress)+"%"} label="to next rank"/></div><section className="premium-card"><div className="flex items-center justify-between"><div><div className="kicker">Career progression</div><h3 className="mt-2 text-2xl font-black">Rank runway</h3></div><span className="text-xs font-black text-primary">{Math.round(data.progress)}%</span></div><div className="mt-6 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full brand-gradient" style={{width:data.progress+"%"}}/></div><div className="mt-3 flex justify-between text-xs font-bold text-muted-foreground"><span>{data.stats.hours.toFixed(1)}h completed</span><span>{data.nextRank?(Math.max(0,data.nextRank.min_hours-data.stats.hours)).toFixed(1)+"h left":"Top rank reached"}</span></div></section><section className="premium-card"><div className="flex items-center gap-2"><BellRing className="size-4 text-primary"/><div><div className="kicker">Crew NOTAM</div><h3 className="mt-2 text-2xl font-black">Operational notices</h3></div></div><div className="mt-5 grid gap-3">{(data.announcements||[]).map((n:any)=><article key={n.id} className="rounded-2xl border border-border bg-muted/30 p-4"><div className="flex items-center justify-between gap-3"><div className="font-black">{n.title}</div><Badge variant={n.priority==="critical"?"destructive":n.priority==="important"?"default":"secondary"}>{n.priority}</Badge></div><p className="mt-2 text-sm leading-6 text-muted-foreground">{n.body}</p><div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{n.created_at?new Date(n.created_at).toLocaleString():""}</div></article>)}{!(data.announcements||[]).length&&<div className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No active NOTAMs.</div>}</div></section><section className="premium-card"><div className="kicker">Recent PIREPs</div><div className="mt-5 overflow-x-auto"><table className="w-full min-w-[600px] text-left text-xs"><thead><tr className="border-b border-border text-[9px] uppercase tracking-wider text-muted-foreground"><th className="pb-3">Flight</th><th className="pb-3">Route</th><th className="pb-3">Aircraft</th><th className="pb-3">Time</th><th className="pb-3">Status</th></tr></thead><tbody>{data.recentPireps.map((x:any)=><tr key={x.id} className="border-b border-border last:border-0"><td className="py-4 font-black text-primary">{x.flight_number||"—"}</td><td className="py-4 font-bold">{x.dep_icao||"—"} → {x.arr_icao||"—"}</td><td className="py-4">{x.aircraft||"—"}</td><td className="py-4">{Math.floor((x.flight_time_minutes||0)/60)}h {(x.flight_time_minutes||0)%60}m</td><td className="py-4"><Badge variant={x.status==="approved"?"default":x.status==="rejected"?"destructive":"secondary"}>{x.status}</Badge></td></tr>)}</tbody></table></div></section></div>}
-function RoutesView({routes,request,go}: RoutesViewProps){const[q,setQ]=useState("");const[done,setDone]=useState<string[]>([]);const list=routes.filter(r=>[r.routeNo,r.depIcao,r.arrIcao,r.depAirport,r.arrAirport,r.aircraft].join(" ").toUpperCase().includes(q.toUpperCase())).slice(0,50);async function dispatch(r:RouteRecord){try{await request("dispatch",{routeId:r.routeId,flightNumber:r.routeNo,depIcao:r.depIcao,arrIcao:r.arrIcao,aircraft:r.aircraft});setDone(x=>x.concat(r.routeId))}catch(e){alert(e instanceof Error?e.message:"Dispatch failed")}}return <div className="space-y-5"><section className="rounded-[2rem] bg-[#111b31] p-7 text-white"><div className="kicker !text-[#d9bd7b]">Dispatch desk</div><h2 className="mt-3 text-4xl font-black">Choose your next sector.</h2><Input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search flight, ICAO, airport or aircraft" className="mt-6 w-full max-w-xl border-white/10 bg-white/5 text-white placeholder:text-white/30"/></section><div className="grid gap-4">{list.map(r=><article key={r.routeId} className="premium-card"><div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between"><div><div className="text-sm font-black text-primary">{r.routeNo} · {r.aircraft}</div><div className="mt-1 text-2xl font-black">{r.depIcao} <span className="text-muted-foreground">→</span> {r.arrIcao}</div><div className="text-xs text-muted-foreground">{r.depAirport} → {r.arrAirport}</div></div><div className="flex gap-2"><button onClick={()=>dispatch(r)} disabled={done.includes(r.routeId)} className="inline-flex items-center gap-2 rounded-xl brand-gradient px-4 py-3 text-xs font-black text-white disabled:opacity-60">{done.includes(r.routeId)?<CheckCircle2 className="size-4"/>:<Send className="size-4"/>}{done.includes(r.routeId)?"Dispatched":"Dispatch"}</button><button onClick={()=>go("pirep",{flightNumber:r.routeNo,depIcao:r.depIcao,arrIcao:r.arrIcao,aircraft:r.aircraft,routeId:r.routeId})} className="rounded-xl border border-border px-4 py-3 text-xs font-black">File PIREP</button></div></div></article>)}</div></div>}
-function PirepView({request,go,seed}: PirepViewProps){const aircraftOptions=["A220","A318","A319","A320","A321","A321neo","A330 Passenger","A330 Cargo","A330neo","A340","A350-900","A350-1000","A380","717","737-700","737-800","737-900","747-200","747-400","747-8","757","767","777-200ER/LR","777-300ER","777 Cargo","787-8","787-9","787-10","Challenger 350","CRJ-200","CRJ-700","CRJ-900","CRJ-1000","Dash-8 Q400"];const[form,setForm]=useState({flightNumber:seed.flightNumber||"",depIcao:seed.depIcao||"",arrIcao:seed.arrIcao||"",aircraft:seed.aircraft||"",flightDate:new Date().toISOString().slice(0,10),hours:"",mins:"",notes:"",notesStaffOnly:false,routeId:seed.routeId||"",ifFlightId:""});const[acarsLoading,setAcarsLoading]=useState(false);const[acarsError,setAcarsError]=useState("");const[older,setOlder]=useState<any[]>([]);const[sent,setSent]=useState(false);const[loading,setLoading]=useState(false);const set=(k:string,v:string)=>setForm(x=>({...x,[k]:v}));const applyFlight=(f:any)=>{const total=Math.max(0,Math.round(Number(f.totalTime||0))),h=Math.floor(total/60),m=total%60;setForm(x=>({...x,flightNumber:f.callsign||x.flightNumber,depIcao:f.originAirport||x.depIcao,arrIcao:f.destinationAirport||x.arrIcao,aircraft:f.aircraft||x.aircraft,flightDate:f.created?new Date(f.created).toISOString().slice(0,10):x.flightDate,hours:String(h),mins:String(m),ifFlightId:f.id||x.ifFlightId,notes:x.notes||"Loaded from verified Infinite Flight ACARS."}))};async function loadAcars(){setAcarsLoading(true);setAcarsError("");setOlder([]);try{const d=await request("acars-check");if(d.flight){applyFlight(d.flight);return}setAcarsError(d.error||"The latest flight was not eligible for ACARS filing.")}catch(err){setAcarsError(err instanceof Error?err.message:"Could not check the latest Infinite Flight flight")}finally{setAcarsLoading(false)}}async function checkOlder(){setAcarsLoading(true);setAcarsError("");try{const d=await request("acars-older");if(d.autoFiled){setSent(true);return}setOlder(d.flights||[]);if(!d.flights?.length)setAcarsError("No eligible KC flight was found in the previous 5 flights.")}catch(err){setAcarsError(err instanceof Error?err.message:"Could not check older flights")}finally{setAcarsLoading(false)}}async function chooseOlder(f:any){applyFlight(f);setOlder([])}async function submit(e:any){e.preventDefault();setLoading(true);try{const mins=Math.max(0,Number(form.hours||0)*60+Number(form.mins||0));await request("pirep",{...form,flightTimeMinutes:mins,verifiedAcars:Boolean(form.ifFlightId)});setSent(true)}catch(err){alert(err instanceof Error?err.message:"Could not submit PIREP")}finally{setLoading(false)}}if(sent)return <div className="premium-card py-16 text-center"><CheckCircle2 className="mx-auto size-14 text-emerald-500"/><h2 className="mt-5 text-3xl font-black">PIREP filed.</h2><p className="mt-2 text-sm text-muted-foreground">{form.ifFlightId?"Verified ACARS flight accepted automatically.":"Your PIREP has been submitted."}</p><button onClick={()=>go("dashboard")} className="mt-6 rounded-xl brand-gradient px-5 py-3 text-xs font-black text-white">Back to flight deck</button></div>;return <form onSubmit={submit} className="premium-card"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><div className="kicker"><FileText className="size-3"/> PIREP desk</div><h2 className="mt-2 text-4xl font-black">Log the sector.</h2></div><Button type="button" onClick={loadAcars} disabled={acarsLoading} className="border-0 bg-[#111b31] text-white hover:bg-[#17213a]"><Radio className="size-4"/>{acarsLoading?"Checking…":"File with ACARS"}</Button></div>{acarsError&&<div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700"><div>{acarsError}</div><div className="mt-3 flex flex-wrap gap-2"><button type="button" onClick={loadAcars} className="rounded-xl bg-white px-3 py-2 text-xs font-black">Retry</button><button type="button" onClick={checkOlder} className="rounded-xl bg-[#111b31] px-3 py-2 text-xs font-black text-white">Check older flights</button></div></div>}{older.length>0&&<div className="mt-5 rounded-2xl border border-[#d9bd7b]/30 bg-[#fbf8ef] p-4"><div className="text-xs font-black uppercase tracking-wider text-[#8d7440]">KC flights found</div><div className="mt-3 grid gap-2">{older.map((f:any)=><button type="button" key={f.id} onClick={()=>chooseOlder(f)} className="flex items-center justify-between rounded-xl bg-white p-3 text-left shadow-sm"><span><b>{f.callsign}</b><span className="ml-2 text-xs text-muted-foreground">{f.originAirport} → {f.destinationAirport}</span></span><span className="text-xs font-black text-primary">{Math.floor(Number(f.totalTime||0)/60)}h {Math.round(Number(f.totalTime||0))%60}m</span></button>)}</div></div>}<div className="mt-6 grid gap-4 sm:grid-cols-2"> <Field label="Flight Number" value={form.flightNumber} onChange={v=>set("flightNumber",v)} required/><label className="block"><span className="mb-2 block text-xs font-bold">Aircraft</span><Select required value={form.aircraft} onValueChange={v=>set("aircraft",v)}><SelectTrigger><SelectValue placeholder="Select aircraft"/></SelectTrigger><SelectContent>{aircraftOptions.map(a=><SelectItem key={a} value={a} disabled={a==="A321neo"}>{a}{a==="A321neo"?" — unavailable":""}</SelectItem>)}</SelectContent></Select></label><Field label="Departure Airport" value={form.depIcao} onChange={v=>set("depIcao",v)} required/><Field label="Arrival Airport" value={form.arrIcao} onChange={v=>set("arrIcao",v)} required/><label className="block"><span className="mb-2 block text-xs font-bold">Date</span><input required type="date" value={form.flightDate} onChange={e=>set("flightDate",e.target.value)} className="form-input"/></label><Field label="Flight Time (hours)" value={form.hours} onChange={v=>set("hours",v.replace(/\\D/g,""))} required type="number"/><Field label="Flight Time (Mins)" value={form.mins} onChange={v=>set("mins",v.replace(/\\D/g,""))} required type="number"/></div><div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4"><label className="flex cursor-pointer items-start gap-3"><input type="checkbox" checked={Boolean((form as any).notesStaffOnly)} onChange={e=>setForm(x=>({...x,notesStaffOnly:e.target.checked}))} className="mt-1 size-4 accent-primary"/><span><span className="block text-sm font-black">Notes for Staff only</span><span className="mt-1 block text-xs text-muted-foreground">When enabled, the Discord webhook will show <b>NA</b> instead of the pilot notes.</span></span></label></div><label className="mt-4 block"><span className="mb-2 block text-xs font-bold">Notes</span><Textarea rows={5} value={form.notes} onChange={e=>set("notes",e.target.value)}/></label><Button disabled={loading} className="mt-5 border-0 brand-gradient text-white hover:opacity-90"><Send className="size-4"/>{loading?"Submitting…":"Submit PIREP"}</Button></form>}
-function Field({label,value,onChange,required,type="text"}: FieldProps){return <label className="block"><span className="mb-2 block text-xs font-bold">{label}</span><Input required={required} type={type} value={value} onChange={e=>onChange(e.target.value)}/></label>}
-function HistoryView({request}: HistoryViewProps){const[p,setP]=useState<any[]>([]);useEffect(()=>{request("pireps").then((d:any)=>setP(d.pireps||[]))},[request]);return <section className="premium-card"><div className="kicker"><History className="size-3"/> Records</div><h2 className="mt-2 text-4xl font-black">PIREP History</h2><div className="mt-6 overflow-x-auto"><table className="w-full min-w-[650px] text-left text-xs"><thead><tr className="border-b border-border text-[9px] uppercase tracking-wider text-muted-foreground"><th className="pb-3">Flight</th><th className="pb-3">Route</th><th className="pb-3">Aircraft</th><th className="pb-3">Time</th><th className="pb-3">Status</th></tr></thead><tbody>{p.map((x:any)=><tr key={x.id} className="border-b border-border"><td className="py-4 font-black text-primary">{x.flight_number||"—"}</td><td className="py-4">{x.dep_icao||"—"} → {x.arr_icao||"—"}</td><td className="py-4">{x.aircraft||"—"}</td><td className="py-4">{Math.floor((x.flight_time_minutes||0)/60)}h {(x.flight_time_minutes||0)%60}m</td><td className="py-4">{x.status}</td></tr>)}</tbody></table></div></section>}
-function EventsView({request}: EventsViewProps){const[e,setE]=useState<any[]>([]);const[loading,setLoading]=useState(true);const[action,setAction]=useState<string>("");useEffect(()=>{request("events").then((d:any)=>setE(d.events||[])).finally(()=>setLoading(false))},[request]);const toggle=async(x:any)=>{setAction(x.id);try{await request(x.joined?"event-unregister":"event-register",{eventId:x.id});const d=await request("events");setE(d.events||[])}catch(err){alert(err instanceof Error?err.message:"Event registration failed")}finally{setAction("")}};if(loading)return <div className="grid gap-4 md:grid-cols-2"><div className="premium-card h-80 animate-pulse"/><div className="premium-card h-80 animate-pulse"/></div>;return <div className="space-y-5"><section className="rounded-[2rem] bg-[#111b31] p-7 text-white sm:p-9"><div className="kicker !text-[#d9bd7b]"><CalendarDays className="size-3"/> Crew calendar</div><h2 className="mt-3 text-4xl font-black">Events & operations.</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">Join group flights, community events and scheduled VA operations. Event briefings, meeting links and participation limits are managed by the operations team.</p></section><div className="grid gap-5 lg:grid-cols-2">{e.map(x=>{const full=x.max_participants&&Number(x.participants_count||0)>=Number(x.max_participants)&&!x.joined;return <article key={x.id} className="premium-card overflow-hidden p-0">{(x.banner_url||x.image_url)&&<img src={x.banner_url||x.image_url} alt="" className="h-48 w-full object-cover"/>}<div className="p-6"><div className="flex flex-wrap items-center gap-2"><Badge>{x.event_type||"VA Event"}</Badge>{x.featured&&<Badge variant="default">Featured</Badge>}{x.registration_open===false&&<Badge variant="secondary">Registration closed</Badge>}</div><h3 className="mt-3 text-2xl font-black">{x.title}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{x.description||"Air Astana Virtual crew event."}</p><div className="mt-5 grid gap-3 sm:grid-cols-2 text-xs"><div className="flex gap-2"><CalendarDays className="size-4 text-primary"/><span>{x.starts_at?new Date(x.starts_at).toLocaleString():"TBA"}{x.ends_at?" → "+new Date(x.ends_at).toLocaleString():""}</span></div><div className="flex gap-2"><MapPin className="size-4 text-primary"/><span>{x.location||"Online"}</span></div><div className="flex gap-2"><Plane className="size-4 text-primary"/><span>{x.aircraft||"All aircraft"}</span></div><div className="flex gap-2"><Users className="size-4 text-primary"/><span>{x.participants_count||0}{x.max_participants?"/"+x.max_participants:""} registered</span></div></div>{x.host&&<div className="mt-4 rounded-xl bg-muted p-3 text-xs"><b>Host:</b> {x.host}</div>}{x.briefing&&<div className="mt-4"><div className="kicker">Briefing</div><p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{x.briefing}</p></div>}{x.requirements&&<div className="mt-4"><div className="kicker">Requirements</div><p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{x.requirements}</p></div>}<div className="mt-5 flex flex-wrap gap-2">{x.meeting_url&&<a href={x.meeting_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-black"><ExternalLink className="size-4"/> Meeting link</a>}<Button disabled={!!action||full||x.registration_open===false} onClick={()=>toggle(x)} variant={x.joined?"outline":"default"}>{action===x.id?"Updating…":x.joined?"Cancel registration":full?"Event full":"Register for event"}</Button></div>{x.registration_deadline&&<div className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Registration deadline: {new Date(x.registration_deadline).toLocaleString()}</div>}</div></article>})}{!e.length&&<div className="premium-card lg:col-span-2 py-14 text-center text-sm text-muted-foreground">No upcoming events are published yet.</div>}</div></div>}
-
-function LeaderboardView({request}: LeaderboardViewProps){const[rows,setRows]=useState<any[]>([]);useEffect(()=>{request("leaderboard").then((d:any)=>setRows(d.leaderboard||[]))},[request]);return <div className="space-y-5"><section className="rounded-[2rem] bg-[#111b31] p-7 text-white"><div className="kicker !text-[#d9bd7b]"><Trophy className="size-3"/> Crew leaderboard</div><h2 className="mt-3 text-4xl font-black">Flight time rankings.</h2><p className="mt-2 text-sm text-white/50">Approved PIREPs only. Rankings are informational and update from the VA records.</p></section><AdminTable title="Top crew" subtitle="Sorted by approved flight time, then approved PIREPs.">{rows.map((x:any,i:number)=><div key={x.id} className="grid grid-cols-[44px_1fr_auto_auto] items-center gap-3 border-b border-border py-4"><div className="grid size-9 place-items-center rounded-full bg-muted text-xs font-black">{i+1}</div><div><div className="text-sm font-black">{x.callsign||x.full_name}</div><div className="text-[10px] text-muted-foreground">{x.rank}</div></div><div className="text-right text-sm font-black">{Number(x.hours||0).toFixed(1)}h</div><Badge>{x.pireps} PIREPs</Badge></div>)}</AdminTable></div>}
-
-function ChallengesView({request}: ChallengesViewProps){const[c,setC]=useState<any[]>([]);useEffect(()=>{request("challenges").then((d:any)=>setC(d.challenges||[]))},[request]);return <div className="space-y-5"><section className="rounded-[2rem] bg-[#111b31] p-7 text-white"><div className="kicker !text-[#d9bd7b]"><Target className="size-3"/> Career challenges</div><h2 className="mt-3 text-4xl font-black">Build your flight record.</h2><p className="mt-2 text-sm text-white/50">Milestones are calculated from approved PIREPs and flight time.</p></section><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{c.map(x=><article key={x.id} className="premium-card"><div className="flex items-start justify-between"><div><div className="text-lg font-black">{x.title}</div><p className="mt-1 text-xs text-muted-foreground">{x.description}</p></div><span className="text-xl">{x.completed?"🏆":"🎯"}</span></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full brand-gradient" style={{width:x.progress+"%"}}/></div><div className="mt-2 flex justify-between text-[10px] font-bold text-muted-foreground"><span>{x.value.toFixed?x.value.toFixed(1):x.value} {x.unit}</span><span>{x.target} {x.unit}</span></div></article>)}</div></div>}
-
-function ActivityView({request}: ActivityViewProps){const[items,setItems]=useState<any[]>([]);useEffect(()=>{request("activity").then((d:any)=>setItems(d.items||[]))},[request]);return <AdminTable title="My Activity" subtitle="A unified timeline of your PIREPs, dispatches and event registrations.">{items.map((x:any,i:number)=><div key={i} className="flex items-start gap-4 border-b border-border py-4"><div className="grid size-9 shrink-0 place-items-center rounded-xl bg-muted text-primary">{x.type==="PIREP"?<FileText className="size-4"/>:x.type==="EVENT"?<CalendarDays className="size-4"/>:<Send className="size-4"/>}</div><div className="min-w-0 flex-1"><div className="text-sm font-black">{x.title}</div><div className="mt-1 text-xs text-muted-foreground">{x.detail}</div><div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{x.at?new Date(x.at).toLocaleString():""}</div></div><Badge>{x.status}</Badge></div>)}{!items.length&&<div className="py-12 text-center text-sm text-muted-foreground">No activity yet.</div>}</AdminTable>}
-
-function ProfileView({data,member}: ProfileViewProps){return <div className="space-y-5"><section className="rounded-[2rem] bg-[#111b31] p-8 text-white"><div className="kicker !text-[#d9bd7b]">Crew profile</div><h2 className="mt-3 text-4xl font-black">{member.full_name||member.discord_username||member.callsign}</h2><p className="mt-2 text-sm text-white/50">{member.callsign} · {member.ifc_username}</p></section><div className="grid gap-4 md:grid-cols-3"><Stat icon={Shield} value={data.rank?.name||"Cadet Pilot"} label="current rank"/><Stat icon={Clock3} value={data.stats.hours.toFixed(1)+"h"} label="approved VA time"/><Stat icon={UserRound} value={member.is_admin?"Administrator":"Crew member"} label="access level"/></div></div>}
-function AdminView({request}: AdminViewProps){const[tab,setTab]=useState("overview");const[data,setData]=useState<any>();const[routes,setRoutes]=useState<RouteRecord[]>([]);const[loading,setLoading]=useState(true);const[title,setTitle]=useState("");const[body,setBody]=useState("");const[notice,setNotice]=useState("");useEffect(()=>{const load=()=>Promise.all([request("admin-data"),fetchRoutes()]).then(([d,r])=>{setData(d);setRoutes(r)}).finally(()=>setLoading(false));void load();const onRefresh=()=>void load();window.addEventListener("crew-admin-refresh",onRefresh);return()=>window.removeEventListener("crew-admin-refresh",onRefresh)},[request]);if(!data)return <div className="premium-card py-20 text-center text-sm font-bold text-muted-foreground">Loading command center…</div>;const pending=data.pireps.filter((x:any)=>x.status==="pending").length;const activeMembers=data.members.filter((x:any)=>x.status==="active").length;const nav=[["overview","Overview",LayoutDashboard],["pireps","PIREP Queue",FileText],["members","Members",UserRound],["applications","Applications",Shield],["routes","Routes",MapPin],["dispatches","Dispatches",Send],["events","Events",CalendarDays],["notices","NOTAMs & Notices",Radio],["ranks","Ranks",Activity],["fleet","Fleet",Plane],["activity","Activity",History],["audit","Audit Log",History],["custom","Discord & Theme",Palette],["settings","Settings",Shield]] as const;async function refresh(){try{const d=await request("admin-data");setData(d)}catch{}finally{setLoading(false)}}async function review(id:string,status:string,action?:string,reason?:string,extra?:any){await request("admin-pirep",{id,status,action,reason,...(extra||{})});await refresh()}async function toggleMember(x:any){await request("admin-member",{id:x.id,is_admin:!x.is_admin,status:x.status||"active"});await refresh()}return <div className="space-y-5"><section className="overflow-hidden rounded-[2rem] bg-[#0d1629] text-white shadow-2xl"><div className="hairline-grid p-7 sm:p-9"><div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between"><div><div className="kicker !text-[#d9bd7b]"><Shield className="size-3"/> Air Astana Virtual · Administration</div><h2 className="mt-3 text-4xl font-black tracking-[-.06em] sm:text-5xl">Operations Command</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-white/50">Manage crew, PIREPs, dispatch activity, route operations, events, notices and VA configuration from one protected workspace.</p></div><div className="grid grid-cols-2 gap-2 sm:grid-cols-4"><AdminMetric value={String(activeMembers)} label="active crew"/><AdminMetric value={String(pending)} label="pending PIREPs"/><AdminMetric value={String(data.applications.length)} label="applications"/><AdminMetric value={String(data.dispatches.length)} label="dispatches"/></div></div></div></section><div className="grid gap-5 lg:grid-cols-[230px_1fr]"><aside className="rounded-3xl border border-border bg-white p-3 shadow-soft lg:sticky lg:top-24 lg:h-fit"><div className="px-3 pb-3 pt-2 text-[9px] font-black uppercase tracking-[.2em] text-muted-foreground">Command modules</div><div className="grid gap-1">{nav.map(([id,label,Icon])=><button key={id} onClick={()=>setTab(id)} className={"flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-extrabold transition "+(tab===id?"bg-[#111b31] text-white":"text-muted-foreground hover:bg-muted")}><span className="flex items-center gap-3"><Icon className="size-4"/>{label}</span>{id==="pireps"&&pending>0?<Badge variant="destructive">{pending}</Badge>:null}</button>)}</div></aside><section className="min-w-0">{tab==="overview"&&<AdminOverview data={data} pending={pending} setTab={setTab}/>} {tab==="pireps"&&<AdminPireps data={data} review={review}/>} {tab==="members"&&<AdminMembers data={data} toggleMember={toggleMember} request={request}/>} {tab==="applications"&&<AdminApplications data={data} request={request}/>} {tab==="routes"&&<AdminRoutes routes={routes}/>} {tab==="dispatches"&&<AdminDispatches data={data} request={request}/>} {tab==="events"&&<AdminEvents data={data} request={request} refresh={refresh}/>} {tab==="notices"&&<AdminNotices data={data} request={request} refresh={refresh}/>} {tab==="ranks"&&<AdminRanks data={data} request={request}/>} {tab==="fleet"&&<AdminFleet routes={routes}/>} {tab==="activity"&&<AdminActivity data={data}/>} {tab==="audit"&&<AdminAudit data={data}/>} {tab==="custom"&&<AdminCustom data={data} request={request} refresh={refresh}/>} {tab==="settings"&&<AdminSettings data={data}/>}</section></div>{loading&&<div className="fixed inset-0 z-[200] flex items-start justify-center bg-slate-900/35 px-4 pt-20 backdrop-blur-[2px]" role="status" aria-live="polite"><div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-[#111b31] px-5 py-4 text-sm font-black text-white shadow-2xl"><span className="inline-block size-4 animate-spin rounded-full border-2 border-white/25 border-t-[#d9bd7b]"/>Updating command center…</div></div>}</div>}
-function AdminMetric({value,label}: AdminMetricProps){return <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div className="text-xl font-black">{value}</div><div className="mt-1 text-[8px] font-black uppercase tracking-wider text-white/40">{label}</div></div>}
-function AdminOverview({data,pending,setTab}: AdminOverviewProps){const cards=[["pireps","PIREP review",pending+" waiting",FileText],["members","Crew roster",data.members.length+" profiles",UserRound],["applications","Recruitment",data.applications.length+" records",Shield],["routes","Network",data.dispatches.length+" recent dispatches",MapPin],["events","Events",data.events.length+" published",CalendarDays],["notices","Notices",data.announcements.length+" notices",Radio]];return <div className="space-y-5"><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([id,label,value,Icon])=><button key={String(id)} onClick={()=>setTab(String(id))} className="premium-card text-left"><Icon className="size-5 text-primary"/><div className="mt-5 text-lg font-black">{label}</div><div className="mt-1 text-xs text-muted-foreground">{value as string}</div><div className="mt-4 text-[9px] font-black uppercase tracking-wider text-primary">Open module →</div></button>)}</div><section className="premium-card"><div className="kicker">Latest operational activity</div><div className="mt-5 divide-y divide-border">{data.dispatches.slice(0,6).map((x:any)=><div key={x.id} className="flex items-center justify-between py-3 text-xs"><span className="font-black">{x.flight_number||"Dispatch"} · {x.dep_icao||"—"} → {x.arr_icao||"—"}</span><Badge>{x.status||"DISPATCHED"}</Badge></div>)}</div></section></div>}
-function AdminPireps({data,review}: AdminPirepsProps){const[p,setP]=useState("all");const[edit,setEdit]=useState<any>(null);const list=data.pireps.filter((x:any)=>p==="all"||String(x.status)===p);return <div className="space-y-5"><AdminTable title="PIREP Operations" subtitle="Every field is editable. Status changes are reversible and synchronize Discord reactions / pending threads." filters={["all","pending","approved","rejected"]} value={p} setValue={setP}>{list.map((x:any)=><div key={x.id} className="border-b border-border py-4"><div className="grid gap-3 lg:grid-cols-[1.2fr_1fr_.7fr_.7fr_auto] lg:items-center"><div><div className="text-xs font-black">{x.flight_number||"Manual PIREP"}</div><div className="text-[10px] text-muted-foreground">{x.dep_icao||"—"} → {x.arr_icao||"—"} · {x.aircraft||"—"}</div><div className="mt-1 text-[10px] text-muted-foreground">{x.notes_staff_only?"Staff-only notes":"Pilot notes visible"}{x.discord_message_id?" · Discord linked":" · No Discord message"}</div></div><div className="text-xs">{Math.floor((x.flight_time_minutes||0)/60)}h {(x.flight_time_minutes||0)%60}m</div><div className="text-xs text-muted-foreground">{x.flight_date||"—"}</div><Badge variant={x.status==="approved"?"default":x.status==="rejected"?"destructive":"secondary"}>{x.status}</Badge><div className="flex flex-wrap gap-2"><Button size="sm" variant="outline" onClick={()=>setEdit(x)}><Pencil className="mr-1 size-3"/>Edit all</Button>{x.status!=="approved"&&<Button size="sm" onClick={()=>review(x.id,"approved","approve")}>Approve 🟢</Button>}{x.status!=="pending"&&<Button size="sm" variant="outline" onClick={()=>review(x.id,"pending","pending")}>Pending 🟡</Button>}{x.status!=="rejected"&&<Button size="sm" variant="destructive" onClick={()=>review(x.id,"rejected","reject")}>Reject 🔴</Button>}</div></div>{edit?.id===x.id&&<PirepEditor item={x} review={review} close={()=>setEdit(null)}/>}</div>)}</AdminTable></div>}
-
-function PirepEditor({item,review,close}: PirepEditorProps){const[f,setF]=useState<any>({flight_number:item.flight_number||"",dep_icao:item.dep_icao||"",arr_icao:item.arr_icao||"",aircraft:item.aircraft||"",flight_date:item.flight_date||"",flight_time_minutes:String(item.flight_time_minutes||0),notes:item.notes||"",notes_staff_only:Boolean(item.notes_staff_only),pax:item.pax??"",cargo_kg:item.cargo_kg??"",server:item.server||"",landing_rate_fpm:item.landing_rate_fpm??"",status:item.status||"pending"});const set=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));const save=async()=>{await review(item.id,f.status,"admin_edit",{...f,flight_time_minutes:Number(f.flight_time_minutes||0),pax:f.pax===""?null:Number(f.pax),cargo_kg:f.cargo_kg===""?null:Number(f.cargo_kg),landing_rate_fpm:f.landing_rate_fpm===""?null:Number(f.landing_rate_fpm)});close()};return <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4"><div className="kicker">PIREP editor</div><div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Input value={f.flight_number} onChange={e=>set("flight_number",e.target.value)} placeholder="Flight number"/><Input value={f.dep_icao} onChange={e=>set("dep_icao",e.target.value)} placeholder="Departure ICAO"/><Input value={f.arr_icao} onChange={e=>set("arr_icao",e.target.value)} placeholder="Arrival ICAO"/><Input value={f.aircraft} onChange={e=>set("aircraft",e.target.value)} placeholder="Aircraft"/><Input value={f.flight_date} onChange={e=>set("flight_date",e.target.value)} type="date"/><Input value={f.flight_time_minutes} onChange={e=>set("flight_time_minutes",e.target.value)} type="number" placeholder="Minutes"/><Input value={f.pax} onChange={e=>set("pax",e.target.value)} type="number" placeholder="PAX"/><Input value={f.cargo_kg} onChange={e=>set("cargo_kg",e.target.value)} type="number" placeholder="Cargo kg"/><Input value={f.server} onChange={e=>set("server",e.target.value)} placeholder="Server"/><Input value={f.landing_rate_fpm} onChange={e=>set("landing_rate_fpm",e.target.value)} type="number" placeholder="Landing FPM"/><Select value={f.status} onValueChange={v=>set("status",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="pending">Pending 🟡</SelectItem><SelectItem value="approved">Approved 🟢</SelectItem><SelectItem value="rejected">Rejected 🔴</SelectItem></SelectContent></Select><label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={f.notes_staff_only} onChange={e=>set("notes_staff_only",e.target.checked)} className="size-4 accent-primary"/> Notes for staff only</label><Textarea value={f.notes} onChange={e=>set("notes",e.target.value)} placeholder="Notes" className="sm:col-span-2 lg:col-span-3" rows={4}/></div><div className="mt-4 flex gap-2"><Button onClick={save}>Save PIREP</Button><Button variant="outline" onClick={close}>Cancel</Button></div></div>}
-
-function AdminMembers({data,toggleMember,request}: AdminMembersProps){const[edit,setEdit]=useState<any>(null);const[form,setForm]=useState<any>({});const open=(x:any)=>{setEdit(x);setForm({callsign:x.callsign||"",full_name:x.full_name||"",ifc_username:x.ifc_username||"",discord_username:x.discord_username||"",timezone:x.timezone||"",status:x.status||"active",is_admin:Boolean(x.is_admin),rank_id:x.rank_id||""})};const set=(k:string,v:any)=>setForm((x:any)=>({...x,[k]:v}));return <div className="space-y-5"><AdminTable title="Crew Roster" subtitle="Every visible crew identity and access field is editable.">{data.members.map((x:any)=><div key={x.id} className="grid gap-3 border-b border-border py-4 md:grid-cols-[1.2fr_1fr_1fr_auto] md:items-center"><div><div className="text-xs font-black">{x.callsign||"Unassigned"} · {x.full_name||x.discord_username||"Crew member"}</div><div className="text-[10px] text-muted-foreground">{x.discord_username||"Discord"} · {x.ifc_username||"IF identity"}</div></div><Badge>{x.status}</Badge><Badge variant={x.is_admin?"default":"secondary"}>{x.is_admin?"Administrator":"Crew"}</Badge><div className="flex gap-2"><Button size="sm" variant="outline" onClick={()=>open(x)}><Pencil className="mr-1 size-3"/>Edit all</Button></div></div>)}</AdminTable>{edit&&<section className="premium-card"><div className="flex items-center justify-between"><div><div className="kicker">Crew editor</div><h3 className="mt-2 text-2xl font-black">{edit.callsign||"Crew member"}</h3></div><Button variant="ghost" onClick={()=>setEdit(null)}>Close</Button></div><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Input value={form.callsign} onChange={e=>set("callsign",e.target.value)} placeholder="Callsign"/><Input value={form.full_name} onChange={e=>set("full_name",e.target.value)} placeholder="Full name"/><Input value={form.ifc_username} onChange={e=>set("ifc_username",e.target.value)} placeholder="Infinite Flight username"/><Input value={form.discord_username} onChange={e=>set("discord_username",e.target.value)} placeholder="Discord username"/><Input value={form.timezone} onChange={e=>set("timezone",e.target.value)} placeholder="Timezone"/><Select value={form.status} onValueChange={v=>set("status",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="active">Active</SelectItem><SelectItem value="suspended">Suspended</SelectItem><SelectItem value="inactive">Inactive</SelectItem></SelectContent></Select><Input value={form.rank_id} onChange={e=>set("rank_id",e.target.value)} placeholder="Rank ID (optional)"/><label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={form.is_admin} onChange={e=>set("is_admin",e.target.checked)} className="size-4 accent-primary"/> Administrator</label></div><Button className="mt-4" onClick={async()=>{await request("admin-member",{id:edit.id,...form});setEdit(null);window.dispatchEvent(new Event("crew-admin-refresh"))}}>Save crew changes</Button></section>}</div>}
-
-function AdminApplications({data,request}: AdminApplicationsProps){return <AdminTable title="Recruitment Applications" subtitle="Application records are editable from the protected recruitment workflow.">{data.applications.map((x:any)=><ApplicationEditor key={x.id} item={x} request={request}/>)}</AdminTable>}
-function ApplicationEditor({item,request}: ApplicationEditorProps){const[open,setOpen]=useState(false);const[form,setForm]=useState<any>({status:item.status||"pending",applicant_name:item.applicant_name||"",ifc_username:item.ifc_username||"",callsign:item.callsign||"",discord_user_id:item.discord_user_id||"",discord_username:item.discord_username||"",age:item.age??"",timezone:item.timezone||"",experience:item.experience||"",favourite_aircraft:item.favourite_aircraft||"",motivation:item.motivation||"",agreed_to_rules:Boolean(item.agreed_to_rules),rejection_reason:item.rejection_reason||""});const set=(k:string,v:any)=>setForm((x:any)=>({...x,[k]:v}));const save=async()=>{await request("admin-application",{id:item.id,...form});setOpen(false);window.dispatchEvent(new Event("crew-admin-refresh"))};return <div className="border-b border-border py-4"><div className="flex items-center justify-between gap-3"><div><div className="text-xs font-black">{form.applicant_name||"Applicant"}</div><div className="text-[10px] text-muted-foreground">{form.ifc_username||"Infinite Flight identity"} · {form.callsign||"No callsign"} · {form.discord_username||form.discord_user_id||"No Discord"}</div></div><div className="flex items-center gap-2"><Badge>{form.status}</Badge><Button size="sm" variant="outline" onClick={()=>setOpen(!open)}><Pencil className="mr-1 size-3"/>Edit all</Button></div></div>{open&&<div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Input value={form.applicant_name} onChange={e=>set("applicant_name",e.target.value)} placeholder="Applicant name"/><Input value={form.ifc_username} onChange={e=>set("ifc_username",e.target.value)} placeholder="IFC username"/><Input value={form.callsign} onChange={e=>set("callsign",e.target.value)} placeholder="Callsign"/><Input value={form.discord_username} onChange={e=>set("discord_username",e.target.value)} placeholder="Discord username"/><Input value={form.discord_user_id} onChange={e=>set("discord_user_id",e.target.value)} placeholder="Discord ID"/><Input value={form.age} onChange={e=>set("age",e.target.value)} type="number" placeholder="Age"/><Input value={form.timezone} onChange={e=>set("timezone",e.target.value)} placeholder="Timezone"/><Input value={form.experience} onChange={e=>set("experience",e.target.value)} placeholder="Flight experience"/><Input value={form.favourite_aircraft} onChange={e=>set("favourite_aircraft",e.target.value)} placeholder="Favourite aircraft"/><Select value={form.status} onValueChange={v=>set("status",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="pending">Pending</SelectItem><SelectItem value="approved">Approved</SelectItem><SelectItem value="rejected">Rejected</SelectItem><SelectItem value="completed">Completed</SelectItem></SelectContent></Select><label className="flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={form.agreed_to_rules} onChange={e=>set("agreed_to_rules",e.target.checked)} className="size-4 accent-primary"/> Rules accepted</label><Textarea value={form.motivation} onChange={e=>set("motivation",e.target.value)} placeholder="Motivation" className="sm:col-span-2 lg:col-span-3" rows={5}/><Textarea value={form.rejection_reason} onChange={e=>set("rejection_reason",e.target.value)} placeholder="Rejection / staff note" className="sm:col-span-2 lg:col-span-3" rows={3}/><Button onClick={save}>Save application</Button></div>}</div>}
-
-function AdminRoutes({routes}: AdminRoutesProps){return <AdminTable title="Route Network" subtitle="Shared network source used by the public site and Crew Center."><div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{routes.map(r=><div key={r.routeId} className="rounded-2xl bg-muted p-4"><div className="text-xs font-black text-primary">{r.routeNo} · {r.aircraft}</div><div className="mt-1 text-sm font-black">{r.depIcao} → {r.arrIcao}</div><div className="mt-1 text-[10px] text-muted-foreground">{r.depAirport} → {r.arrAirport}</div></div>)}</div></AdminTable>}
-function AdminDispatches({data,request}: AdminDispatchesProps){return <AdminTable title="Dispatch Control" subtitle="Track and edit active, filed and closed dispatch records.">{data.dispatches.map((x:any)=><DispatchEditor key={x.id} item={x} request={request}/>)}</AdminTable>}
-function AdminEvents({data,request,refresh}: AdminEventsProps){const[id,setId]=useState("");const[f,setF]=useState<any>({title:"",description:"",startsAt:"",endsAt:"",location:"",aircraft:"",route:"",imageUrl:"",bannerUrl:"",eventType:"VA Event",host:"",meetingUrl:"",briefing:"",requirements:"",registrationDeadline:"",maxParticipants:"",featured:false,timezone:"",durationMinutes:"",registrationOpen:true,status:"published"});const set=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));const edit=(x:any)=>{setId(x.id);setF({title:x.title||"",description:x.description||"",startsAt:x.starts_at?new Date(x.starts_at).toISOString().slice(0,16):"",endsAt:x.ends_at?new Date(x.ends_at).toISOString().slice(0,16):"",location:x.location||"",aircraft:x.aircraft||"",route:x.route||"",imageUrl:x.image_url||"",bannerUrl:x.banner_url||"",eventType:x.event_type||"VA Event",host:x.host||"",meetingUrl:x.meeting_url||"",briefing:x.briefing||"",requirements:x.requirements||"",registrationDeadline:x.registration_deadline?new Date(x.registration_deadline).toISOString().slice(0,16):"",maxParticipants:x.max_participants??"",featured:Boolean(x.featured),timezone:x.timezone||"",durationMinutes:x.duration_minutes??"",registrationOpen:x.registration_open!==false,status:x.status||"published"})};const reset=()=>{setId("");setF({title:"",description:"",startsAt:"",endsAt:"",location:"",aircraft:"",route:"",imageUrl:"",bannerUrl:"",eventType:"VA Event",host:"",meetingUrl:"",briefing:"",requirements:"",registrationDeadline:"",maxParticipants:"",featured:false,timezone:"",durationMinutes:"",registrationOpen:true,status:"published"})};const save=async()=>{const r=await request("admin-event",{id:id||undefined,...f});if(r?.webhookError)alert("Event saved, but Discord webhook failed: "+r.webhookError);reset();await refresh()};return <div className="space-y-5"><AdminTable title="Event Calendar" subtitle="Detailed event operations, registration, briefing and Discord publishing.">{data.events.map((x:any)=><div key={x.id} className="flex flex-col gap-3 border-b border-border py-4 lg:flex-row lg:items-center lg:justify-between"><div><div className="flex flex-wrap items-center gap-2"><div className="text-sm font-black">{x.title}</div><Badge>{x.event_type||"VA Event"}</Badge>{x.featured&&<Badge>Featured</Badge>}</div><div className="mt-1 text-xs text-muted-foreground">{x.starts_at?new Date(x.starts_at).toLocaleString():"—"} · {x.location||"Online"} · {x.participants_count||0}{x.max_participants?"/"+x.max_participants:""} registered</div></div><Button size="sm" variant="outline" onClick={()=>edit(x)}><Pencil className="mr-1 size-3"/>Edit all details</Button></div>)}</AdminTable><section className="premium-card"><div className="kicker">Event editor</div><h3 className="mt-2 text-2xl font-black">{id?"Edit event":"Create detailed event"}</h3><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Input value={f.title} onChange={e=>set("title",e.target.value)} placeholder="Event title"/><Input value={f.eventType} onChange={e=>set("eventType",e.target.value)} placeholder="Event type"/><Select value={f.status} onValueChange={v=>set("status",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="draft">Draft</SelectItem><SelectItem value="published">Published</SelectItem><SelectItem value="cancelled">Cancelled</SelectItem></SelectContent></Select><Input type="datetime-local" value={f.startsAt} onChange={e=>set("startsAt",e.target.value)} /><Input type="datetime-local" value={f.endsAt} onChange={e=>set("endsAt",e.target.value)} /><Input value={f.timezone} onChange={e=>set("timezone",e.target.value)} placeholder="Timezone e.g. UTC+5:30"/><Input value={f.durationMinutes} onChange={e=>set("durationMinutes",e.target.value)} type="number" placeholder="Duration (minutes)"/><Input value={f.location} onChange={e=>set("location",e.target.value)} placeholder="Location / server"/><Input value={f.host} onChange={e=>set("host",e.target.value)} placeholder="Host / organizer"/><Input value={f.aircraft} onChange={e=>set("aircraft",e.target.value)} placeholder="Aircraft"/><Input value={f.route} onChange={e=>set("route",e.target.value)} placeholder="Route"/><Input value={f.meetingUrl} onChange={e=>set("meetingUrl",e.target.value)} placeholder="Meeting / Discord URL"/><Input value={f.registrationDeadline} onChange={e=>set("registrationDeadline",e.target.value)} type="datetime-local"/><Input value={f.maxParticipants} onChange={e=>set("maxParticipants",e.target.value)} type="number" placeholder="Max participants"/><Input value={f.imageUrl} onChange={e=>set("imageUrl",e.target.value)} placeholder="Thumbnail image URL"/><Input value={f.bannerUrl} onChange={e=>set("bannerUrl",e.target.value)} placeholder="Banner image URL"/><Textarea value={f.description} onChange={e=>set("description",e.target.value)} placeholder="Public event description" className="sm:col-span-2 lg:col-span-3" rows={4}/><Textarea value={f.briefing} onChange={e=>set("briefing",e.target.value)} placeholder="Flight / event briefing" className="sm:col-span-2" rows={6}/><Textarea value={f.requirements} onChange={e=>set("requirements",e.target.value)} placeholder="Requirements / rules" className="sm:col-span-2" rows={6}/></div><div className="mt-4 flex flex-wrap gap-4 text-xs font-bold"><label className="flex items-center gap-2"><input type="checkbox" checked={f.featured} onChange={e=>set("featured",e.target.checked)} className="size-4 accent-primary"/> Featured event</label><label className="flex items-center gap-2"><input type="checkbox" checked={f.registrationOpen} onChange={e=>set("registrationOpen",e.target.checked)} className="size-4 accent-primary"/> Registration open</label></div>{(f.bannerUrl||f.imageUrl)&&<img src={f.bannerUrl||f.imageUrl} alt="" className="mt-4 h-48 w-full rounded-2xl object-cover"/>}<div className="mt-5 flex gap-2"><Button onClick={save}>{id?"Save event":"Publish event"}</Button>{id&&<Button variant="outline" onClick={reset}>New event</Button>}</div></section></div>}
-
-function AdminNotices({data,request,refresh}: AdminNoticesProps){const[id,setId]=useState("");const[f,setF]=useState<any>({title:"",body:"",priority:"normal",active:true,expiresAt:"",imageUrl:"",actionLabel:"",actionUrl:""});const set=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));const edit=(x:any)=>{setId(x.id);setF({title:x.title||"",body:x.body||"",priority:x.priority||"normal",active:x.active!==false,expiresAt:x.expires_at?new Date(x.expires_at).toISOString().slice(0,16):"",imageUrl:x.image_url||"",actionLabel:x.action_label||"",actionUrl:x.action_url||""})};const save=async()=>{await request("admin-announcement",{id:id||undefined,...f});setId("");setF({title:"",body:"",priority:"normal",active:true,expiresAt:"",imageUrl:"",actionLabel:"",actionUrl:""});await refresh()};return <div className="space-y-5"><section className="premium-card"><div className="kicker">NOTAM / Announcement desk</div><h3 className="mt-2 text-2xl font-black">{id?"Edit notice":"Publish crew briefing"}</h3><div className="mt-4 grid gap-3 sm:grid-cols-2"><Input value={f.title} onChange={e=>set("title",e.target.value)} placeholder="Headline"/><Select value={f.priority} onValueChange={v=>set("priority",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="normal">Normal</SelectItem><SelectItem value="important">Important</SelectItem><SelectItem value="critical">Critical</SelectItem></SelectContent></Select><Input value={f.expiresAt} onChange={e=>set("expiresAt",e.target.value)} type="datetime-local"/><Input value={f.imageUrl} onChange={e=>set("imageUrl",e.target.value)} placeholder="Image URL"/><Input value={f.actionLabel} onChange={e=>set("actionLabel",e.target.value)} placeholder="Action button label"/><Input value={f.actionUrl} onChange={e=>set("actionUrl",e.target.value)} placeholder="Action URL"/><Textarea value={f.body} onChange={e=>set("body",e.target.value)} className="sm:col-span-2" rows={6} placeholder="Operational notice…"/></div><label className="mt-4 flex items-center gap-2 text-xs font-bold"><input type="checkbox" checked={f.active} onChange={e=>set("active",e.target.checked)} className="size-4 accent-primary"/> Active on crew dashboard</label><div className="mt-4 flex gap-2"><Button onClick={save}>{id?"Save changes":"Publish notice"}</Button>{id&&<Button variant="outline" onClick={()=>{setId("");setF({title:"",body:"",priority:"normal",active:true,expiresAt:"",imageUrl:"",actionLabel:"",actionUrl:""})}}>New notice</Button>}</div></section><AdminTable title="Published notices" subtitle="These appear directly on the crew dashboard.">{data.announcements.map((x:any)=><div key={x.id} className="flex items-center justify-between gap-3 border-b border-border py-4"><div><div className="flex items-center gap-2"><div className="text-sm font-black">{x.title}</div><Badge>{x.priority}</Badge>{x.active===false&&<Badge variant="secondary">Inactive</Badge>}</div><div className="mt-1 text-xs text-muted-foreground">{x.body}</div></div><Button size="sm" variant="outline" onClick={()=>edit(x)}><Pencil className="mr-1 size-3"/>Edit all</Button></div>)}</AdminTable></div>}
-
-function AdminRanks({data,request}: {data: any; request: any}){
+function CrewCenter() {
   return (
-    <AdminTable title="Crew Ranks" subtitle="Manage progression ranks and minimum hours required.">
-      {(data.ranks || []).map((x: any) => (
-        <RankEditor key={x.id} item={x} request={request} />
+    <CrewProvider>
+      <CrewCenterInner />
+    </CrewProvider>
+  );
+}
+
+function CrewCenterInner() {
+  const { member, loading, login, logout, request } = useCrew();
+  const [busy, setBusy] = useState(false);
+
+  const actionRequest = useCallback(
+    async (a: string, b: Record<string, unknown> = {}) => {
+      const mutation = /^(dispatch|cancel-dispatch|pirep|event-(register|unregister)|admin-)/.test(a);
+      if (mutation) setBusy(true);
+      try {
+        return await request(a, b);
+      } finally {
+        if (mutation) setBusy(false);
+      }
+    },
+    [request]
+  );
+
+  const [view, setView] = useState(
+    new URLSearchParams(typeof window !== "undefined" ? window.location.search : "").get("view") || "dashboard"
+  );
+  const [data, setData] = useState<any>();
+  const [live, setLive] = useState<any>();
+  const [routes, setRoutes] = useState<RouteRecord[]>([]);
+  const [pirepSeed, setPirepSeed] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (member) {
+      request("dashboard").then(setData).catch(() => {});
+      fetchRoutes().then(setRoutes).catch(() => {});
+    }
+  }, [member, request]);
+
+  useEffect(() => {
+    if (member) {
+      const pull = () => request("live").then(setLive).catch(() => {});
+      pull();
+      const id = setInterval(pull, 60000);
+      return () => clearInterval(id);
+    }
+  }, [member, request]);
+
+  const go = (v: string, seed: Record<string, string> = {}) => {
+    setView(v);
+    setPirepSeed(seed);
+    history.replaceState(
+      {},
+      document.title,
+      v === "dashboard" ? "/crew-center" : "/crew-center?view=" + v
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] grid place-items-center text-sm font-bold text-muted-foreground">
+        Connecting to Crew Center…
+      </div>
+    );
+  }
+
+  if (!member) {
+    return (
+      <div className="min-h-[70vh] grid place-items-center px-4">
+        <div className="w-full max-w-4xl rounded-[2rem] bg-[#10192d] p-8 text-white shadow-2xl sm:p-12">
+          <div className="kicker !text-[#d9bd7b]">Restricted operations</div>
+          <h1 className="mt-5 text-5xl font-black tracking-[-.07em]">
+            Your <span className="text-[#d9bd7b]">flight deck.</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-sm leading-7 text-white/60">
+            Crew Center connects your Air Astana Virtual membership, Discord identity and Infinite Flight profile into one operational workspace.
+          </p>
+          <button
+            onClick={login}
+            className="mt-7 inline-flex items-center gap-3 rounded-xl bg-white px-5 py-3.5 text-sm font-black text-[#17213a]"
+          >
+            Continue with Discord <ArrowRight className="size-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#eef2f6]">
+      <div className="bg-[#111b31] text-white">
+        <div className="mx-auto max-w-[1500px] px-4 py-5 sm:px-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em] text-white/45">
+                <span className="size-2 rounded-full bg-emerald-400" /> Crew operations
+              </div>
+              <h1 className="mt-2 text-2xl font-black">
+                Air Astana <span className="text-[#d9bd7b]">Crew Center</span>
+              </h1>
+            </div>
+            <button
+              onClick={logout}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold"
+            >
+              <LogOut className="size-4" /> Exit
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto grid max-w-[1500px] gap-5 px-3 py-5 sm:px-6 lg:grid-cols-[240px_1fr]">
+        <aside className="rounded-3xl border border-border bg-[#f9fbfd] p-3 shadow-soft lg:sticky lg:top-24 lg:h-fit">
+          <div className="mb-3 rounded-2xl brand-gradient p-4 text-white">
+            <div className="flex items-center gap-3">
+              <div className="grid size-10 place-items-center rounded-xl bg-white/10">
+                <Plane className="size-5" />
+              </div>
+              <div>
+                <div className="text-xs font-black">{member.callsign}</div>
+                <div className="text-[9px] uppercase tracking-wider text-white/50">{member.ifc_username}</div>
+              </div>
+            </div>
+          </div>
+          <nav className="grid gap-1">
+            {nav.map(([id, label, Icon]) => (
+              <button
+                key={id}
+                onClick={() => go(id)}
+                className={
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-extrabold " +
+                  (view === id ? "bg-[#17213a] text-white" : "text-muted-foreground hover:bg-muted")
+                }
+              >
+                <Icon className="size-4" />
+                {label}
+              </button>
+            ))}
+          </nav>
+          {member.is_admin && (
+            <button
+              onClick={() => go("admin")}
+              className={
+                "mt-3 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-extrabold " +
+                (view === "admin" ? "bg-[#17213a] text-white" : "text-primary")
+              }
+            >
+              <Shield className="size-4" /> Admin Control
+            </button>
+          )}
+          <div className="mt-4 rounded-2xl bg-muted p-3">
+            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+              <Radio className="size-3" /> ACARS link
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-xs font-bold">
+              <span className="size-2 rounded-full bg-emerald-500" />
+              {live?.online ? "IF Live connected" : "Standby"}
+            </div>
+          </div>
+        </aside>
+        <main className="min-w-0">
+          <Content
+            view={view}
+            data={data}
+            live={live}
+            routes={routes}
+            request={actionRequest}
+            member={member}
+            go={go}
+            pirepSeed={pirepSeed}
+          />
+        </main>
+      </div>
+      {busy && (
+        <div
+          className="fixed inset-0 z-[200] flex items-start justify-center bg-slate-900/45 px-4 pt-20 backdrop-blur-[2px]"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#111b31] px-5 py-4 text-sm font-black text-white shadow-2xl">
+            <LoaderCircle className="size-5 animate-spin text-[#d9bd7b]" />
+            <span>Saving changes…</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Content({ view, data, live, routes, request, member, go, pirepSeed }: ContentProps) {
+  if (!data) return <div className="grid min-h-[60vh] place-items-center text-sm font-bold text-muted-foreground">Loading your flight deck…</div>;
+  if (view === "routes") return <RoutesView routes={routes} request={request} go={go} />;
+  if (view === "pirep") return <PirepView request={request} go={go} seed={pirepSeed} />;
+  if (view === "history") return <HistoryView request={request} />;
+  if (view === "events") return <EventsView request={request} />;
+  if (view === "leaderboard") return <LeaderboardView request={request} />;
+  if (view === "challenges") return <ChallengesView request={request} />;
+  if (view === "activity") return <ActivityView request={request} />;
+  if (view === "profile") return <ProfileView data={data} member={member} />;
+  if (view === "admin" && member.is_admin) return <AdminView request={request} />;
+  return <Dashboard data={data} live={live} go={go} />;
+}
+
+function Dashboard({ data, live, go }: DashboardProps) {
+  return (
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-[2rem] bg-[#111b31] text-white">
+        <div className="relative h-64 w-full overflow-hidden sm:h-80">
+          <img src={ccBanner} alt="Air Astana Virtual Crew Center" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-[#111b31]/15 to-[#111b31]" />
+          <div className="absolute inset-x-0 bottom-0 p-7 sm:p-9">
+            <div className="grid gap-8 lg:grid-cols-[1.1fr_.9fr]">
+              <div>
+                <div className="kicker !text-[#d9bd7b]">Operations dashboard</div>
+                <h2 className="mt-4 text-5xl font-black tracking-[-.07em]">
+                  Good day, <span className="text-[#d9bd7b]">{data.member.callsign}.</span>
+                </h2>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-white/60">
+                  Dispatch a sector, monitor your Infinite Flight session and turn every approved flight into rank progress.
+                </p>
+                <div className="mt-7 flex gap-3">
+                  <button onClick={() => go("routes")} className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-xs font-black text-[#17213a]">
+                    Dispatch a flight <ArrowRight className="size-4" />
+                  </button>
+                  <button onClick={() => go("pirep")} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-black">
+                    File PIREP <FileText className="size-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-white/45">
+                  <span className="flex items-center gap-2">
+                    <Activity className="size-3" /> ACARS
+                  </span>
+                  <span>{live?.online ? "LIVE" : "STANDBY"}</span>
+                </div>
+                {live?.flights?.[0] ? (
+                  <>
+                    <div className="mt-5 text-3xl font-black">
+                      {Math.round(live.flights[0].altitude).toLocaleString()} <span className="text-xs text-white/40">FT</span>
+                    </div>
+                    <div className="mt-2 text-xs">
+                      {Math.round(live.flights[0].speed)} KT · {Math.round(live.flights[0].heading)}° HDG · {Math.round(live.flights[0].verticalSpeed)} FPM
+                    </div>
+                  </>
+                ) : (
+                  <div className="mt-5 text-sm text-white/45">No active Infinite Flight session detected.</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Stat icon={Clock3} value={data.stats.hours.toFixed(1) + "h"} label="approved flight time" />
+        <Stat icon={FileText} value={String(data.stats.pireps)} label="approved PIREPs" />
+        <Stat icon={Shield} value={data.rank?.name || "Cadet Pilot"} label="current rank" />
+        <Stat icon={Activity} value={Math.round(data.progress) + "%"} label="to next rank" />
+      </div>
+      <section className="premium-card">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="kicker">Career progression</div>
+            <h3 className="mt-2 text-2xl font-black">Rank runway</h3>
+          </div>
+          <span className="text-xs font-black text-primary">{Math.round(data.progress)}%</span>
+        </div>
+        <div className="mt-6 h-3 overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full brand-gradient" style={{ width: data.progress + "%" }} />
+        </div>
+        <div className="mt-3 flex justify-between text-xs font-bold text-muted-foreground">
+          <span>{data.stats.hours.toFixed(1)}h completed</span>
+          <span>{data.nextRank ? Math.max(0, data.nextRank.min_hours - data.stats.hours).toFixed(1) + "h left" : "Top rank reached"}</span>
+        </div>
+      </section>
+      <section className="premium-card">
+        <div className="flex items-center gap-2">
+          <BellRing className="size-4 text-primary" />
+          <div>
+            <div className="kicker">Crew NOTAM</div>
+            <h3 className="mt-2 text-2xl font-black">Operational notices</h3>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3">
+          {(data.announcements || []).map((n: any) => (
+            <article key={n.id} className="rounded-2xl border border-border bg-muted/30 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="font-black">{n.title}</div>
+                <Badge variant={n.priority === "critical" ? "destructive" : n.priority === "important" ? "default" : "secondary"}>
+                  {n.priority}
+                </Badge>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{n.body}</p>
+              <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {n.created_at ? new Date(n.created_at).toLocaleString() : ""}
+              </div>
+            </article>
+          ))}
+          {!(data.announcements || []).length && <div className="rounded-2xl bg-muted p-5 text-sm text-muted-foreground">No active NOTAMs.</div>}
+        </div>
+      </section>
+      <section className="premium-card">
+        <div className="kicker">Recent PIREPs</div>
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[600px] text-left text-xs">
+            <thead>
+              <tr className="border-b border-border text-[9px] uppercase tracking-wider text-muted-foreground">
+                <th className="pb-3">Flight</th>
+                <th className="pb-3">Route</th>
+                <th className="pb-3">Aircraft</th>
+                <th className="pb-3">Time</th>
+                <th className="pb-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.recentPireps.map((x: any) => (
+                <tr key={x.id} className="border-b border-border last:border-0">
+                  <td className="py-4 font-black text-primary">{x.flight_number || "—"}</td>
+                  <td className="py-4 font-bold">
+                    {x.dep_icao || "—"} → {x.arr_icao || "—"}
+                  </td>
+                  <td className="py-4">{x.aircraft || "—"}</td>
+                  <td className="py-4">
+                    {Math.floor((x.flight_time_minutes || 0) / 60)}h {(x.flight_time_minutes || 0) % 60}m
+                  </td>
+                  <td className="py-4">
+                    <Badge variant={x.status === "approved" ? "default" : x.status === "rejected" ? "destructive" : "secondary"}>
+                      {x.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function RoutesView({ routes, request, go }: RoutesViewProps) {
+  const [q, setQ] = useState("");
+  const [done, setDone] = useState<string[]>([]);
+  const list = routes
+    .filter((r) => [r.routeNo, r.depIcao, r.arrIcao, r.depAirport, r.arrAirport, r.aircraft].join(" ").toUpperCase().includes(q.toUpperCase()))
+    .slice(0, 50);
+
+  async function dispatch(r: RouteRecord) {
+    try {
+      await request("dispatch", { routeId: r.routeId, flightNumber: r.routeNo, depIcao: r.depIcao, arrIcao: r.arrIcao, aircraft: r.aircraft });
+      setDone((x) => x.concat(r.routeId));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Dispatch failed");
+    }
+  }
+
+  return (
+    <div className="space-y-5">
+      <section className="rounded-[2rem] bg-[#111b31] p-7 text-white">
+        <div className="kicker !text-[#d9bd7b]">Dispatch desk</div>
+        <h2 className="mt-3 text-4xl font-black">Choose your next sector.</h2>
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search flight, ICAO, airport or aircraft"
+          className="mt-6 w-full max-w-xl border-white/10 bg-white/5 text-white placeholder:text-white/30"
+        />
+      </section>
+      <div className="grid gap-4">
+        {list.map((r) => (
+          <article key={r.routeId} className="premium-card">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-sm font-black text-primary">
+                  {r.routeNo} · {r.aircraft}
+                </div>
+                <div className="mt-1 text-2xl font-black">
+                  {r.depIcao} <span className="text-muted-foreground">→</span> {r.arrIcao}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {r.depAirport} → {r.arrAirport}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => dispatch(r)}
+                  disabled={done.includes(r.routeId)}
+                  className="inline-flex items-center gap-2 rounded-xl brand-gradient px-4 py-3 text-xs font-black text-white disabled:opacity-60"
+                >
+                  {done.includes(r.routeId) ? <CheckCircle2 className="size-4" /> : <Send className="size-4" />}
+                  {done.includes(r.routeId) ? "Dispatched" : "Dispatch"}
+                </button>
+                <button
+                  onClick={() =>
+                    go("pirep", {
+                      flightNumber: r.routeNo,
+                      depIcao: r.depIcao,
+                      arrIcao: r.arrIcao,
+                      aircraft: r.aircraft,
+                      routeId: r.routeId,
+                    })
+                  }
+                  className="rounded-xl border border-border px-4 py-3 text-xs font-black"
+                >
+                  File PIREP
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PirepView({ request, go, seed }: PirepViewProps) {
+  const aircraftOptions = [
+    "A220",
+    "A318",
+    "A319",
+    "A320",
+    "A321",
+    "A321neo",
+    "A330 Passenger",
+    "A330 Cargo",
+    "A330neo",
+    "A340",
+    "A350-900",
+    "A350-1000",
+    "A380",
+    "717",
+    "737-700",
+    "737-800",
+    "737-900",
+    "747-200",
+    "747-400",
+    "747-8",
+    "757",
+    "767",
+    "777-200ER/LR",
+    "777-300ER",
+    "777 Cargo",
+    "787-8",
+    "787-9",
+    "787-10",
+    "Challenger 350",
+    "CRJ-200",
+    "CRJ-700",
+    "CRJ-900",
+    "CRJ-1000",
+    "Dash-8 Q400",
+  ];
+  const [form, setForm] = useState({
+    flightNumber: seed.flightNumber || "",
+    depIcao: seed.depIcao || "",
+    arrIcao: seed.arrIcao || "",
+    aircraft: seed.aircraft || "",
+    flightDate: new Date().toISOString().slice(0, 10),
+    hours: "",
+    mins: "",
+    notes: "",
+    notesStaffOnly: false,
+    routeId: seed.routeId || "",
+    ifFlightId: "",
+  });
+  const [acarsLoading, setAcarsLoading] = useState(false);
+  const [acarsError, setAcarsError] = useState("");
+  const [older, setOlder] = useState<any[]>([]);
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const set = (k: string, v: string) => setForm((x) => ({ ...x, [k]: v }));
+
+  const applyFlight = (f: any) => {
+    const total = Math.max(0, Math.round(Number(f.totalTime || 0))),
+      h = Math.floor(total / 60),
+      m = total % 60;
+    setForm((x) => ({
+      ...x,
+      flightNumber: f.callsign || x.flightNumber,
+      depIcao: f.originAirport || x.depIcao,
+      arrIcao: f.destinationAirport || x.arrIcao,
+      aircraft: f.aircraft || x.aircraft,
+      flightDate: f.created ? new Date(f.created).toISOString().slice(0, 10) : x.flightDate,
+      hours: String(h),
+      mins: String(m),
+      ifFlightId: f.id || x.ifFlightId,
+      notes: x.notes || "Loaded from verified Infinite Flight ACARS.",
+    }));
+  };
+
+  async function loadAcars() {
+    setAcarsLoading(true);
+    setAcarsError("");
+    setOlder([]);
+    try {
+      const d = await request("acars-check");
+      if (d.flight) {
+        applyFlight(d.flight);
+        return;
+      }
+      setAcarsError(d.error || "The latest flight was not eligible for ACARS filing.");
+    } catch (err) {
+      setAcarsError(err instanceof Error ? err.message : "Could not check the latest Infinite Flight flight");
+    } finally {
+      setAcarsLoading(false);
+    }
+  }
+
+  async function checkOlder() {
+    setAcarsLoading(true);
+    setAcarsError("");
+    try {
+      const d = await request("acars-older");
+      if (d.autoFiled) {
+        setSent(true);
+        return;
+      }
+      setOlder(d.flights || []);
+      if (!d.flights?.length) setAcarsError("No eligible KC flight was found in the previous 5 flights.");
+    } catch (err) {
+      setAcarsError(err instanceof Error ? err.message : "Could not check older flights");
+    } finally {
+      setAcarsLoading(false);
+    }
+  }
+
+  async function chooseOlder(f: any) {
+    applyFlight(f);
+    setOlder([]);
+  }
+
+  async function submit(e: any) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const mins = Math.max(0, Number(form.hours || 0) * 60 + Number(form.mins || 0));
+      await request("pirep", { ...form, flightTimeMinutes: mins, verifiedAcars: Boolean(form.ifFlightId) });
+      setSent(true);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Could not submit PIREP");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (sent)
+    return (
+      <div className="premium-card py-16 text-center">
+        <CheckCircle2 className="mx-auto size-14 text-emerald-500" />
+        <h2 className="mt-5 text-3xl font-black">PIREP filed.</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {form.ifFlightId ? "Verified ACARS flight accepted automatically." : "Your PIREP has been submitted."}
+        </p>
+        <button onClick={() => go("dashboard")} className="mt-6 rounded-xl brand-gradient px-5 py-3 text-xs font-black text-white">
+          Back to flight deck
+        </button>
+      </div>
+    );
+
+  return (
+    <form onSubmit={submit} className="premium-card">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="kicker">
+            <FileText className="size-3" /> PIREP desk
+          </div>
+          <h2 className="mt-2 text-4xl font-black">Log the sector.</h2>
+        </div>
+        <Button type="button" onClick={loadAcars} disabled={acarsLoading} className="border-0 bg-[#111b31] text-white hover:bg-[#17213a]">
+          <Radio className="size-4" />
+          {acarsLoading ? "Checking…" : "File with ACARS"}
+        </Button>
+      </div>
+      {acarsError && (
+        <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">
+          <div>{acarsError}</div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={loadAcars} className="rounded-xl bg-white px-3 py-2 text-xs font-black">
+              Retry
+            </button>
+            <button type="button" onClick={checkOlder} className="rounded-xl bg-[#111b31] px-3 py-2 text-xs font-black text-white">
+              Check older flights
+            </button>
+          </div>
+        </div>
+      )}
+      {older.length > 0 && (
+        <div className="mt-5 rounded-2xl border border-[#d9bd7b]/30 bg-[#fbf8ef] p-4">
+          <div className="text-xs font-black uppercase tracking-wider text-[#8d7440]">KC flights found</div>
+          <div className="mt-3 grid gap-2">
+            {older.map((f: any) => (
+              <button
+                type="button"
+                key={f.id}
+                onClick={() => chooseOlder(f)}
+                className="flex items-center justify-between rounded-xl bg-white p-3 text-left shadow-sm"
+              >
+                <span>
+                  <b>{f.callsign}</b>
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {f.originAirport} → {f.destinationAirport}
+                  </span>
+                </span>
+                <span className="text-xs font-black text-primary">
+                  {Math.floor(Number(f.totalTime || 0) / 60)}h {Math.round(Number(f.totalTime || 0)) % 60}m
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Field label="Flight Number" value={form.flightNumber} onChange={(v) => set("flightNumber", v)} required />
+        <label className="block">
+          <span className="mb-2 block text-xs font-bold">Aircraft</span>
+          <Select required value={form.aircraft} onValueChange={(v) => set("aircraft", v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select aircraft" />
+            </SelectTrigger>
+            <SelectContent>
+              {aircraftOptions.map((a) => (
+                <SelectItem key={a} value={a} disabled={a === "A321neo"}>
+                  {a}
+                  {a === "A321neo" ? " — unavailable" : ""}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+        <Field label="Departure Airport" value={form.depIcao} onChange={(v) => set("depIcao", v)} required />
+        <Field label="Arrival Airport" value={form.arrIcao} onChange={(v) => set("arrIcao", v)} required />
+        <label className="block">
+          <span className="mb-2 block text-xs font-bold">Date</span>
+          <input required type="date" value={form.flightDate} onChange={(e) => set("flightDate", e.target.value)} className="form-input" />
+        </label>
+        <Field label="Flight Time (hours)" value={form.hours} onChange={(v) => set("hours", v.replace(/\D/g, ""))} required type="number" />
+        <Field label="Flight Time (Mins)" value={form.mins} onChange={(v) => set("mins", v.replace(/\D/g, ""))} required type="number" />
+      </div>
+      <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={Boolean(form.notesStaffOnly)}
+            onChange={(e) => setForm((x) => ({ ...x, notesStaffOnly: e.target.checked }))}
+            className="mt-1 size-4 accent-primary"
+          />
+          <span>
+            <span className="block text-sm font-black">Notes for Staff only</span>
+            <span className="mt-1 block text-xs text-muted-foreground">
+              When enabled, the Discord webhook will show <b>NA</b> instead of the pilot notes.
+            </span>
+          </span>
+        </label>
+      </div>
+      <label className="mt-4 block">
+        <span className="mb-2 block text-xs font-bold">Notes</span>
+        <Textarea rows={5} value={form.notes} onChange={(e) => set("notes", e.target.value)} />
+      </label>
+      <Button disabled={loading} className="mt-5 border-0 brand-gradient text-white hover:opacity-90">
+        <Send className="size-4" />
+        {loading ? "Submitting…" : "Submit PIREP"}
+      </Button>
+    </form>
+  );
+}
+
+function Field({ label, value, onChange, required, type = "text" }: FieldProps) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-xs font-bold">{label}</span>
+      <Input required={required} type={type} value={value} onChange={(e) => onChange(e.target.value)} />
+    </label>
+  );
+}
+
+function HistoryView({ request }: HistoryViewProps) {
+  const [p, setP] = useState<any[]>([]);
+  useEffect(() => {
+    request("pireps").then((d: any) => setP(d.pireps || []));
+  }, [request]);
+  return (
+    <section className="premium-card">
+      <div className="kicker">
+        <History className="size-3" /> Records
+      </div>
+      <h2 className="mt-2 text-4xl font-black">PIREP History</h2>
+      <div className="mt-6 overflow-x-auto">
+        <table className="w-full min-w-[650px] text-left text-xs">
+          <thead>
+            <tr className="border-b border-border text-[9px] uppercase tracking-wider text-muted-foreground">
+              <th className="pb-3">Flight</th>
+              <th className="pb-3">Route</th>
+              <th className="pb-3">Aircraft</th>
+              <th className="pb-3">Time</th>
+              <th className="pb-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {p.map((x: any) => (
+              <tr key={x.id} className="border-b border-border">
+                <td className="py-4 font-black text-primary">{x.flight_number || "—"}</td>
+                <td className="py-4">
+                  {x.dep_icao || "—"} → {x.arr_icao || "—"}
+                </td>
+                <td className="py-4">{x.aircraft || "—"}</td>
+                <td className="py-4">
+                  {Math.floor((x.flight_time_minutes || 0) / 60)}h {(x.flight_time_minutes || 0) % 60}m
+                </td>
+                <td className="py-4">{x.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function EventsView({ request }: EventsViewProps) {
+  const [e, setE] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [action, setAction] = useState<string>("");
+
+  useEffect(() => {
+    request("events")
+      .then((d: any) => setE(d.events || []))
+      .finally(() => setLoading(false));
+  }, [request]);
+
+  const toggle = async (x: any) => {
+    setAction(x.id);
+    try {
+      await request(x.joined ? "event-unregister" : "event-register", { eventId: x.id });
+      const d = await request("events");
+      setE(d.events || []);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Event registration failed");
+    } finally {
+      setAction("");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="premium-card h-80 animate-pulse" />
+        <div className="premium-card h-80 animate-pulse" />
+      </div>
+    );
+
+  return (
+    <div className="space-y-5">
+      <section className="rounded-[2rem] bg-[#111b31] p-7 text-white sm:p-9">
+        <div className="kicker !text-[#d9bd7b]">
+          <CalendarDays className="size-3" /> Crew calendar
+        </div>
+        <h2 className="mt-3 text-4xl font-black">Events & operations.</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-white/55">
+          Join group flights, community events and scheduled VA operations. Event briefings, meeting links and participation limits are managed by the
+          operations team.
+        </p>
+      </section>
+      <div className="grid gap-5 lg:grid-cols-2">
+        {e.map((x) => {
+          const full = x.max_participants && Number(x.participants_count || 0) >= Number(x.max_participants) && !x.joined;
+          return (
+            <article key={x.id} className="premium-card overflow-hidden p-0">
+              {(x.banner_url || x.image_url) && <img src={x.banner_url || x.image_url} alt="" className="h-48 w-full object-cover" />}
+              <div className="p-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge>{x.event_type || "VA Event"}</Badge>
+                  {x.featured && <Badge variant="default">Featured</Badge>}
+                  {x.registration_open === false && <Badge variant="secondary">Registration closed</Badge>}
+                </div>
+                <h3 className="mt-3 text-2xl font-black">{x.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{x.description || "Air Astana Virtual crew event."}</p>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 text-xs">
+                  <div className="flex gap-2">
+                    <CalendarDays className="size-4 text-primary" />
+                    <span>
+                      {x.starts_at ? new Date(x.starts_at).toLocaleString() : "TBA"}
+                      {x.ends_at ? " → " + new Date(x.ends_at).toLocaleString() : ""}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <MapPin className="size-4 text-primary" />
+                    <span>{x.location || "Online"}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Plane className="size-4 text-primary" />
+                    <span>{x.aircraft || "All aircraft"}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Users className="size-4 text-primary" />
+                    <span>
+                      {x.participants_count || 0}
+                      {x.max_participants ? "/" + x.max_participants : ""} registered
+                    </span>
+                  </div>
+                </div>
+                {x.host && (
+                  <div className="mt-4 rounded-xl bg-muted p-3 text-xs">
+                    <b>Host:</b> {x.host}
+                  </div>
+                )}
+                {x.briefing && (
+                  <div className="mt-4">
+                    <div className="kicker">Briefing</div>
+                    <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{x.briefing}</p>
+                  </div>
+                )}
+                {x.requirements && (
+                  <div className="mt-4">
+                    <div className="kicker">Requirements</div>
+                    <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">{x.requirements}</p>
+                  </div>
+                )}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {x.meeting_url && (
+                    <a href={x.meeting_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-3 text-xs font-black">
+                      <ExternalLink className="size-4" /> Meeting link
+                    </a>
+                  )}
+                  <Button disabled={!!action || full || x.registration_open === false} onClick={() => toggle(x)} variant={x.joined ? "outline" : "default"}>
+                    {action === x.id ? "Updating…" : x.joined ? "Cancel registration" : full ? "Event full" : "Register for event"}
+                  </Button>
+                </div>
+                {x.registration_deadline && (
+                  <div className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Registration deadline: {new Date(x.registration_deadline).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
+        {!e.length && <div className="premium-card lg:col-span-2 py-14 text-center text-sm text-muted-foreground">No upcoming events are published yet.</div>}
+      </div>
+    </div>
+  );
+}
+
+function LeaderboardView({ request }: LeaderboardViewProps) {
+  const [rows, setRows] = useState<any[]>([]);
+  useEffect(() => {
+    request("leaderboard").then((d: any) => setRows(d.leaderboard || []));
+  }, [request]);
+  return (
+    <div className="space-y-5">
+      <section className="rounded-[2rem] bg-[#111b31] p-7 text-white">
+        <div className="kicker !text-[#d9bd7b]">
+          <Trophy className="size-3" /> Crew leaderboard
+        </div>
+        <h2 className="mt-3 text-4xl font-black">Flight time rankings.</h2>
+        <p className="mt-2 text-sm text-white/50">Approved PIREPs only. Rankings are informational and update from the VA records.</p>
+      </section>
+      <AdminTable title="Top crew" subtitle="Sorted by approved flight time, then approved PIREPs.">
+        {rows.map((x: any, i: number) => (
+          <div key={x.id} className="grid grid-cols-[44px_1fr_auto_auto] items-center gap-3 border-b border-border py-4">
+            <div className="grid size-9 place-items-center rounded-full bg-muted text-xs font-black">{i + 1}</div>
+            <div>
+              <div className="text-sm font-black">{x.callsign || x.full_name}</div>
+              <div className="text-[10px] text-muted-foreground">{x.rank}</div>
+            </div>
+            <div className="text-right text-sm font-black">{Number(x.hours || 0).toFixed(1)}h</div>
+            <Badge>{x.pireps} PIREPs</Badge>
+          </div>
+        ))}
+      </AdminTable>
+    </div>
+  );
+}
+
+function ChallengesView({ request }: ChallengesViewProps) {
+  const [c, setC] = useState<any[]>([]);
+  useEffect(() => {
+    request("challenges").then((d: any) => setC(d.challenges || []));
+  }, [request]);
+  return (
+    <div className="space-y-5">
+      <section className="rounded-[2rem] bg-[#111b31] p-7 text-white">
+        <div className="kicker !text-[#d9bd7b]">
+          <Target className="size-3" /> Career challenges
+        </div>
+        <h2 className="mt-3 text-4xl font-black">Build your flight record.</h2>
+        <p className="mt-2 text-sm text-white/50">Milestones are calculated from approved PIREPs and flight time.</p>
+      </section>
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {c.map((x) => (
+          <article key={x.id} className="premium-card">
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="text-lg font-black">{x.title}</div>
+                <p className="mt-1 text-xs text-muted-foreground">{x.description}</p>
+              </div>
+              <span className="text-xl">{x.completed ? "🏆" : "🎯"}</span>
+            </div>
+            <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full brand-gradient" style={{ width: x.progress + "%" }} />
+            </div>
+            <div className="mt-2 flex justify-between text-[10px] font-bold text-muted-foreground">
+              <span>
+                {x.value.toFixed ? x.value.toFixed(1) : x.value} {x.unit}
+              </span>
+              <span>
+                {x.target} {x.unit}
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ActivityView({ request }: ActivityViewProps) {
+  const [items, setItems] = useState<any[]>([]);
+  useEffect(() => {
+    request("activity").then((d: any) => setItems(d.items || []));
+  }, [request]);
+  return (
+    <AdminTable title="My Activity" subtitle="A unified timeline of your PIREPs, dispatches and event registrations.">
+      {items.map((x: any, i: number) => (
+        <div key={i} className="flex items-start gap-4 border-b border-border py-4">
+          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-muted text-primary">
+            {x.type === "PIREP" ? <FileText className="size-4" /> : x.type === "EVENT" ? <CalendarDays className="size-4" /> : <Send className="size-4" />}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-black">{x.title}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{x.detail}</div>
+            <div className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{x.at ? new Date(x.at).toLocaleString() : ""}</div>
+          </div>
+          <Badge>{x.status}</Badge>
+        </div>
+      ))}
+      {!items.length && <div className="py-12 text-center text-sm text-muted-foreground">No activity yet.</div>}
+    </AdminTable>
+  );
+}
+
+function ProfileView({ data, member }: ProfileViewProps) {
+  return (
+    <div className="space-y-5">
+      <section className="rounded-[2rem] bg-[#111b31] p-8 text-white">
+        <div className="kicker !text-[#d9bd7b]">Crew profile</div>
+        <h2 className="mt-3 text-4xl font-black">{member.full_name || member.discord_username || member.callsign}</h2>
+        <p className="mt-2 text-sm text-white/50">
+          {member.callsign} · {member.ifc_username}
+        </p>
+      </section>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Stat icon={Shield} value={data.rank?.name || "Cadet Pilot"} label="current rank" />
+        <Stat icon={Clock3} value={data.stats.hours.toFixed(1) + "h"} label="approved VA time" />
+        <Stat icon={UserRound} value={member.is_admin ? "Administrator" : "Crew member"} label="access level" />
+      </div>
+    </div>
+  );
+}
+
+function AdminView({ request }: AdminViewProps) {
+  const [tab, setTab] = useState("overview");
+  const [data, setData] = useState<any>();
+  const [routes, setRoutes] = useState<RouteRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const d = await request("admin-data");
+      setData(d);
+    } catch {
+    } finally {
+      setLoading(false);
+    }
+  }, [request]);
+
+  useEffect(() => {
+    Promise.all([request("admin-data"), fetchRoutes()])
+      .then(([d, r]) => {
+        setData(d);
+        setRoutes(r);
+      })
+      .finally(() => setLoading(false));
+  }, [request]);
+
+  if (!data) return <div className="premium-card py-20 text-center text-sm font-bold text-muted-foreground">Loading command center…</div>;
+
+  const pending = data.pireps.filter((x: any) => x.status === "pending").length;
+  const activeMembers = data.members.filter((x: any) => x.status === "active").length;
+
+  const nav = [
+    ["overview", "Overview", LayoutDashboard],
+    ["pireps", "PIREP Queue", FileText],
+    ["members", "Members", UserRound],
+    ["applications", "Applications", Shield],
+    ["routes", "Routes", MapPin],
+    ["dispatches", "Dispatches", Send],
+    ["events", "Events", CalendarDays],
+    ["notices", "NOTAMs & Notices", Radio],
+    ["ranks", "Ranks", Activity],
+    ["fleet", "Fleet", Plane],
+    ["activity", "Activity", History],
+    ["audit", "Audit Log", History],
+    ["custom", "Discord & Theme", Palette],
+    ["settings", "Settings", Shield],
+  ] as const;
+
+  async function review(id: string, status: string, action?: string, reason?: string, extra?: any) {
+    await request("admin-pirep", { id, status, action, reason, ...(extra || {}) });
+    await refresh();
+  }
+
+  async function toggleMember(x: any) {
+    await request("admin-member", { id: x.id, is_admin: !x.is_admin, status: x.status || "active" });
+    await refresh();
+  }
+
+  return (
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-[2rem] bg-[#0d1629] text-white shadow-2xl">
+        <div className="hairline-grid p-7 sm:p-9">
+          <div className="flex flex-col gap-7 xl:flex-row xl:items-end xl:justify-between">
+            <div>
+              <div className="kicker !text-[#d9bd7b]">
+                <Shield className="size-3" /> Air Astana Virtual · Administration
+              </div>
+              <h2 className="mt-3 text-4xl font-black tracking-[-.06em] sm:text-5xl">Operations Command</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-white/50">
+                Manage crew, PIREPs, dispatch activity, route operations, events, notices and VA configuration from one protected workspace.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <AdminMetric value={String(activeMembers)} label="active crew" />
+              <AdminMetric value={String(pending)} label="pending PIREPs" />
+              <AdminMetric value={String(data.applications.length)} label="applications" />
+              <AdminMetric value={String(data.dispatches.length)} label="dispatches" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <div className="grid gap-5 lg:grid-cols-[230px_1fr]">
+        <aside className="rounded-3xl border border-border bg-white p-3 shadow-soft lg:sticky lg:top-24 lg:h-fit">
+          <div className="px-3 pb-3 pt-2 text-[9px] font-black uppercase tracking-[.2em] text-muted-foreground">Command modules</div>
+          <div className="grid gap-1">
+            {nav.map(([id, label, Icon]) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={
+                  "flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-extrabold transition " +
+                  (tab === id ? "bg-[#111b31] text-white" : "text-muted-foreground hover:bg-muted")
+                }
+              >
+                <span className="flex items-center gap-3">
+                  <Icon className="size-4" />
+                  {label}
+                </span>
+                {id === "pireps" && pending > 0 ? <Badge variant="destructive">{pending}</Badge> : null}
+              </button>
+            ))}
+          </div>
+        </aside>
+        <section className="min-w-0">
+          {tab === "overview" && <AdminOverview data={data} pending={pending} setTab={setTab} />}
+          {tab === "pireps" && <AdminPireps data={data} review={review} />}
+          {tab === "members" && <AdminMembers data={data} toggleMember={toggleMember} request={request} refresh={refresh} />}
+          {tab === "applications" && <AdminApplications data={data} request={request} refresh={refresh} />}
+          {tab === "routes" && <AdminRoutes routes={routes} />}
+          {tab === "dispatches" && <AdminDispatches data={data} request={request} refresh={refresh} />}
+          {tab === "events" && <AdminEvents data={data} request={request} refresh={refresh} />}
+          {tab === "notices" && <AdminNotices data={data} request={request} refresh={refresh} />}
+          {tab === "ranks" && <AdminRanks data={data} request={request} refresh={refresh} />}
+          {tab === "fleet" && <AdminFleet routes={routes} />}
+          {tab === "activity" && <AdminActivity data={data} />}
+          {tab === "audit" && <AdminAudit data={data} />}
+          {tab === "custom" && <AdminCustom data={data} request={request} refresh={refresh} />}
+          {tab === "settings" && <AdminSettings data={data} />}
+        </section>
+      </div>
+      {loading && (
+        <div className="fixed inset-0 z-[200] flex items-start justify-center bg-slate-900/35 px-4 pt-20 backdrop-blur-[2px]" role="status" aria-live="polite">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/15 bg-[#111b31] px-5 py-4 text-sm font-black text-white shadow-2xl">
+            <span className="inline-block size-4 animate-spin rounded-full border-2 border-white/25 border-t-[#d9bd7b]" />
+            Updating command center…
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminMetric({ value, label }: AdminMetricProps) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+      <div className="text-xl font-black">{value}</div>
+      <div className="mt-1 text-[8px] font-black uppercase tracking-wider text-white/40">{label}</div>
+    </div>
+  );
+}
+
+function AdminOverview({ data, pending, setTab }: AdminOverviewProps) {
+  const cards = [
+    ["pireps", "PIREP review", pending + " waiting", FileText],
+    ["members", "Crew roster", data.members.length + " profiles", UserRound],
+    ["applications", "Recruitment", data.applications.length + " records", Shield],
+    ["routes", "Network", data.dispatches.length + " recent dispatches", MapPin],
+    ["events", "Events", data.events.length + " published", CalendarDays],
+    ["notices", "Notices", data.announcements.length + " notices", Radio],
+  ];
+
+  return (
+    <div className="space-y-5">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {cards.map(([id, label, value, Icon]) => (
+          <button key={String(id)} onClick={() => setTab(String(id))} className="premium-card text-left">
+            <Icon className="size-5 text-primary" />
+            <div className="mt-5 text-lg font-black">{label}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{value as string}</div>
+            <div className="mt-4 text-[9px] font-black uppercase tracking-wider text-primary">Open module →</div>
+          </button>
+        ))}
+      </div>
+      <section className="premium-card">
+        <div className="kicker">Latest operational activity</div>
+        <div className="mt-5 divide-y divide-border">
+          {data.dispatches.slice(0, 6).map((x: any) => (
+            <div key={x.id} className="flex items-center justify-between py-3 text-xs">
+              <span className="font-black">
+                {x.flight_number || "Dispatch"} · {x.dep_icao || "—"} → {x.arr_icao || "—"}
+              </span>
+              <Badge>{x.status || "DISPATCHED"}</Badge>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function AdminPireps({ data, review }: AdminPirepsProps) {
+  const [p, setP] = useState("all");
+  const [edit, setEdit] = useState<any>(null);
+  const list = data.pireps.filter((x: any) => p === "all" || String(x.status) === p);
+
+  return (
+    <div className="space-y-5">
+      <AdminTable title="PIREP Operations" subtitle="Every field is editable. Status changes are reversible and synchronize Discord reactions / pending threads." filters={["all", "pending", "approved", "rejected"]} value={p} setValue={setP}>
+        {list.map((x: any) => (
+          <div key={x.id} className="border-b border-border py-4">
+            <div className="grid gap-3 lg:grid-cols-[1.2fr_1fr_.7fr_.7fr_auto] lg:items-center">
+              <div>
+                <div className="text-xs font-black">{x.flight_number || "Manual PIREP"}</div>
+                <div className="text-[10px] text-muted-foreground">
+                  {x.dep_icao || "—"} → {x.arr_icao || "—"} · {x.aircraft || "—"}
+                </div>
+                <div className="mt-1 text-[10px] text-muted-foreground">
+                  {x.notes_staff_only ? "Staff-only notes" : "Pilot notes visible"}
+                  {x.discord_message_id ? " · Discord linked" : " · No Discord message"}
+                </div>
+              </div>
+              <div className="text-xs">
+                {Math.floor((x.flight_time_minutes || 0) / 60)}h {(x.flight_time_minutes || 0) % 60}m
+              </div>
+              <div className="text-xs text-muted-foreground">{x.flight_date || "—"}</div>
+              <Badge variant={x.status === "approved" ? "default" : x.status === "rejected" ? "destructive" : "secondary"}>{x.status}</Badge>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => setEdit(x)}>
+                  <Pencil className="mr-1 size-3" />
+                  Edit all
+                </Button>
+                {x.status !== "approved" && <Button size="sm" onClick={() => review(x.id, "approved", "approve")}>Approve 🟢</Button>}
+                {x.status !== "pending" && (
+                  <Button size="sm" variant="outline" onClick={() => review(x.id, "pending", "pending")}>
+                    Pending 🟡
+                  </Button>
+                )}
+                {x.status !== "rejected" && (
+                  <Button size="sm" variant="destructive" onClick={() => review(x.id, "rejected", "reject")}>
+                    Reject 🔴
+                  </Button>
+                )}
+              </div>
+            </div>
+            {edit?.id === x.id && <PirepEditor item={x} review={review} close={() => setEdit(null)} />}
+          </div>
+        ))}
+      </AdminTable>
+    </div>
+  );
+}
+
+function PirepEditor({ item, review, close }: PirepEditorProps) {
+  const [f, setF] = useState<any>({
+    flight_number: item.flight_number || "",
+    dep_icao: item.dep_icao || "",
+    arr_icao: item.arr_icao || "",
+    aircraft: item.aircraft || "",
+    flight_date: item.flight_date || "",
+    flight_time_minutes: String(item.flight_time_minutes || 0),
+    notes: item.notes || "",
+    notes_staff_only: Boolean(item.notes_staff_only),
+    pax: item.pax ?? "",
+    cargo_kg: item.cargo_kg ?? "",
+    server: item.server || "",
+    landing_rate_fpm: item.landing_rate_fpm ?? "",
+    status: item.status || "pending",
+  });
+
+  const set = (k: string, v: any) => setF((x: any) => ({ ...x, [k]: v }));
+
+  const save = async () => {
+    await review(item.id, f.status, "admin_edit", {
+      ...f,
+      flight_time_minutes: Number(f.flight_time_minutes || 0),
+      pax: f.pax === "" ? null : Number(f.pax),
+      cargo_kg: f.cargo_kg === "" ? null : Number(f.cargo_kg),
+      landing_rate_fpm: f.landing_rate_fpm === "" ? null : Number(f.landing_rate_fpm),
+    });
+    close();
+  };
+
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+      <div className="kicker">PIREP editor</div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <Input value={f.flight_number} onChange={(e) => set("flight_number", e.target.value)} placeholder="Flight number" />
+        <Input value={f.dep_icao} onChange={(e) => set("dep_icao", e.target.value)} placeholder="Departure ICAO" />
+        <Input value={f.arr_icao} onChange={(e) => set("arr_icao", e.target.value)} placeholder="Arrival ICAO" />
+        <Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} placeholder="Aircraft" />
+        <Input value={f.flight_date} onChange={(e) => set("flight_date", e.target.value)} type="date" />
+        <Input value={f.flight_time_minutes} onChange={(e) => set("flight_time_minutes", e.target.value)} type="number" placeholder="Minutes" />
+        <Input value={f.pax} onChange={(e) => set("pax", e.target.value)} type="number" placeholder="PAX" />
+        <Input value={f.cargo_kg} onChange={(e) => set("cargo_kg", e.target.value)} type="number" placeholder="Cargo kg" />
+        <Input value={f.server} onChange={(e) => set("server", e.target.value)} placeholder="Server" />
+        <Input value={f.landing_rate_fpm} onChange={(e) => set("landing_rate_fpm", e.target.value)} type="number" placeholder="Landing FPM" />
+        <Select value={f.status} onValueChange={(v) => set("status", v)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">Pending 🟡</SelectItem>
+            <SelectItem value="approved">Approved 🟢</SelectItem>
+            <SelectItem value="rejected">Rejected 🔴</SelectItem>
+          </SelectContent>
+        </Select>
+        <label className="flex items-center gap-2 text-xs font-bold">
+          <input type="checkbox" checked={f.notes_staff_only} onChange={(e) => set("notes_staff_only", e.target.checked)} className="size-4 accent-primary" />
+          Notes for staff only
+        </label>
+        <Textarea value={f.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Notes" className="sm:col-span-2 lg:col-span-3" rows={4} />
+      </div>
+      <div className="mt-4 flex gap-2">
+        <Button onClick={save}>Save PIREP</Button>
+        <Button variant="outline" onClick={close}>
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AdminMembers({ data, request, refresh }: AdminMembersProps & { refresh: () => Promise<void> }) {
+  const [edit, setEdit] = useState<any>(null);
+  const [form, setForm] = useState<any>({});
+
+  const open = (x: any) => {
+    setEdit(x);
+    setForm({
+      callsign: x.callsign || "",
+      full_name: x.full_name || "",
+      ifc_username: x.ifc_username || "",
+      discord_username: x.discord_username || "",
+      timezone: x.timezone || "",
+      status: x.status || "active",
+      is_admin: Boolean(x.is_admin),
+      rank_id: x.rank_id || "",
+    });
+  };
+
+  const set = (k: string, v: any) => setForm((x: any) => ({ ...x, [k]: v }));
+
+  return (
+    <div className="space-y-5">
+      <AdminTable title="Crew Roster" subtitle="Every visible crew identity and access field is editable.">
+        {data.members.map((x: any) => (
+          <div key={x.id} className="grid gap-3 border-b border-border py-4 md:grid-cols-[1.2fr_1fr_1fr_auto] md:items-center">
+            <div>
+              <div className="text-xs font-black">{x.callsign || "Unassigned"} · {x.full_name || x.discord_username || "Crew member"}</div>
+              <div className="text-[10px] text-muted-foreground">{x.discord_username || "Discord"} · {x.ifc_username || "IF identity"}</div>
+            </div>
+            <Badge>{x.status}</Badge>
+            <Badge variant={x.is_admin ? "default" : "secondary"}>{x.is_admin ? "Administrator" : "Crew"}</Badge>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => open(x)}>
+                <Pencil className="mr-1 size-3" />
+                Edit all
+              </Button>
+            </div>
+          </div>
+        ))}
+      </AdminTable>
+      {edit && (
+        <section className="premium-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="kicker">Crew editor</div>
+              <h3 className="mt-2 text-2xl font-black">{edit.callsign || "Crew member"}</h3>
+            </div>
+            <Button variant="ghost" onClick={() => setEdit(null)}>
+              Close
+            </Button>
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} placeholder="Callsign" />
+            <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} placeholder="Full name" />
+            <Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} placeholder="Infinite Flight username" />
+            <Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} placeholder="Discord username" />
+            <Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone" />
+            <Select value={form.status} onValueChange={(v) => set("status", v)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="suspended">Suspended</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input value={form.rank_id} onChange={(e) => set("rank_id", e.target.value)} placeholder="Rank ID (optional)" />
+            <label className="flex items-center gap-2 text-xs font-bold">
+              <input type="checkbox" checked={form.is_admin} onChange={(e) => set("is_admin", e.target.checked)} className="size-4 accent-primary" />
+              Administrator
+            </label>
+          </div>
+          <Button
+            className="mt-4"
+            onClick={async () => {
+              await request("admin-member", { id: edit.id, ...form });
+              setEdit(null);
+              await refresh();
+            }}
+          >
+            Save crew changes
+          </Button>
+        </section>
+      )}
+    </div>
+  );
+}
+
+function AdminApplications({ data, request, refresh }: AdminApplicationsProps & { refresh: () => Promise<void> }) {
+  return (
+    <AdminTable title="Recruitment Applications" subtitle="Application records are editable from the protected recruitment workflow.">
+      {data.applications.map((x: any) => (
+        <ApplicationEditor key={x.id} item={x} request={request} refresh={refresh} />
       ))}
     </AdminTable>
   );
-  }
-function RankEditor({item,request}: RankEditorProps){const[name,setName]=useState(item.name||"");const[h,setH]=useState(String(item.min_hours||0));const[badge,setBadge]=useState(item.badge||"CADET");const[order,setOrder]=useState(String(item.order_index||0));const save=async()=>{await request("admin-rank",{id:item.id,name,min_hours:Number(h),badge,order_index:Number(order)});window.dispatchEvent(new Event("crew-admin-refresh"))};return <div className="grid gap-3 border-b border-border py-4 md:grid-cols-[1fr_1fr_.7fr_.5fr_auto] md:items-center"><Input value={name} onChange={e=>setName(e.target.value)} placeholder="Rank name"/><Input value={h} onChange={e=>setH(e.target.value)} type="number" placeholder="Min hours"/><Input value={badge} onChange={e=>setBadge(e.target.value)} placeholder="Badge"/><Input value={order} onChange={e=>setOrder(e.target.value)} type="number"/><Button size="sm" onClick={save}>Save</Button></div>}
-function AdminFleet({routes}: AdminFleetProps){const counts=routes.reduce((m:any,r)=>{m[r.aircraft]=(m[r.aircraft]||0)+1;return m},{});return <AdminTable title="Fleet & Network Allocation" subtitle="Aircraft represented across the current route schedule.">{Object.entries(counts).map(([name,count]:any)=><div key={name} className="grid grid-cols-[1fr_auto] border-b border-border py-4"><div className="text-sm font-black">{name}</div><Badge>{count} sectors</Badge></div>)}</AdminTable>}
-function AdminActivity({data}: AdminActivityProps){const items=[...data.pireps.map((x:any)=>({at:x.created_at,label:"PIREP "+(x.flight_number||"submission"),status:x.status})),...data.dispatches.map((x:any)=>({at:x.dispatched_at,label:"Dispatch "+(x.flight_number||"sector"),status:x.status}))].sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,50);return <AdminTable title="Activity Log" subtitle="Recent PIREP and dispatch activity.">{items.map((x:any,i:number)=><div key={i} className="flex items-center justify-between border-b border-border py-4"><div><div className="text-xs font-black">{x.label}</div><div className="mt-1 text-[10px] text-muted-foreground">{x.at?new Date(x.at).toLocaleString():"—"}</div></div><Badge>{x.status||"logged"}</Badge></div>)}</AdminTable>}
-function AdminAudit({data}: AdminAuditProps){return <AdminTable title="Audit Log" subtitle="Every PIREP state change is recorded for accountability.">{(data.audit||[]).map((x:any)=><div key={x.id} className="flex items-center justify-between border-b border-border py-3 text-xs"><div><b>{x.action}</b><div className="text-[10px] text-muted-foreground">{x.from_status||"—"} → {x.to_status||"—"} · {x.reason||"No reason"}</div></div><span className="text-muted-foreground">{x.created_at?new Date(x.created_at).toLocaleString():""}</span></div>)}</AdminTable>}
-function AdminCustom({data,request,refresh}: AdminCustomProps){const p=(data.settings||[]).find((x:any)=>x.key==="discord_pirep")?.value||{};const ev=(data.settings||[]).find((x:any)=>x.key==="discord_event")?.value||{};const[pColor,setPColor]=useState(p.embedColor||"#d9bd7b");const[eColor,setEColor]=useState(ev.embedColor||"#d9bd7b");const[pChannel,setPChannel]=useState(p.channelId||"");const[eChannel,setEChannel]=useState(ev.channelId||"");const[enabled,setEnabled]=useState(p.webhookEnabled!==false);const[test,setTest]=useState("");const save=async(key:string,value:any)=>{await request("admin-settings",{key,value});await refresh()};return <div className="grid gap-5 lg:grid-cols-2"><section className="premium-card"><div className="kicker">Discord Bot · PIREP</div><h3 className="mt-2 text-2xl font-black">Bot channel & reaction controls</h3><label className="mt-4 block text-xs font-bold">Discord PIREP channel ID<input value={pChannel} onChange={e=>setPChannel(e.target.value)} className="form-input mt-2" placeholder="123456789012345678"/></label><label className="mt-4 block text-xs font-bold">Embed colour<input type="color" value={pColor} onChange={e=>setPColor(e.target.value)} className="mt-2 h-10 w-full rounded-xl"/></label><label className="mt-4 block text-xs font-bold">Footer text<input value={p.footer||"Managed by Gurnoor | CEO"} onChange={e=>p.footer=e.target.value} className="form-input mt-2"/></label><label className="mt-4 block text-xs font-bold">Pending thread name<input value={p.pendingThreadName||"PIREP Pending 🟡"} onChange={e=>p.pendingThreadName=e.target.value} className="form-input mt-2"/></label><label className="mt-4 flex items-center gap-3 text-xs font-bold"><input type="checkbox" checked={enabled} onChange={e=>setEnabled(e.target.checked)} className="size-4 accent-primary"/> Enable PIREP Discord bot</label><div className="mt-5 flex flex-wrap gap-2"><Button onClick={async()=>{setTest("");try{await save("discord_pirep",{...p,channelId:pChannel,embedColor:pColor,webhookEnabled:enabled});setTest("PIREP Discord settings saved.")}catch(err){setTest(err instanceof Error?err.message:"Could not save settings.")}}}>Save PIREP Discord settings</Button><Button variant="outline" onClick={async()=>{setTest("");try{await save("discord_pirep",{...p,channelId:pChannel,embedColor:pColor,webhookEnabled:enabled});const r=await request("admin-test-webhook",{kind:"pirep"});setTest(r?.messageId?"Test PIREP sent and 🔴 reaction added successfully.":"Discord bot returned no message ID.")}catch(err){setTest(err instanceof Error?err.message:"Discord bot test failed.")}}}>Send test PIREP</Button></div>{test&&<div className="mt-4 rounded-2xl border border-border bg-muted p-4 text-sm font-bold">{test}</div>}</section><section className="premium-card"><div className="kicker">Discord event styling</div><h3 className="mt-2 text-2xl font-black">Event bot</h3><label className="mt-4 block text-xs font-bold">Discord Events channel ID<input value={eChannel} onChange={e=>setEChannel(e.target.value)} className="form-input mt-2" placeholder="123456789012345678"/></label><label className="mt-4 block text-xs font-bold">Embed colour<input type="color" value={eColor} onChange={e=>setEColor(e.target.value)} className="mt-2 h-10 w-full rounded-xl"/></label><label className="mt-4 block text-xs font-bold">Footer text<input value={ev.footer||"Managed by Gurnoor | CEO"} onChange={e=>ev.footer=e.target.value} className="form-input mt-2"/></label><label className="mt-4 flex items-center gap-3 text-xs font-bold"><input type="checkbox" checked={ev.webhookEnabled!==false} onChange={e=>ev.webhookEnabled=e.target.checked} className="size-4 accent-primary"/> Enable event Discord bot</label><div className="mt-5 flex flex-wrap gap-2"><Button onClick={()=>save("discord_event",{...ev,channelId:eChannel,embedColor:eColor})}>Save event Discord settings</Button><Button variant="outline" onClick={async()=>{setTest("");try{await save("discord_event",{...ev,channelId:eChannel,embedColor:eColor});const r=await request("admin-test-webhook",{kind:"event"});setTest(r?.messageId?"Test event sent successfully.":"Discord bot returned no message ID.")}catch(err){setTest(err instanceof Error?err.message:"Event webhook test failed.")}}}>Send test event</Button></div></section></div>}
-function DispatchEditor({item,request}: DispatchEditorProps){const[open,setOpen]=useState(false);const[f,setF]=useState<any>({status:item.status||"DISPATCHED",flight_number:item.flight_number||"",dep_icao:item.dep_icao||"",arr_icao:item.arr_icao||"",aircraft:item.aircraft||"",route_id:item.route_id||""});const set=(k:string,v:any)=>setF((x:any)=>({...x,[k]:v}));const save=async()=>{await request("admin-dispatch",{id:item.id,...f});setOpen(false);window.dispatchEvent(new Event("crew-admin-refresh"))};return <div className="border-b border-border py-4"><div className="flex items-center justify-between gap-3"><div><div className="text-xs font-black">{f.flight_number||"Dispatch"}</div><div className="text-[10px] text-muted-foreground">{f.dep_icao||"—"} → {f.arr_icao||"—"} · {f.aircraft||"—"}</div></div><div className="flex items-center gap-2"><Badge>{f.status}</Badge><Button size="sm" variant="outline" onClick={()=>setOpen(!open)}><Pencil className="mr-1 size-3"/>Edit all</Button></div></div>{open&&<div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Input value={f.flight_number} onChange={e=>set("flight_number",e.target.value)} placeholder="Flight number"/><Input value={f.dep_icao} onChange={e=>set("dep_icao",e.target.value)} placeholder="Departure ICAO"/><Input value={f.arr_icao} onChange={e=>set("arr_icao",e.target.value)} placeholder="Arrival ICAO"/><Input value={f.aircraft} onChange={e=>set("aircraft",e.target.value)} placeholder="Aircraft"/><Input value={f.route_id} onChange={e=>set("route_id",e.target.value)} placeholder="Route ID"/><Select value={f.status} onValueChange={v=>set("status",v)}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="DISPATCHED">DISPATCHED</SelectItem><SelectItem value="CANCELLED">CANCELLED</SelectItem><SelectItem value="PIREP_FILED">PIREP FILED</SelectItem><SelectItem value="CLOSED">CLOSED</SelectItem></SelectContent></Select><Button onClick={save}>Save dispatch</Button></div>}</div>}
+}
 
-function AdminSettings({data}: AdminSettingsProps){return <div className="grid gap-5 lg:grid-cols-2"><section className="premium-card"><div className="kicker">System status</div><h3 className="mt-2 text-2xl font-black">Crew Center configuration</h3><div className="mt-5 grid gap-3">{[["Discord access","Enabled"],["Infinite Flight identity","Linked during crew onboarding"],["ACARS verification","Enabled"],["Admin authorization","Backend controlled"],["Route source","Public route CSV"]].map(([a,b])=> <div key={a} className="flex items-center justify-between rounded-xl bg-muted px-4 py-3 text-xs"><span className="font-bold">{a}</span><span className="font-black text-primary">{b}</span></div>)}</div></section><section className="premium-card"><div className="kicker">Data overview</div><h3 className="mt-2 text-2xl font-black">Current records</h3><div className="mt-5 space-y-2 text-sm">{Object.entries({Members:data.members.length,Applications:data.applications.length,PIREP:data.pireps.length,Dispatches:data.dispatches.length,Events:data.events.length,Notices:data.announcements.length}).map(([k,v])=><div key={k} className="flex justify-between border-b border-border py-3"><span>{k}</span><b>{String(v)}</b></div>)}</div></section></div>}
-function AdminTable({title,subtitle,children,filters,value,setValue}: AdminTableProps){return <section className="premium-card"><div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"><div><div className="kicker">Administration</div><h3 className="mt-2 text-2xl font-black">{title}</h3><p className="mt-1 text-xs text-muted-foreground">{subtitle}</p></div>{filters&&setValue&&<Select value={value} onValueChange={setValue}><SelectTrigger className="w-44"><SelectValue placeholder="Filter"/></SelectTrigger><SelectContent>{filters.map(x=><SelectItem key={x} value={x}>{x==="all"?"All statuses":x}</SelectItem>)}</SelectContent></Select>}</div><div className="mt-5">{children}</div></section>}
-function Stat({icon:Icon,value,label}: StatProps){return <Card className="premium-card border-border/70"><CardContent className="p-5"><Icon className="size-5 text-primary"/><div className="mt-5 text-2xl font-black">{value}</div><div className="mt-1 text-[9px] font-extrabold uppercase tracking-[.16em] text-muted-foreground">{label}</div></CardContent></Card>}
+function ApplicationEditor({ item, request, refresh }: ApplicationEditorProps & { refresh: () => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<any>({
+    status: item.status || "pending",
+    applicant_name: item.applicant_name || "",
+    ifc_username: item.ifc_username || "",
+    callsign: item.callsign || "",
+    discord_user_id: item.discord_user_id || "",
+    discord_username: item.discord_username || "",
+    age: item.age ?? "",
+    timezone: item.timezone || "",
+    experience: item.experience || "",
+    favourite_aircraft: item.favourite_aircraft || "",
+    motivation: item.motivation || "",
+    agreed_to_rules: Boolean(item.agreed_to_rules),
+    rejection_reason: item.rejection_reason || "",
+  });
+
+  const set = (k: string, v: any) => setForm((x: any) => ({ ...x, [k]: v }));
+
+  const save = async () => {
+    await request("admin-application", { id: item.id, ...form });
+    setOpen(false);
+    await refresh();
+  };
+
+  return (
+    <div className="border-b border-border py-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-black">{form.applicant_name || "Applicant"}</div>
+          <div className="text-[10px] text-muted-foreground">
+            {form.ifc_username || "Infinite Flight identity"} · {form.callsign || "No callsign"} · {form.discord_username || form.discord_user_id || "No Discord"}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge>{form.status}</Badge>
+          <Button size="sm" variant="outline" onClick={() => setOpen(!open)}>
+            <Pencil className="mr-1 size-3" />
+            Edit all
+          </Button>
+        </div>
+      </div>
+      {open && (
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Input value={form.applicant_name} onChange={(e) => set("applicant_name", e.target.value)} placeholder="Applicant name" />
+          <Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} placeholder="IFC username" />
+          <Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} placeholder="Callsign" />
+          <Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} placeholder="Discord username" />
+          <Input value={form.discord_user_id} onChange={(e) => set("discord_user_id", e.target.value)} placeholder="Discord ID" />
+          <Input value={form.age} onChange={(e) => set("age", e.target.value)} type="number" placeholder="Age" />
+          <Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone" />
+          <Input value={form.experience} onChange={(e) => set("experience", e.target.value)} placeholder="Flight experience" />
+          <Input value={form.favourite_aircraft} onChange={(e) => set("favourite_aircraft", e.target.value)} placeholder="Favourite aircraft" />
+          <Select value={form.status} onValueChange={(v) => set("status", v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <label className="flex items-center gap-2 text-xs font-bold">
+            <input type="checkbox" checked={form.agreed_to_rules} onChange={(e) => set("agreed_to_rules", e.target.checked)} className="size-4 accent-primary" />
+            Rules accepted
+          </label>
+          <Textarea value={form.motivation} onChange={(e) => set("motivation", e.target.value)} placeholder="Motivation" className="sm:col-span-2 lg:col-span-3" rows={5} />
+          <Textarea value={form.rejection_reason} onChange={(e) => set("rejection_reason", e.target.value)} placeholder="Rejection / staff note" className="sm:col-span-2 lg:col-span-3" rows={3} />
+          <Button onClick={save}>Save application</Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminRoutes({ routes }: AdminRoutesProps) {
+  return (
+    <AdminTable title="Route Network" subtitle="Shared network source used by the public site and Crew Center.">
+      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        {routes.map((r) => (
+          <div key={r.routeId} className="rounded-2xl bg-muted p-4">
+            <div className="text-xs font-black text-primary">
+              {r.routeNo} · {r.aircraft}
+            </div>
+            <div className="mt-1 text-sm font-black">
+              {r.depIcao} → {r.arrIcao}
+            </div>
+            <div className="mt-1 text-[10px] text-muted-foreground">
+              {r.depAirport} → {r.arrAirport}
+            </div>
+          </div>
+        ))}
+      </div>
+    </AdminTable>
+  );
+}
+
+function AdminDispatches({ data, request, refresh }: AdminDispatchesProps & { refresh: () => Promise<void> }) {
+  return (
+    <AdminTable title="Dispatch Control" subtitle="Track and edit active, filed and closed dispatch records.">
+      {data.dispatches.map((x: any) => (
+        <DispatchEditor key={x.id} item={x} request={request} refresh={refresh} />
+      ))}
+    </AdminTable>
+  );
+}
+
+function AdminEvents({ data, request, refresh }: AdminEventsProps) {
+  const [id, setId] = useState("");
+  const [f, setF] = useState<any>({
+    title: "",
+    description: "",
+    startsAt: "",
+    endsAt: "",
+    location: "",
+    aircraft: "",
+    route: "",
+    imageUrl: "",
+    bannerUrl: "",
+    eventType: "VA Event",
+    host: "",
+    meetingUrl: "",
+    briefing: "",
+    requirements: "",
+    registrationDeadline: "",
+    maxParticipants: "",
+    featured: false,
+    timezone: "",
+    durationMinutes: "",
+    registrationOpen: true,
+    status: "published",
+  });
+
+  const set = (k: string, v: any) => setF((x: any) => ({ ...x, [k]: v }));
+
+  const edit = (x: any) => {
+    setId(x.id);
+    setF({
+      title: x.title || "",
+      description: x.description || "",
+      startsAt: x.starts_at ? new Date(x.starts_at).toISOString().slice(0, 16) : "",
+      endsAt: x.ends_at ? new Date(x.ends_at).toISOString().slice(0, 16) : "",
+      location: x.location || "",
+      aircraft: x.aircraft || "",
+      route: x.route || "",
+      imageUrl: x.image_url || "",
+      bannerUrl: x.banner_url || "",
+      eventType: x.event_type || "VA Event",
+      host: x.host || "",
+      meetingUrl: x.meeting_url || "",
+      briefing: x.briefing || "",
+      requirements: x.requirements || "",
+      registrationDeadline: x.registration_deadline ? new Date(x.registration_deadline).toISOString().slice(0, 16) : "",
+      maxParticipants: x.max_participants ?? "",
+      featured: Boolean(x.featured),
+      timezone: x.timezone || "",
+      durationMinutes: x.duration_minutes ?? "",
+      registrationOpen: x.registration_open !== false,
+      status: x.status || "published",
+    });
+  };
+
+  const reset = () => {
+    setId("");
+    setF({
+      title: "",
+      description: "",
+      startsAt: "",
+      endsAt: "",
+      location: "",
+      aircraft: "",
+      route: "",
+      imageUrl: "",
+      bannerUrl: "",
+      eventType: "VA Event",
+      host: "",
+      meetingUrl: "",
+      briefing: "",
+      requirements: "",
+      registrationDeadline: "",
+      maxParticipants: "",
+      featured: false,
+      timezone: "",
+      durationMinutes: "",
+      registrationOpen: true,
+      status: "published",
+    });
+  };
+
+  const save = async () => {
+    const r = await request("admin-event", { id: id || undefined, ...f });
+    if (r?.webhookError) alert("Event saved, but Discord webhook failed: " + r.webhookError);
+    reset();
+    await refresh();
+  };
+
+  return (
+    <div className="space-y-5">
+      <AdminTable title="Event Calendar" subtitle="Detailed event operations, registration, briefing and Discord publishing.">
+        {data.events.map((x: any) => (
+          <div key={x.id} className="flex flex-col gap-3 border-b border-border py-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-sm font-black">{x.title}</div>
+                <Badge>{x.event_type || "VA Event"}</Badge>
+                {x.featured && <Badge>Featured</Badge>}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {x.starts_at ? new Date(x.starts_at).toLocaleString() : "—"} · {x.location || "Online"} · {x.participants_count || 0}
+                {x.max_participants ? "/" + x.max_participants : ""} registered
+              </div>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => edit(x)}>
+              <Pencil className="mr-1 size-3" />
+              Edit all details
+            </Button>
+          </div>
+        ))}
+      </AdminTable>
+      <section className="premium-card">
+        <div className="kicker">Event editor</div>
+        <h3 className="mt-2 text-2xl font-black">{id ? "Edit event" : "Create detailed event"}</h3>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Event title" />
+          <Input value={f.eventType} onChange={(e) => set("eventType", e.target.value)} placeholder="Event type" />
+          <Select value={f.status} onValueChange={(v) => set("status", v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input type="datetime-local" value={f.startsAt} onChange={(e) => set("startsAt", e.target.value)} />
+          <Input type="datetime-local" value={f.endsAt} onChange={(e) => set("endsAt", e.target.value)} />
+          <Input value={f.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone e.g. UTC+5:30" />
+          <Input value={f.durationMinutes} onChange={(e) => set("durationMinutes", e.target.value)} type="number" placeholder="Duration (minutes)" />
+          <Input value={f.location} onChange={(e) => set("location", e.target.value)} placeholder="Location / server" />
+          <Input value={f.host} onChange={(e) => set("host", e.target.value)} placeholder="Host / organizer" />
+          <Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} placeholder="Aircraft" />
+          <Input value={f.route} onChange={(e) => set("route", e.target.value)} placeholder="Route" />
+          <Input value={f.meetingUrl} onChange={(e) => set("meetingUrl", e.target.value)} placeholder="Meeting / Discord URL" />
+          <Input value={f.registrationDeadline} onChange={(e) => set("registrationDeadline", e.target.value)} type="datetime-local" />
+          <Input value={f.maxParticipants} onChange={(e) => set("maxParticipants", e.target.value)} type="number" placeholder="Max participants" />
+          <Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="Thumbnail image URL" />
+          <Input value={f.bannerUrl} onChange={(e) => set("bannerUrl", e.target.value)} placeholder="Banner image URL" />
+          <Textarea value={f.description} onChange={(e) => set("description", e.target.value)} placeholder="Public event description" className="sm:col-span-2 lg:col-span-3" rows={4} />
+          <Textarea value={f.briefing} onChange={(e) => set("briefing", e.target.value)} placeholder="Flight / event briefing" className="sm:col-span-2" rows={6} />
+          <Textarea value={f.requirements} onChange={(e) => set("requirements", e.target.value)} placeholder="Requirements / rules" className="sm:col-span-2" rows={6} />
+        </div>
+        <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold">
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={f.featured} onChange={(e) => set("featured", e.target.checked)} className="size-4 accent-primary" /> Featured event
+          </label>
+          <label className="flex items-center gap-2">
+            <input type="checkbox" checked={f.registrationOpen} onChange={(e) => set("registrationOpen", e.target.checked)} className="size-4 accent-primary" /> Registration open
+          </label>
+        </div>
+        {(f.bannerUrl || f.imageUrl) && <img src={f.bannerUrl || f.imageUrl} alt="" className="mt-4 h-48 w-full rounded-2xl object-cover" />}
+        <div className="mt-5 flex gap-2">
+          <Button onClick={save}>{id ? "Save event" : "Publish event"}</Button>
+          {id && (
+            <Button variant="outline" onClick={reset}>
+              New event
+            </Button>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function AdminNotices({ data, request, refresh }: AdminNoticesProps) {
+  const [id, setId] = useState("");
+  const [f, setF] = useState<any>({
+    title: "",
+    body: "",
+    priority: "normal",
+    active: true,
+    expiresAt: "",
+    imageUrl: "",
+    actionLabel: "",
+    actionUrl: "",
+  });
+
+  const set = (k: string, v: any) => setF((x: any) => ({ ...x, [k]: v }));
+
+  const edit = (x: any) => {
+    setId(x.id);
+    setF({
+      title: x.title || "",
+      body: x.body || "",
+      priority: x.priority || "normal",
+      active: x.active !== false,
+      expiresAt: x.expires_at ? new Date(x.expires_at).toISOString().slice(0, 16) : "",
+      imageUrl: x.image_url || "",
+      actionLabel: x.action_label || "",
+      actionUrl: x.action_url || "",
+    });
+  };
+
+  const save = async () => {
+    await request("admin-announcement", { id: id || undefined, ...f });
+    setId("");
+    setF({
+      title: "",
+      body: "",
+      priority: "normal",
+      active: true,
+      expiresAt: "",
+      imageUrl: "",
+      actionLabel: "",
+      actionUrl: "",
+    });
+    await refresh();
+  };
+
+  return (
+    <div className="space-y-5">
+      <section className="premium-card">
+        <div className="kicker">NOTAM / Announcement desk</div>
+        <h3 className="mt-2 text-2xl font-black">{id ? "Edit notice" : "Publish crew briefing"}</h3>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Headline" />
+          <Select value={f.priority} onValueChange={(v) => set("priority", v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="normal">Normal</SelectItem>
+              <SelectItem value="important">Important</SelectItem>
+              <SelectItem value="critical">Critical</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input value={f.expiresAt} onChange={(e) => set("expiresAt", e.target.value)} type="datetime-local" />
+          <Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="Image URL" />
+          <Input value={f.actionLabel} onChange={(e) => set("actionLabel", e.target.value)} placeholder="Action button label" />
+          <Input value={f.actionUrl} onChange={(e) => set("actionUrl", e.target.value)} placeholder="Action URL" />
+          <Textarea value={f.body} onChange={(e) => set("body", e.target.value)} className="sm:col-span-2" rows={6} placeholder="Operational notice…" />
+        </div>
+        <label className="mt-4 flex items-center gap-2 text-xs font-bold">
+          <input type="checkbox" checked={f.active} onChange={(e) => set("active", e.target.checked)} className="size-4 accent-primary" /> Active on crew dashboard
+        </label>
+        <div className="mt-4 flex gap-2">
+          <Button onClick={save}>{id ? "Save changes" : "Publish notice"}</Button>
+          {id && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                setId("");
+                setF({
+                  title: "",
+                  body: "",
+                  priority: "normal",
+                  active: true,
+                  expiresAt: "",
+                  imageUrl: "",
+                  actionLabel: "",
+                  actionUrl: "",
+                });
+              }}
+            >
+              New notice
+            </Button>
+          )}
+        </div>
+      </section>
+      <AdminTable title="Published notices" subtitle="These appear directly on the crew dashboard.">
+        {data.announcements.map((x: any) => (
+          <div key={x.id} className="flex items-center justify-between gap-3 border-b border-border py-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="text-sm font-black">{x.title}</div>
+                <Badge>{x.priority}</Badge>
+                {x.active === false && <Badge variant="secondary">Inactive</Badge>}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">{x.body}</div>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => edit(x)}>
+              <Pencil className="mr-1 size-3" />
+              Edit all
+            </Button>
+          </div>
+        ))}
+      </AdminTable>
+    </div>
+  );
+}
+
+function AdminRanks({ data, request, refresh }: { data: any; request: any; refresh: () => Promise<void> }) {
+  return (
+    <AdminTable title="Crew Ranks" subtitle="Manage progression ranks and minimum hours required.">
+      {(data.ranks || []).map((x: any) => (
+        <RankEditor key={x.id} item={x} request={request} refresh={refresh} />
+      ))}
+    </AdminTable>
+  );
+}
+
+function RankEditor({ item, request, refresh }: RankEditorProps & { refresh: () => Promise<void> }) {
+  const [name, setName] = useState(item.name || "");
+  const [h, setH] = useState(String(item.min_hours || 0));
+  const [badge, setBadge] = useState(item.badge || "CADET");
+  const [order, setOrder] = useState(String(item.order_index || 0));
+
+  const save = async () => {
+    await request("admin-rank", { id: item.id, name, min_hours: Number(h), badge, order_index: Number(order) });
+    await refresh();
+  };
+
+  return (
+    <div className="grid gap-3 border-b border-border py-4 md:grid-cols-[1fr_1fr_.7fr_.5fr_auto] md:items-center">
+      <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rank name" />
+      <Input value={h} onChange={(e) => setH(e.target.value)} type="number" placeholder="Min hours" />
+      <Input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge" />
+      <Input value={order} onChange={(e) => setOrder(e.target.value)} type="number" />
+      <Button size="sm" onClick={save}>
+        Save
+      </Button>
+    </div>
+  );
+}
+
+function AdminFleet({ routes }: AdminFleetProps) {
+  const counts = routes.reduce((m: any, r) => {
+    m[r.aircraft] = (m[r.aircraft] || 0) + 1;
+    return m;
+  }, {});
+
+  return (
+    <AdminTable title="Fleet & Network Allocation" subtitle="Aircraft represented across the current route schedule.">
+      {Object.entries(counts).map(([name, count]: any) => (
+        <div key={name} className="grid grid-cols-[1fr_auto] border-b border-border py-4">
+          <div className="text-sm font-black">{name}</div>
+          <Badge>{count} sectors</Badge>
+        </div>
+      ))}
+    </AdminTable>
+  );
+}
+
+function AdminActivity({ data }: AdminActivityProps) {
+  const items = [
+    ...data.pireps.map((x: any) => ({ at: x.created_at, label: "PIREP " + (x.flight_number || "submission"), status: x.status })),
+    ...data.dispatches.map((x: any) => ({ at: x.dispatched_at, label: "Dispatch " + (x.flight_number || "sector"), status: x.status })),
+  ]
+    .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+    .slice(0, 50);
+
+  return (
+    <AdminTable title="Activity Log" subtitle="Recent PIREP and dispatch activity.">
+      {items.map((x: any, i: number) => (
+        <div key={i} className="flex items-center justify-between border-b border-border py-4">
+          <div>
+            <div className="text-xs font-black">{x.label}</div>
+            <div className="mt-1 text-[10px] text-muted-foreground">{x.at ? new Date(x.at).toLocaleString() : "—"}</div>
+          </div>
+          <Badge>{x.status || "logged"}</Badge>
+        </div>
+      ))}
+    </AdminTable>
+  );
+}
+
+function AdminAudit({ data }: AdminAuditProps) {
+  return (
+    <AdminTable title="Audit Log" subtitle="Every PIREP state change is recorded for accountability.">
+      {(data.audit || []).map((x: any) => (
+        <div key={x.id} className="flex items-center justify-between border-b border-border py-3 text-xs">
+          <div>
+            <b>{x.action}</b>
+            <div className="text-[10px] text-muted-foreground">
+              {x.from_status || "—"} → {x.to_status || "—"} · {x.reason || "No reason"}
+            </div>
+          </div>
+          <span className="text-muted-foreground">{x.created_at ? new Date(x.created_at).toLocaleString() : ""}</span>
+        </div>
+      ))}
+    </AdminTable>
+  );
+}
+
+function AdminCustom({ data, request, refresh }: AdminCustomProps) {
+  const p = (data.settings || []).find((x: any) => x.key === "discord_pirep")?.value || {};
+  const ev = (data.settings || []).find((x: any) => x.key === "discord_event")?.value || {};
+
+  const [pColor, setPColor] = useState(p.embedColor || "#d9bd7b");
+  const [eColor, setEColor] = useState(ev.embedColor || "#d9bd7b");
+  const [pChannel, setPChannel] = useState(p.channelId || "");
+  const [eChannel, setEChannel] = useState(ev.channelId || "");
+  const [pFooter, setPFooter] = useState(p.footer || "Managed by Gurnoor | CEO");
+  const [eFooter, setEFooter] = useState(ev.footer || "Managed by Gurnoor | CEO");
+  const [pendingThreadName, setPendingThreadName] = useState(p.pendingThreadName || "PIREP Pending 🟡");
+  const [enabled, setEnabled] = useState(p.webhookEnabled !== false);
+  const [eventWebhookEnabled, setEventWebhookEnabled] = useState(ev.webhookEnabled !== false);
+  const [test, setTest] = useState("");
+
+  const save = async (key: string, value: any) => {
+    await request("admin-settings", { key, value });
+    await refresh();
+  };
+
+  return (
+    <div className="grid gap-5 lg:grid-cols-2">
+      <section className="premium-card">
+        <div className="kicker">Discord Bot · PIREP</div>
+        <h3 className="mt-2 text-2xl font-black">Bot channel & reaction controls</h3>
+        <label className="mt-4 block text-xs font-bold">
+          Discord PIREP channel ID
+          <Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Embed colour
+          <input type="color" value={pColor} onChange={(e) => setPColor(e.target.value)} className="mt-2 h-10 w-full rounded-xl" />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Footer text
+          <Input value={pFooter} onChange={(e) => setPFooter(e.target.value)} className="mt-2" />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Pending thread name
+          <Input value={pendingThreadName} onChange={(e) => setPendingThreadName(e.target.value)} className="mt-2" />
+        </label>
+        <label className="mt-4 flex items-center gap-3 text-xs font-bold">
+          <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="size-4 accent-primary" /> Enable PIREP Discord bot
+        </label>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button
+            onClick={async () => {
+              setTest("");
+              try {
+                await save("discord_pirep", { ...p, channelId: pChannel, embedColor: pColor, footer: pFooter, pendingThreadName, webhookEnabled: enabled });
+                setTest("PIREP Discord settings saved.");
+              } catch (err) {
+                setTest(err instanceof Error ? err.message : "Could not save settings.");
+              }
+            }}
+          >
+            Save PIREP Discord settings
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setTest("");
+              try {
+                await save("discord_pirep", { ...p, channelId: pChannel, embedColor: pColor, footer: pFooter, pendingThreadName, webhookEnabled: enabled });
+                const r = await request("admin-test-webhook", { kind: "pirep" });
+                setTest(r?.messageId ? "Test PIREP sent and 🔴 reaction added successfully." : "Discord bot returned no message ID.");
+              } catch (err) {
+                setTest(err instanceof Error ? err.message : "Discord bot test failed.");
+              }
+            }}
+          >
+            Send test PIREP
+          </Button>
+        </div>
+        {test && <div className="mt-4 rounded-2xl border border-border bg-muted p-4 text-sm font-bold">{test}</div>}
+      </section>
+
+      <section className="premium-card">
+        <div className="kicker">Discord event styling</div>
+        <h3 className="mt-2 text-2xl font-black">Event bot</h3>
+        <label className="mt-4 block text-xs font-bold">
+          Discord Events channel ID
+          <Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Embed colour
+          <input type="color" value={eColor} onChange={(e) => setEColor(e.target.value)} className="mt-2 h-10 w-full rounded-xl" />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Footer text
+          <Input value={eFooter} onChange={(e) => setEFooter(e.target.value)} className="mt-2" />
+        </label>
+        <label className="mt-4 flex items-center gap-3 text-xs font-bold">
+          <input type="checkbox" checked={eventWebhookEnabled} onChange={(e) => setEventWebhookEnabled(e.target.checked)} className="size-4 accent-primary" /> Enable event Discord bot
+        </label>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button onClick={() => save("discord_event", { ...ev, channelId: eChannel, embedColor: eColor, footer: eFooter, webhookEnabled: eventWebhookEnabled })}>
+            Save event Discord settings
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setTest("");
+              try {
+                await save("discord_event", { ...ev, channelId: eChannel, embedColor: eColor, footer: eFooter, webhookEnabled: eventWebhookEnabled });
+                const r = await request("admin-test-webhook", { kind: "event" });
+                setTest(r?.messageId ? "Test event sent successfully." : "Discord bot returned no message ID.");
+              } catch (err) {
+                setTest(err instanceof Error ? err.message : "Event webhook test failed.");
+              }
+            }}
+          >
+            Send test event
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function DispatchEditor({ item, request, refresh }: DispatchEditorProps & { refresh: () => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [f, setF] = useState<any>({
+    status: item.status || "DISPATCHED",
+    flight_number: item.flight_number || "",
+    dep_icao: item.dep_icao || "",
+    arr_icao: item.arr_icao || "",
+    aircraft: item.aircraft || "",
+    route_id: item.route_id || "",
+  });
+
+  const set = (k: string, v: any) => setF((x: any) => ({ ...x, [k]: v }));
+
+  const save = async () => {
+    await request("admin-dispatch", { id: item.id, ...f });
+    setOpen(false);
+    await refresh();
+  };
+
+  return (
+    <div className="border-b border-border py-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-xs font-black">{f.flight_number || "Dispatch"}</div>
+          <div className="text-[10px] text-muted-foreground">
+            {f.dep_icao || "—"} → {f.arr_icao || "—"} · {f.aircraft || "—"}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge>{f.status}</Badge>
+          <Button size="sm" variant="outline" onClick={() => setOpen(!open)}>
+            <Pencil className="mr-1 size-3" />
+            Edit all
+          </Button>
+        </div>
+      </div>
+      {open && (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Input value={f.flight_number} onChange={(e) => set("flight_number", e.target.value)} placeholder="Flight number" />
+          <Input value={f.dep_icao} onChange={(e) => set("dep_icao", e.target.value)} placeholder="Departure ICAO" />
+          <Input value={f.arr_icao} onChange={(e) => set("arr_icao", e.target.value)} placeholder="Arrival ICAO" />
+          <Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} placeholder="Aircraft" />
+          <Input value={f.route_id} onChange={(e) => set("route_id", e.target.value)} placeholder="Route ID" />
+          <Select value={f.status} onValueChange={(v) => set("status", v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="DISPATCHED">DISPATCHED</SelectItem>
+              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+              <SelectItem value="PIREP_FILED">PIREP FILED</SelectItem>
+              <SelectItem value="CLOSED">CLOSED</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={save}>Save dispatch</Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminSettings({ data }: AdminSettingsProps) {
+  return (
+    <div className="grid gap-5 lg:grid-cols-2">
+      <section className="premium-card">
+        <div className="kicker">System status</div>
+        <h3 className="mt-2 text-2xl font-black">Crew Center configuration</h3>
+        <div className="mt-5 grid gap-3">
+          {[
+            ["Discord access", "Enabled"],
+            ["Infinite Flight identity", "Linked during crew onboarding"],
+            ["ACARS verification", "Enabled"],
+            ["Admin authorization", "Backend controlled"],
+            ["Route source", "Public route CSV"],
+          ].map(([a, b]) => (
+            <div key={a} className="flex items-center justify-between rounded-xl bg-muted px-4 py-3 text-xs">
+              <span className="font-bold">{a}</span>
+              <span className="font-black text-primary">{b}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+      <section className="premium-card">
+        <div className="kicker">Data overview</div>
+        <h3 className="mt-2 text-2xl font-black">Current records</h3>
+        <div className="mt-5 space-y-2 text-sm">
+          {Object.entries({
+            Members: data.members.length,
+            Applications: data.applications.length,
+            PIREP: data.pireps.length,
+            Dispatches: data.dispatches.length,
+            Events: data.events.length,
+            Notices: data.announcements.length,
+          }).map(([k, v]) => (
+            <div key={k} className="flex justify-between border-b border-border py-3">
+              <span>{k}</span>
+              <b>{String(v)}</b>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function AdminTable({ title, subtitle, children, filters, value, setValue }: AdminTableProps) {
+  return (
+    <section className="premium-card">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="kicker">Administration</div>
+          <h3 className="mt-2 text-2xl font-black">{title}</h3>
+          <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        {filters && setValue && (
+          <Select value={value} onValueChange={setValue}>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              {filters.map((x) => (
+                <SelectItem key={x} value={x}>
+                  {x === "all" ? "All statuses" : x}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+function Stat({ icon: Icon, value, label }: StatProps) {
+  return (
+    <Card className="premium-card border-border/70">
+      <CardContent className="p-5">
+        <Icon className="size-5 text-primary" />
+        <div className="mt-5 text-2xl font-black">{value}</div>
+        <div className="mt-1 text-[9px] font-extrabold uppercase tracking-[.16em] text-muted-foreground">{label}</div>
+      </CardContent>
+    </Card>
+  );
+}
