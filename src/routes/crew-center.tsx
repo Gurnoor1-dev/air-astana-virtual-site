@@ -435,7 +435,6 @@ function Dashboard({ data, live, go }: DashboardProps) {
             alt="Air Astana Virtual Crew Center"
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
-          {/* Black fade overlay from left to right */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/75 via-50% to-black/20" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#111b31] via-transparent to-black/30" />
 
@@ -722,7 +721,7 @@ function PirepView({ request, go, seed }: PirepViewProps) {
   const [acarsError, setAcarsError] = useState("");
   const [older, setOlder] = useState<any[]>([]);
   const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   const set = (k: string, v: string) => setForm((x) => ({ ...x, [k]: v }));
 
@@ -912,9 +911,9 @@ function PirepView({ request, go, seed }: PirepViewProps) {
         <span className="mb-2 block text-xs font-bold">Notes</span>
         <Textarea rows={5} value={form.notes} onChange={(e) => set("notes", e.target.value)} />
       </label>
-      <Button disabled={loading} className="mt-5 border-0 brand-gradient text-white hover:opacity-90">
+      <Button className="mt-5 border-0 brand-gradient text-white hover:opacity-90">
         <Send className="size-4" />
-        {loading ? "Submitting…" : "Submit PIREP"}
+        Submit PIREP
       </Button>
     </form>
   );
@@ -991,7 +990,7 @@ function EventsView({ request }: EventsViewProps) {
       setE(d.events || []);
     } catch (err) {
       alert(err instanceof Error ? err.message : "Event registration failed");
-    } font-black finally {
+    } finally {
       setAction("");
     }
   };
@@ -1156,7 +1155,7 @@ function ChallengesView({ request }: ChallengesViewProps) {
             </div>
             <div className="mt-2 flex justify-between text-[10px] font-bold text-muted-foreground">
               <span>
-                {x.value.toFixed ? x.value.toFixed(1) : x.value} {x.unit}
+                {x.value?.toFixed ? x.value.toFixed(1) : x.value} {x.unit}
               </span>
               <span>
                 {x.target} {x.unit}
