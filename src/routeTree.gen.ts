@@ -15,6 +15,7 @@ import { Route as RanksRouteImport } from './routes/ranks'
 import { Route as RoutesRouteImport } from './routes/routes'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as CrewCenterRouteImport } from './routes/crew-center'
+import { Route as CrewLoginRouteImport } from './routes/crew-login'
 
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 const AboutRoute = AboutRouteImport.update({ id: '/about', path: '/about', getParentRoute: () => rootRouteImport } as any)
@@ -25,6 +26,7 @@ const RanksRoute = RanksRouteImport.update({ id: '/ranks', path: '/ranks', getPa
 const RoutesRoute = RoutesRouteImport.update({ id: '/routes', path: '/routes', getParentRoute: () => rootRouteImport } as any)
 const StaffRoute = StaffRouteImport.update({ id: '/staff', path: '/staff', getParentRoute: () => rootRouteImport } as any)
 const CrewCenterRoute = CrewCenterRouteImport.update({ id: '/crew-center', path: '/crew-center', getParentRoute: () => rootRouteImport } as any)
+const CrewLoginRoute = CrewLoginRouteImport.update({ id: '/crew-login', path: '/crew-login', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -36,6 +38,7 @@ export interface FileRoutesByFullPath {
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
   '/crew-center': typeof CrewCenterRoute
+  '/crew-login': typeof CrewLoginRoute
 }
 export interface FileRoutesByTo extends FileRoutesByFullPath {}
 export interface FileRoutesById {
@@ -49,13 +52,14 @@ export interface FileRoutesById {
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
   '/crew-center': typeof CrewCenterRoute
+  '/crew-login': typeof CrewLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
+  fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
-  id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center'
+  to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -81,6 +85,7 @@ declare module '@tanstack/react-router' {
     '/routes': { id: '/routes'; path: '/routes'; fullPath: '/routes'; preLoaderRoute: typeof RoutesRouteImport; parentRoute: typeof rootRouteImport }
     '/staff': { id: '/staff'; path: '/staff'; fullPath: '/staff'; preLoaderRoute: typeof StaffRouteImport; parentRoute: typeof rootRouteImport }
     '/crew-center': { id: '/crew-center'; path: '/crew-center'; fullPath: '/crew-center'; preLoaderRoute: typeof CrewCenterRouteImport; parentRoute: typeof rootRouteImport }
+    '/crew-login': { id: '/crew-login'; path: '/crew-login'; fullPath: '/crew-login'; preLoaderRoute: typeof CrewLoginRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
@@ -94,6 +99,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoutesRoute,
   StaffRoute,
   CrewCenterRoute,
+  CrewLoginRoute,
 }
 
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
