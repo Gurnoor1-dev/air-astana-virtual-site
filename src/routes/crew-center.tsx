@@ -55,6 +55,7 @@ type ContentProps = {
   data: any;
   live: any;
   routes: RouteRecord[];
+  routeOverrides: Record<string, any>;
   request: (a: string, b?: Record<string, unknown>) => Promise<any>;
   member: any;
   go: (v: string, seed?: Record<string, string>) => void;
@@ -71,6 +72,7 @@ type RoutesViewProps = {
   routes: RouteRecord[];
   request: any;
   go: any;
+  hours?: number;
 };
 
 type PirepViewProps = {
@@ -156,6 +158,9 @@ type ApplicationEditorProps = {
 
 type AdminRoutesProps = {
   routes: RouteRecord[];
+  request: any;
+  refresh: () => Promise<void>;
+  ranks: any[];
 };
 
 type AdminDispatchesProps = {
@@ -253,12 +258,14 @@ function CrewCenterInner() {
   const [data, setData] = useState<any>();
   const [live, setLive] = useState<any>();
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
+  const [routeOverrides, setRouteOverrides] = useState<Record<string, any>>({});
   const [pirepSeed, setPirepSeed] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (member) {
       request("dashboard").then(setData).catch(() => {});
       fetchRoutes().then(setRoutes).catch(() => {});
+      request("route-overrides").then((x:any) => setRouteOverrides(x?.overrides || {})).catch(() => {});
     }
   }, [member, request]);
 
@@ -411,9 +418,9 @@ function CrewCenterInner() {
   );
 }
 
-function Content({ view, data, live, routes, request, member, go, pirepSeed }: ContentProps) {
+function Content({ view, data, live, routes, routeOverrides, request, member, go, pirepSeed }: ContentProps) {
   if (!data) return <div className="grid min-h-[60vh] place-items-center text-sm font-bold text-muted-foreground">Loading your flight deck…</div>;
-  if (view === "routes") return <RoutesView routes={routes} request={request} go={go} />;
+  if (view === "routes") return <RoutesView routes={routes} request={request} go={go} hours={Number(data.stats?.hours || 0)} />;
   if (view === "pirep") return <PirepView request={request} go={go} seed={pirepSeed} />;
   if (view === "history") return <HistoryView request={request} />;
   if (view === "events") return <EventsView request={request} />;
@@ -592,81 +599,24 @@ function Dashboard({ data, live, go }: DashboardProps) {
   );
 }
 
-function RoutesView({ routes, request, go }: RoutesViewProps) {
-  const [q, setQ] = useState("");
-  const [done, setDone] = useState<string[]>([]);
-  const list = routes
-    .filter((r) => [r.routeNo, r.depIcao, r.arrIcao, r.depAirport, r.arrAirport, r.aircraft].join(" ").toUpperCase().includes(q.toUpperCase()))
-    .slice(0, 50);
-
-  async function dispatch(r: RouteRecord) {
-    try {
-      await request("dispatch", { routeId: r.routeId, flightNumber: r.routeNo, depIcao: r.depIcao, arrIcao: r.arrIcao, aircraft: r.aircraft });
-      setDone((x) => x.concat(r.routeId));
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Dispatch failed");
-    }
-  }
-
-  return (
-    <div className="space-y-5">
-      <section className="rounded-[2rem] bg-[#111b31] p-7 text-white">
-        <div className="kicker !text-[#d9bd7b]">Dispatch desk</div>
-        <h2 className="mt-3 text-4xl font-black">Choose your next sector.</h2>
-        <Input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search flight, ICAO, airport or aircraft"
-          className="mt-6 w-full max-w-xl border-white/10 bg-white/5 text-white placeholder:text-white/30"
-        />
-      </section>
-      <div className="grid gap-4">
-        {list.map((r) => (
-          <article key={r.routeId} className="premium-card">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-              <div>
-                <div className="text-sm font-black text-primary">
-                  {r.routeNo} · {r.aircraft}
-                </div>
-                <div className="mt-1 text-2xl font-black">
-                  {r.depIcao} <span className="text-muted-foreground">→</span> {r.arrIcao}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {r.depAirport} → {r.arrAirport}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => dispatch(r)}
-                  disabled={done.includes(r.routeId)}
-                  className="inline-flex items-center gap-2 rounded-xl brand-gradient px-4 py-3 text-xs font-black text-white disabled:opacity-60"
-                >
-                  {done.includes(r.routeId) ? <CheckCircle2 className="size-4" /> : <Send className="size-4" />}
-                  {done.includes(r.routeId) ? "Dispatched" : "Dispatch"}
-                </button>
-                <button
-                  onClick={() =>
-                    go("pirep", {
-                      flightNumber: r.routeNo,
-                      depIcao: r.depIcao,
-                      arrIcao: r.arrIcao,
-                      aircraft: r.aircraft,
-                      routeId: r.routeId,
-                    })
-                  }
-                  className="rounded-xl border border-border px-4 py-3 text-xs font-black"
-                >
-                  File PIREP
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </div>
-  );
+function RoutesView({ routes, request, go, hours=0 }: RoutesViewProps) {
+  const [q,setQ]=useState("");const [done,setDone]=useState<string[]>([]);const [modal,setModal]=useState<RouteRecord|null>(null);const [share,setShare]=useState(true);const [departureMode,setDepartureMode]=useState("now");const [customTime,setCustomTime]=useState("");const [notes,setNotes]=useState("");const [selectedFlight,setSelectedFlight]=useState("");const [selectedAircraft,setSelectedAircraft]=useState("");const [error,setError]=useState("");
+  const list=routes.filter(r=>[r.routeNo,r.depIcao,r.arrIcao,r.depAirport,r.arrAirport,r.aircraft].join(" ").toUpperCase().includes(q.toUpperCase())).slice(0,50);
+  const openDispatch=(r:RouteRecord)=>{setError("");setModal(r);const siblings=routes.filter(x=>x.depIcao===r.depIcao&&x.arrIcao===r.arrIcao);setSelectedFlight(r.routeNo);setSelectedAircraft(String(siblings[0]?.aircraft||r.aircraft||"").split("|")[0]);setDepartureMode("now");setCustomTime("");setNotes("");setShare(true)};
+  const submitDispatch=async()=>{if(!modal)return;try{setError("");const siblings=routes.filter(x=>x.depIcao===modal.depIcao&&x.arrIcao===modal.arrIcao);const flight=siblings.find(x=>x.routeNo===selectedFlight)||modal;const estimatedDeparture=departureMode==="now"?new Date().toISOString():departureMode==="15"?new Date(Date.now()+900000).toISOString():departureMode==="30"?new Date(Date.now()+1800000).toISOString():customTime?new Date(customTime).toISOString():new Date().toISOString();const r=await request("dispatch",{routeId:flight.routeId,flightNumber:selectedFlight||flight.routeNo,depIcao:flight.depIcao,arrIcao:flight.arrIcao,aircraft:selectedAircraft||flight.aircraft,estimatedDeparture,notes,shareToDiscord:share});if(r?.webhookError)setError("Flight dispatched, but Discord sharing failed: "+r.webhookError);else{setDone(x=>x.includes(flight.routeId)?x:x.concat(flight.routeId));setModal(null)}}catch(e){setError(e instanceof Error?e.message:"Dispatch failed.")}};
+  return <div className="space-y-5">
+    <section className="overflow-hidden rounded-[2rem] bg-[#111b31] p-7 text-white shadow-2xl sm:p-9"><div className="kicker !text-[#d9bd7b]"><Send className="size-3"/> Dispatch desk</div><div className="mt-3 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between"><div><h2 className="text-4xl font-black tracking-[-.05em]">Choose your next sector.</h2><p className="mt-2 max-w-xl text-sm leading-6 text-white/55">Dispatch a route, choose the operating aircraft and share the sector with the crew when you want company.</p></div><label className="block w-full max-w-xl"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-white/50">Search</span><Input value={q} onChange={e=>setQ(e.target.value)} placeholder="Flight, ICAO, airport or aircraft" className="border-white/10 bg-white/5 text-white placeholder:text-white/30"/></label></div></section>
+    <div className="grid gap-4">{list.map(r=><article key={r.routeId} className="group overflow-hidden rounded-[1.75rem] border border-border bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl"><div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center"><div><div className="flex flex-wrap items-center gap-2"><Badge>{r.routeNo}</Badge><span className="text-[10px] font-black uppercase tracking-[.18em] text-muted-foreground">{r.aircraft}</span></div><div className="mt-3 text-2xl font-black">{r.depIcao} <span className="text-muted-foreground">→</span> {r.arrIcao}</div><div className="mt-1 text-xs text-muted-foreground">{r.depAirport} → {r.arrAirport}</div></div><div className="flex flex-wrap gap-2 lg:justify-end"><button onClick={()=>openDispatch(r)} disabled={done.includes(r.routeId)} className={"inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-xs font-black text-white transition "+(done.includes(r.routeId)?"bg-emerald-600/70":"brand-gradient shadow-[0_0_28px_rgba(217,189,123,.14)] hover:shadow-[0_0_32px_rgba(217,189,123,.35)]")}>{done.includes(r.routeId)?<CheckCircle2 className="size-4"/>:<Send className="size-4"/>}{done.includes(r.routeId)?"Dispatched":"Dispatch"}</button><button onClick={()=>go("pirep",{flightNumber:r.routeNo,depIcao:r.depIcao,arrIcao:r.arrIcao,aircraft:r.aircraft,routeId:r.routeId})} className="rounded-xl border border-border px-4 py-3 text-xs font-black">File PIREP</button></div></div></article>)}</div>
+    {modal&&<div className="fixed inset-0 z-[180] flex items-center justify-center bg-[#07101f]/70 p-4 backdrop-blur-md"><div className="w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/15 bg-white shadow-2xl"><div className="bg-[#111b31] p-6 text-white sm:p-7"><div className="flex items-start justify-between gap-4"><div><div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[.2em] text-[#d9bd7b]"><Plane className="size-3"/> Flight Dispatch Briefing</div><h3 className="mt-3 text-2xl font-black">{modal.depIcao} → {modal.arrIcao}</h3><p className="mt-1 text-xs text-white/50">{modal.depAirport} · {modal.arrAirport}</p></div><button onClick={()=>setModal(null)} className="text-2xl text-white/50 hover:text-white">×</button></div></div>
+      <div className="space-y-6 p-6 sm:p-7"><div className="grid gap-5 sm:grid-cols-2">
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Select flight number</span><Select value={selectedFlight} onValueChange={setSelectedFlight}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{routes.filter(x=>x.depIcao===modal.depIcao&&x.arrIcao===modal.arrIcao).map(x=><SelectItem key={x.routeId} value={x.routeNo}>{x.routeNo}</SelectItem>)}</SelectContent></Select></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Select aircraft</span>{Array.from(new Set(routes.filter(x=>x.depIcao===modal.depIcao&&x.arrIcao===modal.arrIcao).flatMap(x=>String(x.aircraft||"").split("|").map(v=>v.trim()).filter(Boolean)))).length>1?<Select value={selectedAircraft} onValueChange={setSelectedAircraft}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent>{Array.from(new Set(routes.filter(x=>x.depIcao===modal.depIcao&&x.arrIcao===modal.arrIcao).flatMap(x=>String(x.aircraft||"").split("|").map(v=>v.trim()).filter(Boolean)))).map(x=><SelectItem key={x} value={x}>{x}</SelectItem>)}</SelectContent></Select>:<div className="flex h-10 items-center justify-between rounded-xl border border-[#d9bd7b]/50 bg-[#fffaf0] px-3 text-sm font-black shadow-[0_0_24px_rgba(217,189,123,.2)]"><span>{selectedAircraft}</span><span className="text-[9px] uppercase tracking-wider text-[#9a7b35]">Assigned</span></div>}</label>
+      </div><div><div className="mb-2 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Estimated departure time</div><div className="grid grid-cols-3 gap-2"><button onClick={()=>setDepartureMode("now")} className={"rounded-xl border px-3 py-2.5 text-xs font-black "+(departureMode==="now"?"border-primary bg-primary/10 text-primary":"border-border")}>Now</button><button onClick={()=>setDepartureMode("15")} className={"rounded-xl border px-3 py-2.5 text-xs font-black "+(departureMode==="15"?"border-primary bg-primary/10 text-primary":"border-border")}>+15 mins</button><button onClick={()=>setDepartureMode("30")} className={"rounded-xl border px-3 py-2.5 text-xs font-black "+(departureMode==="30"?"border-primary bg-primary/10 text-primary":"border-border")}>+30 mins</button></div><label className="mt-2 block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Custom time</span><Input type="datetime-local" value={customTime} onChange={e=>{setCustomTime(e.target.value);setDepartureMode("custom")}}/></label></div>
+      <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Flight notes & gate <span className="font-normal normal-case">(optional)</span></span><Input value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Terminal 5 · Gate 14 · All pilots welcome"/></label>
+      <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/30 p-4"><div><div className="text-sm font-black">Post to Discord for others to join</div><div className="mt-1 text-xs text-muted-foreground">Share the flight briefing and interactive crew buttons.</div></div><button onClick={()=>setShare(!share)} className={"relative h-7 w-12 rounded-full transition "+(share?"bg-primary":"bg-slate-300")}><span className={"absolute top-1 size-5 rounded-full bg-white shadow transition "+(share?"left-6":"left-1")}/></button></div>
+      {error&&<div className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-700">{error}</div>}<div className="flex gap-3"><Button variant="outline" className="flex-1" onClick={()=>setModal(null)}>Cancel</Button><Button className="flex-1" onClick={submitDispatch}>{share?<><Send className="mr-2 size-4"/>Dispatch & Share</>:<>Dispatch Flight</>}</Button></div></div></div></div>}
+  </div>;
 }
-
 function PirepView({ request, go, seed }: PirepViewProps) {
   const aircraftOptions = [
     "A220",
@@ -1320,7 +1270,7 @@ function AdminView({ request }: AdminViewProps) {
           {tab === "pireps" && <AdminPireps data={data} review={review} />}
           {tab === "members" && <AdminMembers data={data} toggleMember={toggleMember} request={request} refresh={refresh} />}
           {tab === "applications" && <AdminApplications data={data} request={request} refresh={refresh} />}
-          {tab === "routes" && <AdminRoutes routes={routes} />}
+          {tab === "routes" && <AdminRoutes routes={routes} request={request} refresh={refresh} ranks={data.ranks || []} />}
           {tab === "dispatches" && <AdminDispatches data={data} request={request} refresh={refresh} />}
           {tab === "events" && <AdminEvents data={data} request={request} refresh={refresh} />}
           {tab === "notices" && <AdminNotices data={data} request={request} refresh={refresh} />}
@@ -1691,28 +1641,13 @@ function ApplicationEditor({ item, request, refresh }: ApplicationEditorProps & 
   );
 }
 
-function AdminRoutes({ routes }: AdminRoutesProps) {
-  return (
-    <AdminTable title="Route Network" subtitle="Shared network source used by the public site and Crew Center.">
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-        {routes.map((r) => (
-          <div key={r.routeId} className="rounded-2xl bg-muted p-4">
-            <div className="text-xs font-black text-primary">
-              {r.routeNo} · {r.aircraft}
-            </div>
-            <div className="mt-1 text-sm font-black">
-              {r.depIcao} → {r.arrIcao}
-            </div>
-            <div className="mt-1 text-[10px] text-muted-foreground">
-              {r.depAirport} → {r.arrAirport}
-            </div>
-          </div>
-        ))}
-      </div>
-    </AdminTable>
-  );
+function AdminRoutes({ routes, request, refresh, ranks }: AdminRoutesProps) {
+  const [page,setPage]=useState(1);const [edit,setEdit]=useState<RouteRecord|null>(null);const [aircraft,setAircraft]=useState("");const [minHours,setMinHours]=useState("0");const [search,setSearch]=useState("");const perPage=10;const filtered=routes.filter(r=>[r.routeNo,r.depIcao,r.arrIcao,r.depAirport,r.arrAirport,r.aircraft].join(" ").toUpperCase().includes(search.toUpperCase()));const pages=Math.max(1,Math.ceil(filtered.length/perPage));const rows=filtered.slice((page-1)*perPage,page*perPage);
+  const startEdit=(r:RouteRecord)=>{setEdit(r);setAircraft(r.aircraft||"");setMinHours("0")};const save=async()=>{if(!edit)return;await request("admin-route",{routeId:edit.routeId,routeNo:edit.routeNo,depIcao:edit.depIcao,arrIcao:edit.arrIcao,depAirport:edit.depAirport,arrAirport:edit.arrAirport,aircraft,aircraftOptions:aircraft,minRankHours:Number(minHours)});setEdit(null);await refresh()};
+  return <div className="space-y-5"><AdminTable title="Route Network" subtitle="Edit every sector, aircraft pool and minimum rank access. Changes apply to Crew Center dispatch control."><label className="mb-5 block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Search routes</span><Input value={search} onChange={e=>{setSearch(e.target.value);setPage(1)}} placeholder="Route, ICAO or airport"/></label><div className="space-y-2">{rows.map(r=><div key={r.routeId} className="grid gap-3 rounded-2xl border border-border bg-muted/20 p-4 md:grid-cols-[.7fr_1fr_1fr_1fr_auto] md:items-center"><Badge>{r.routeNo}</Badge><div><div className="text-xs font-black">{r.depIcao} → {r.arrIcao}</div><div className="mt-1 text-[10px] text-muted-foreground">{r.depAirport} → {r.arrAirport}</div></div><div className="text-xs font-bold">{r.aircraft}</div><div className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Fleet + rank access</div><Button size="sm" onClick={()=>startEdit(r)}><Pencil className="mr-1 size-3"/>Edit route</Button></div>)}</div><div className="mt-5 flex items-center justify-between border-t border-border pt-4"><span className="text-xs font-bold text-muted-foreground">Page {page} / {pages} · {filtered.length} routes</span><div className="flex gap-2"><Button size="sm" variant="outline" disabled={page<=1} onClick={()=>setPage(page-1)}>Previous</Button><Button size="sm" variant="outline" disabled={page>=pages} onClick={()=>setPage(page+1)}>Next</Button></div></div></AdminTable>
+    {edit&&<div className="fixed inset-0 z-[190] flex items-center justify-center bg-[#07101f]/70 p-4 backdrop-blur-md"><div className="w-full max-w-xl rounded-[2rem] bg-white p-6 shadow-2xl sm:p-8"><div className="kicker">Route editor</div><h3 className="mt-2 text-2xl font-black">{edit.routeNo} · {edit.depIcao} → {edit.arrIcao}</h3><div className="mt-6 grid gap-4 sm:grid-cols-2"><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Aircraft options · separate with |</span><Input value={aircraft} onChange={e=>setAircraft(e.target.value)} placeholder="A320-200 | A321-200"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Minimum approved hours</span><Input type="number" min="0" value={minHours} onChange={e=>setMinHours(e.target.value)} placeholder="0"/></label></div><div className="mt-4 rounded-2xl bg-muted p-4"><div className="text-xs font-black">Rank access</div><div className="mt-1 text-xs text-muted-foreground">{Number(minHours)<=0?"All ranks":"Pilots need at least "+minHours+" approved hours."}</div><div className="mt-3 flex flex-wrap gap-2">{(ranks||[]).map((x:any)=><button key={x.id} onClick={()=>setMinHours(String(x.min_hours))} className="rounded-full border border-border bg-white px-3 py-1.5 text-[10px] font-black">{x.name} · {x.min_hours}h</button>)}</div></div><div className="mt-6 flex gap-3"><Button variant="outline" className="flex-1" onClick={()=>setEdit(null)}>Cancel</Button><Button className="flex-1" onClick={save}>Save route</Button></div></div></div>}
+  </div>;
 }
-
 function AdminDispatches({ data, request, refresh }: AdminDispatchesProps & { refresh: () => Promise<void> }) {
   return (
     <AdminTable title="Dispatch Control" subtitle="Track and edit active, filed and closed dispatch records.">
@@ -2008,39 +1943,11 @@ function AdminNotices({ data, request, refresh }: AdminNoticesProps) {
 }
 
 function AdminRanks({ data, request, refresh }: { data: any; request: any; refresh: () => Promise<void> }) {
-  return (
-    <AdminTable title="Crew Ranks" subtitle="Manage progression ranks and minimum hours required.">
-      {(data.ranks || []).map((x: any) => (
-        <RankEditor key={x.id} item={x} request={request} refresh={refresh} />
-      ))}
-    </AdminTable>
-  );
+  const [adding,setAdding]=useState(false);return <div className="space-y-5"><AdminTable title="Crew Ranks" subtitle="Build and edit the full career ladder. Add new ranks or remove obsolete ones.">{(data.ranks||[]).map((x:any)=><RankEditor key={x.id} item={x} request={request} refresh={refresh}/>)}<Button className="mt-4" onClick={()=>setAdding(true)}>+ Add rank</Button></AdminTable>{adding&&<RankEditor item={{id:"",name:"",min_hours:0,badge:"CREW",order_index:(data.ranks||[]).length+1}} request={request} refresh={async()=>{setAdding(false);await refresh()}}/>}</div>;
 }
-
 function RankEditor({ item, request, refresh }: RankEditorProps & { refresh: () => Promise<void> }) {
-  const [name, setName] = useState(item.name || "");
-  const [h, setH] = useState(String(item.min_hours || 0));
-  const [badge, setBadge] = useState(item.badge || "CADET");
-  const [order, setOrder] = useState(String(item.order_index || 0));
-
-  const save = async () => {
-    await request("admin-rank", { id: item.id, name, min_hours: Number(h), badge, order_index: Number(order) });
-    await refresh();
-  };
-
-  return (
-    <div className="grid gap-3 border-b border-border py-4 md:grid-cols-[1fr_1fr_.7fr_.5fr_auto] md:items-center">
-      <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Rank name" />
-      <Input value={h} onChange={(e) => setH(e.target.value)} type="number" placeholder="Min hours" />
-      <Input value={badge} onChange={(e) => setBadge(e.target.value)} placeholder="Badge" />
-      <Input value={order} onChange={(e) => setOrder(e.target.value)} type="number" />
-      <Button size="sm" onClick={save}>
-        Save
-      </Button>
-    </div>
-  );
+  const [name,setName]=useState(item.name||"");const [h,setH]=useState(String(item.min_hours||0));const [badge,setBadge]=useState(item.badge||"CADET");const [order,setOrder]=useState(String(item.order_index||0));const save=async()=>{await request("admin-rank",{id:item.id||undefined,name,min_hours:Number(h),badge,order_index:Number(order)});await refresh()};const remove=async()=>{if(!item.id||!confirm("Delete this rank?"))return;await request("admin-rank",{id:item.id,delete:true});await refresh()};return <div className="grid gap-3 rounded-2xl border border-border bg-muted/20 p-4 mb-2 md:grid-cols-[1.2fr_.7fr_.7fr_.5fr_auto_auto] md:items-end"><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Rank name</span><Input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. First Officer"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Minimum hours</span><Input value={h} onChange={e=>setH(e.target.value)} type="number" placeholder="0"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Badge</span><Input value={badge} onChange={e=>setBadge(e.target.value)} placeholder="FO"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Order</span><Input value={order} onChange={e=>setOrder(e.target.value)} type="number" placeholder="1"/></label><Button size="sm" onClick={save}>{item.id?"Save":"Add"}</Button>{item.id&&<Button size="sm" variant="outline" onClick={remove}>Delete</Button>}</div>;
 }
-
 function AdminFleet({ routes }: AdminFleetProps) {
   const counts = routes.reduce((m: any, r) => {
     m[r.aircraft] = (m[r.aircraft] || 0) + 1;
