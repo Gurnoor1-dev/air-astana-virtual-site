@@ -9,3 +9,6 @@ create index if not exists dispatch_participants_crew_member_id_idx
   on public.dispatch_participants(crew_member_id);
 
 alter table public.dispatch_participants enable row level security;
+
+revoke all on table public.dispatch_participants from anon, authenticated;
+grant select, insert, update, delete on table public.dispatch_participants to service_role;
