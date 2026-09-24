@@ -2211,7 +2211,7 @@ function DispatchEditor({ item, request, refresh }: DispatchEditorProps & { refr
           <label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Departure ICAO</span><Input value={f.dep_icao} onChange={(e) => set("dep_icao", e.target.value)} /></label>
           <label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Arrival ICAO</span><Input value={f.arr_icao} onChange={(e) => set("arr_icao", e.target.value)} /></label>
           <label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Aircraft</span><Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} /></label>
-          <label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Route ID</span><Input value={f.route_id} onChange={(e) => set("route_id", e.target.value)} />
+          <label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Route ID</span><Input value={f.route_id} onChange={(e) => set("route_id", e.target.value)} /></label>
           <Select value={f.status} onValueChange={(v) => set("status", v)}>
             <SelectTrigger>
               <SelectValue />
