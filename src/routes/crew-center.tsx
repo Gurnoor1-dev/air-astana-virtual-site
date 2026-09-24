@@ -1191,8 +1191,9 @@ function AdminView({ request }: AdminViewProps) {
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const d = await request("admin-data");
+      const [d, base, ov] = await Promise.all([request("admin-data"), fetchRoutes(), request("route-overrides")]);
       setData(d);
+      setRoutes(mergeRouteOverrides(base, ov?.overrides || {}));
     } catch {
     } finally {
       setLoading(false);
@@ -1200,10 +1201,10 @@ function AdminView({ request }: AdminViewProps) {
   }, [request]);
 
   useEffect(() => {
-    Promise.all([request("admin-data"), fetchRoutes()])
-      .then(([d, r]) => {
+    Promise.all([request("admin-data"), fetchRoutes(), request("route-overrides")])
+      .then(([d, r, ov]) => {
         setData(d);
-        setRoutes(r);
+        setRoutes(mergeRouteOverrides(r, ov?.overrides || {}));
       })
       .finally(() => setLoading(false));
   }, [request]);
