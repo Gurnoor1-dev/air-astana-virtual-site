@@ -31,6 +31,22 @@ async function clearStatusReactions(message) {
 }
 const statusEmoji = status => status === "approved" ? "🟢" : status === "pending" ? "🟡" : "🔴";
 
+async function crewDispatchAction(payload) {
+  const base = String(process.env.CREW_CENTER_API_URL || "").replace(/\/$/, "");
+  if (!base) throw new Error("CREW_CENTER_API_URL is not configured.");
+  const response = await fetch(base + "?action=bot-dispatch", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-bot-secret": process.env.BOT_API_SECRET },
+    body: JSON.stringify(payload)
+  });
+  const raw = await response.text();
+  let data = null;
+  try { data = raw ? JSON.parse(raw) : null; } catch {}
+  if (!response.ok || data?.ok === false) throw new Error(data?.error || "Crew Center dispatch request failed.");
+  return data || {};
+}
+
+
 async function sendEmbed(kind, body) {
   const channel = await getTextChannel(channelIdFor(kind, body.channelId));
   const message = await channel.send({ content: body.content || undefined, embeds: [body.embed] });
@@ -139,6 +155,39 @@ app.post("/internal/pirep-status", auth, async (req, res) => {
     res.json({ ok: true, channelId, messageId, threadId });
   } catch (error) {
     res.status(502).json({ ok: false, error: error instanceof Error ? error.message : "Discord PIREP status failed" });
+  }
+});
+
+client.on("interactionCreate", async interaction => {
+  if (!interaction.isButton()) return;
+  const [kind, action, dispatchId] = String(interaction.customId || "").split(":");
+  if (kind !== "dispatch" || !action || !dispatchId) return;
+  try {
+    const result = await crewDispatchAction({
+      action,
+      id: dispatchId,
+      discordUserId: interaction.user.id
+    });
+    if (action === "details") {
+      await interaction.reply({ content: result.content || "Flight details unavailable.", ephemeral: true });
+      return;
+    }
+    await interaction.deferUpdate();
+    if (result.dispatch?.payload && interaction.message) {
+      await interaction.message.edit(result.dispatch.payload);
+    }
+    const verb = action === "join" ? "joined" : "left";
+    await interaction.followUp({
+      content: "You " + verb + " " + (result.participantCount != null ? "the flight." : "the flight."),
+      ephemeral: true
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Dispatch action failed.";
+    if (interaction.deferred || interaction.replied) {
+      await interaction.followUp({ content: "❌ " + message, ephemeral: true }).catch(() => {});
+    } else {
+      await interaction.reply({ content: "❌ " + message, ephemeral: true }).catch(() => {});
+    }
   }
 });
 
