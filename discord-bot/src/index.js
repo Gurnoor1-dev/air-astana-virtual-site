@@ -52,6 +52,28 @@ async function sendEmbed(kind, body) {
   return { channelId: channel.id, messageId: message.id };
 }
 
+app.post("/internal/dispatch", auth, async (req, res) => {
+  try {
+    const channel = await getTextChannel(req.body.channelId);
+    const message = await channel.send(req.body.payload || {});
+    let threadId = null;
+    if (message?.id) {
+      try {
+        const thread = await message.startThread({
+          name: req.body.threadName || "Flight Dispatch 🛫",
+          autoArchiveDuration: 1440
+        });
+        threadId = thread.id;
+      } catch (error) {
+        console.error("dispatch thread creation failed", error);
+      }
+    }
+    res.json({ ok: true, channelId: channel.id, messageId: message.id, threadId });
+  } catch (error) {
+    res.status(502).json({ ok: false, error: error instanceof Error ? error.message : "Discord dispatch failed" });
+  }
+});
+
 app.get("/health", (_req, res) => res.json({ ok: true, ready: client.isReady(), bot: client.user?.tag || null }));
 
 app.post("/internal/test", auth, async (req, res) => {
