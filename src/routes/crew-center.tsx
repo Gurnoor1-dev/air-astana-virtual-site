@@ -2017,7 +2017,9 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
   const [pColor, setPColor] = useState(p.embedColor || "#d9bd7b");
   const [eColor, setEColor] = useState(ev.embedColor || "#d9bd7b");
   const [pChannel, setPChannel] = useState(p.channelId || "");
+  const [pWebhook, setPWebhook] = useState(p.webhookUrl || "");
   const [eChannel, setEChannel] = useState(ev.channelId || "");
+  const [eWebhook, setEWebhook] = useState(ev.webhookUrl || "");
   const [pFooter, setPFooter] = useState(p.footer || "Managed by Gurnoor | CEO");
   const [eFooter, setEFooter] = useState(ev.footer || "Managed by Gurnoor | CEO");
   const [pendingThreadName, setPendingThreadName] = useState(p.pendingThreadName || "PIREP Pending 🟡");
@@ -2038,7 +2040,11 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
         <div className="kicker">Discord Bot · PIREP</div>
         <h3 className="mt-2 text-2xl font-black">Bot channel & reaction controls</h3>
         <label className="mt-4 block text-xs font-bold">
-          Discord PIREP channel ID
+          Discord PIREP webhook URL (recommended)
+          <Input value={pWebhook} onChange={(e) => setPWebhook(e.target.value)} className="mt-2" placeholder="https://discord.com/api/webhooks/..." />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Discord PIREP channel ID (bot fallback)
           <Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
         </label>
         <label className="mt-4 block text-xs font-bold">
@@ -2061,7 +2067,7 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
             onClick={async () => {
               setTest("");
               try {
-                await save("discord_pirep", { ...p, channelId: pChannel, embedColor: pColor, footer: pFooter, pendingThreadName, webhookEnabled: enabled });
+                await save("discord_pirep", { ...p, channelId: pChannel, webhookUrl: pWebhook, embedColor: pColor, footer: pFooter, pendingThreadName, webhookEnabled: enabled });
                 setTest("PIREP Discord settings saved.");
               } catch (err) {
                 setTest(err instanceof Error ? err.message : "Could not save settings.");
@@ -2101,7 +2107,11 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
         <div className="kicker">Discord event styling</div>
         <h3 className="mt-2 text-2xl font-black">Event bot</h3>
         <label className="mt-4 block text-xs font-bold">
-          Discord Events channel ID
+          Discord Events webhook URL (recommended)
+          <Input value={eWebhook} onChange={(e) => setEWebhook(e.target.value)} className="mt-2" placeholder="https://discord.com/api/webhooks/..." />
+        </label>
+        <label className="mt-4 block text-xs font-bold">
+          Discord Events channel ID (bot fallback)
           <Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
         </label>
         <label className="mt-4 block text-xs font-bold">
@@ -2116,7 +2126,7 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
           <input type="checkbox" checked={eventWebhookEnabled} onChange={(e) => setEventWebhookEnabled(e.target.checked)} className="size-4 accent-primary" /> Enable event Discord bot
         </label>
         <div className="mt-5 flex flex-wrap gap-2">
-          <Button onClick={() => save("discord_event", { ...ev, channelId: eChannel, embedColor: eColor, footer: eFooter, webhookEnabled: eventWebhookEnabled })}>
+          <Button onClick={() => save("discord_event", { ...ev, channelId: eChannel, webhookUrl: eWebhook, embedColor: eColor, footer: eFooter, webhookEnabled: eventWebhookEnabled })}>
             Save event Discord settings
           </Button>
           <Button
