@@ -2010,6 +2010,7 @@ function AdminAudit({ data }: AdminAuditProps) {
 function AdminCustom({ data, request, refresh }: AdminCustomProps) {
   const p = (data.settings || []).find((x: any) => x.key === "discord_pirep")?.value || {};
   const ev = (data.settings || []).find((x: any) => x.key === "discord_event")?.value || {};
+  const dispatchCfg = (data.settings || []).find((x: any) => x.key === "discord_dispatch")?.value || {};
 
   const [pColor, setPColor] = useState(p.embedColor || "#d9bd7b");
   const [eColor, setEColor] = useState(ev.embedColor || "#d9bd7b");
@@ -2020,6 +2021,8 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
   const [pendingThreadName, setPendingThreadName] = useState(p.pendingThreadName || "PIREP Pending 🟡");
   const [enabled, setEnabled] = useState(p.webhookEnabled !== false);
   const [eventWebhookEnabled, setEventWebhookEnabled] = useState(ev.webhookEnabled !== false);
+  const [dispatchChannel, setDispatchChannel] = useState(dispatchCfg.channelId || "");
+  const [dispatchColor, setDispatchColor] = useState(dispatchCfg.embedColor || "#d9bd7b");
   const [test, setTest] = useState("");
 
   const save = async (key: string, value: any) => {
@@ -2084,6 +2087,14 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
         {test && <div className="mt-4 rounded-2xl border border-border bg-muted p-4 text-sm font-bold">{test}</div>}
       </section>
 
+      <section className="premium-card">
+        <div className="kicker">Discord dispatch</div>
+        <h3 className="mt-2 text-2xl font-black">Flight sharing channel</h3>
+        <p className="mt-2 text-xs leading-6 text-muted-foreground">The bot posts interactive dispatch cards here and creates the route thread automatically.</p>
+        <label className="mt-4 block text-xs font-bold"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord channel ID</span><Input value={dispatchChannel} onChange={e=>setDispatchChannel(e.target.value)} placeholder="123456789012345678"/></label>
+        <label className="mt-4 block text-xs font-bold"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Embed colour</span><input type="color" value={dispatchColor} onChange={e=>setDispatchColor(e.target.value)} className="mt-2 h-10 w-full rounded-xl"/></label>
+        <Button className="mt-5" onClick={()=>save("discord_dispatch",{...dispatchCfg,channelId:dispatchChannel,embedColor:dispatchColor,webhookEnabled:true})}>Save dispatch settings</Button>
+      </section>
       <section className="premium-card">
         <div className="kicker">Discord event styling</div>
         <h3 className="mt-2 text-2xl font-black">Event bot</h3>
