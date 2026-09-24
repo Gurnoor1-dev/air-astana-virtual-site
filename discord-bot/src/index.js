@@ -32,8 +32,7 @@ async function clearStatusReactions(message) {
 const statusEmoji = status => status === "approved" ? "🟢" : status === "pending" ? "🟡" : "🔴";
 
 async function crewDispatchAction(payload) {
-  const base = String(process.env.CREW_CENTER_API_URL || "").replace(/\/$/, "");
-  if (!base) throw new Error("CREW_CENTER_API_URL is not configured.");
+  const base = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
   const response = await fetch(base + "?action=bot-dispatch", {
     method: "POST",
     headers: { "content-type": "application/json", "x-bot-secret": process.env.BOT_API_SECRET },
