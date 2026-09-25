@@ -34,6 +34,7 @@ const pirepEmbedImage = { url: "https://i.postimg.cc/44pSxbNY/PIREP-Submitted.jp
 
 const CREW_CENTER_API_URL = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
 const BOT_COMMANDS_CHANNEL_ID = "1551517132330766376";
+const DISCORD_GUILD_ID = "1549989450598055969";
 
 async function crewStats(discordUsername, discordUserId) {
   const response = await fetch(CREW_CENTER_API_URL + "?action=bot-stats", {
@@ -50,7 +51,7 @@ async function crewStats(discordUsername, discordUserId) {
 
 async function registerStatsCommand() {
   if (!client.user) return;
-  await client.application.commands.set([{ name: "stats", description: "View your Crew Center flight statistics" }]);
+  await client.application.commands.set([{ name: "stats", description: "View your Crew Center flight statistics" }], DISCORD_GUILD_ID);
   console.log("Registered /stats command");
 }
 
