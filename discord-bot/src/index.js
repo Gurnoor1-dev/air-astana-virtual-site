@@ -50,7 +50,7 @@ async function crewDispatchAction(payload) {
 
 async function sendEmbed(kind, body) {
   const channel = await getTextChannel(channelIdFor(kind, body.channelId));
-  const embed = { ...body.embed, image: body.embed?.image || pirepEmbedImage };
+  const embed = kind === "pirep" ? { ...body.embed, image: body.embed?.image || pirepEmbedImage } : body.embed;
   const message = await channel.send({ content: body.content || undefined, embeds: [embed] });
   return { channelId: channel.id, messageId: message.id };
 }
