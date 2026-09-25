@@ -32,6 +32,28 @@ async function clearStatusReactions(message) {
 const statusEmoji = status => status === "approved" ? "🟢" : status === "pending" ? "🟡" : "🔴";
 const pirepEmbedImage = { url: "https://i.postimg.cc/44pSxbNY/PIREP-Submitted.jpg" };
 
+const CREW_CENTER_API_URL = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
+const BOT_COMMANDS_CHANNEL_ID = "1551517132330766376";
+
+async function crewStats(discordUsername, discordUserId) {
+  const response = await fetch(CREW_CENTER_API_URL + "?action=bot-stats", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-bot-secret": process.env.BOT_API_SECRET },
+    body: JSON.stringify({ discordUsername, discordUserId })
+  });
+  const raw = await response.text();
+  let data = null;
+  try { data = raw ? JSON.parse(raw) : null; } catch {}
+  if (!response.ok || data?.ok === false) throw new Error(data?.error || "Crew Center stats request failed.");
+  return data || {};
+}
+
+async function registerStatsCommand() {
+  if (!client.user) return;
+  await client.application.commands.set([{ name: "stats", description: "View your Crew Center flight statistics" }]);
+  console.log("Registered /stats command");
+}
+
 async function crewDispatchAction(payload) {
   const base = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
   const response = await fetch(base + "?action=bot-dispatch", {
@@ -182,6 +204,35 @@ app.post("/internal/pirep-status", auth, async (req, res) => {
 });
 
 client.on("interactionCreate", async interaction => {
+  if (interaction.isChatInputCommand() && interaction.commandName === "stats") {
+    if (interaction.channelId !== BOT_COMMANDS_CHANNEL_ID) {
+      await interaction.reply({ content: "Use https://discord.com/channels/1549989450598055969/1551517132330766376 channel for commands", ephemeral: true });
+      return;
+    }
+    await interaction.deferReply();
+    try {
+      const data = await crewStats(interaction.user.username, interaction.user.id);
+      const next = data.nextRank || "Maximum Rank";
+      await interaction.editReply({ embeds: [{
+        title: "Stats - " + (data.callsign || "Unknown"),
+        color: 0xd9bd7b,
+        description:
+          "🕑 **Total Flight Time:** " + (data.totalFlightTime || "0h 0m") + "\n\n" +
+          "🔴 **Total PIREPs:** " + Number(data.totalPireps || 0) + "\n\n" +
+          "🟢 **Total Approved PIREPs:** " + Number(data.approvedPireps || 0) + "\n\n" +
+          "👔 **Current Rank:** " + (data.currentRank || "Unranked") + "\n\n" +
+          "📈 **Next Rank:** " + next + "\n\n" +
+          "📊 **Progress to next Rank:** " + Number(data.progress || 100).toFixed(1) + "% (" + next + ")",
+        footer: { text: "Air Astana Virtual | Crew Center" },
+        timestamp: new Date().toISOString()
+      }]});
+    } catch (error) {
+      await interaction.editReply({ content: "❌ " + (error instanceof Error ? error.message : "Could not load your stats.") });
+    }
+    return;
+  }
+
+  if (!interaction.isButton()) return;
   if (!interaction.isButton()) return;
   const [kind, action, dispatchId] = String(interaction.customId || "").split(":");
   if (kind !== "dispatch" || !action || !dispatchId) return;
@@ -216,5 +267,5 @@ client.on("interactionCreate", async interaction => {
 
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => console.log("Bot API listening on :" + port));
-client.once("ready", () => console.log("Discord bot ready as " + client.user.tag));
+client.once("ready", async () => { console.log("Discord bot ready as " + client.user.tag); try { await registerStatsCommand(); } catch (error) { console.error("Failed to register /stats:", error); } });
 client.login(process.env.DISCORD_BOT_TOKEN).catch(error => { console.error("Discord login failed:", error); process.exit(1); });
