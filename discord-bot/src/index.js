@@ -30,8 +30,7 @@ async function clearStatusReactions(message) {
   }
 }
 const statusEmoji = status => status === "approved" ? "🟢" : status === "pending" ? "🟡" : "🔴";
-const crewCenterWebUrl = String(process.env.CREW_CENTER_WEB_URL || "https://air-arabia-virtual-hub.vercel.app").replace(/\/$/, "");
-const pirepEmbedImage = { url: crewCenterWebUrl + "/assets/PIREP-Submitted.jpg" };
+const pirepEmbedImage = { url: "https://i.postimg.cc/44pSxbNY/PIREP-Submitted.jpg" };
 
 async function crewDispatchAction(payload) {
   const base = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
