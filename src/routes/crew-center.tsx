@@ -5,7 +5,6 @@ import {
   ArrowRight,
   CalendarDays,
   CheckCircle2,
-  CircleDashedCheck,
   CircleDotDashed,
   Ban,
   Clock3,
@@ -1398,7 +1397,7 @@ function AdminPireps({ data, review }: AdminPirepsProps) {
                   <Pencil className="mr-1 size-3" />
                   Edit all
                 </Button>
-                {x.status !== "approved" && <Button size="sm" onClick={() => review(x.id, "approved", "approve")}><CircleDashedCheck className="size-4" />Approve</Button>}
+                {x.status !== "approved" && <Button size="sm" onClick={() => review(x.id, "approved", "approve")}><CheckCircle2 className="size-4" />Approve</Button>}
                 {x.status !== "pending" && (
                   <Button size="sm" variant="outline" onClick={() => review(x.id, "pending", "pending")}>
                     <CircleDotDashed className="size-4" />Pending
