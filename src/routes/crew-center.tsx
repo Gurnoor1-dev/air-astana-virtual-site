@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CrewProvider, useCrew } from "@/lib/crew";
 import ccBanner from "@/assets/CC-main-banner.png";
+import pirepSubmittedImage from "@/assets/PIREP-Submitted.jpg";
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 export const Route = createFileRoute("/crew-center")({ component: CrewCenter });
@@ -787,6 +788,7 @@ function PirepView({ request, go, seed }: PirepViewProps) {
 
   return (
     <form onSubmit={submit} className="premium-card">
+      <img src={pirepSubmittedImage} alt="" aria-hidden="true" className="hidden" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="kicker">
