@@ -1452,16 +1452,16 @@ function PirepEditor({ item, review, close }: PirepEditorProps) {
     <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
       <div className="kicker">PIREP editor</div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Input value={f.flight_number} onChange={(e) => set("flight_number", e.target.value)} placeholder="Flight number" />
-        <Input value={f.dep_icao} onChange={(e) => set("dep_icao", e.target.value)} placeholder="Departure ICAO" />
-        <Input value={f.arr_icao} onChange={(e) => set("arr_icao", e.target.value)} placeholder="Arrival ICAO" />
-        <Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} placeholder="Aircraft" />
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Flight number</span><Input value={f.flight_number} onChange={(e) => set("flight_number", e.target.value)} /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Departure ICAO</span><Input value={f.dep_icao} onChange={(e) => set("dep_icao", e.target.value)} /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Arrival ICAO</span><Input value={f.arr_icao} onChange={(e) => set("arr_icao", e.target.value)} /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Aircraft</span><Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} /></label>
         <Input value={f.flight_date} onChange={(e) => set("flight_date", e.target.value)} type="date" />
-        <Input value={f.flight_time_minutes} onChange={(e) => set("flight_time_minutes", e.target.value)} type="number" placeholder="Minutes" />
-        <Input value={f.pax} onChange={(e) => set("pax", e.target.value)} type="number" placeholder="PAX" />
-        <Input value={f.cargo_kg} onChange={(e) => set("cargo_kg", e.target.value)} type="number" placeholder="Cargo kg" />
-        <Input value={f.server} onChange={(e) => set("server", e.target.value)} placeholder="Server" />
-        <Input value={f.landing_rate_fpm} onChange={(e) => set("landing_rate_fpm", e.target.value)} type="number" placeholder="Landing FPM" />
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Minutes</span><Input value={f.flight_time_minutes} onChange={(e) => set("flight_time_minutes", e.target.value)} type="number" /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">PAX</span><Input value={f.pax} onChange={(e) => set("pax", e.target.value)} type="number" /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Cargo kg</span><Input value={f.cargo_kg} onChange={(e) => set("cargo_kg", e.target.value)} type="number" /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Server</span><Input value={f.server} onChange={(e) => set("server", e.target.value)} /></label>
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Landing FPM</span><Input value={f.landing_rate_fpm} onChange={(e) => set("landing_rate_fpm", e.target.value)} type="number" /></label>
         <Select value={f.status} onValueChange={(v) => set("status", v)}>
           <SelectTrigger>
             <SelectValue />
@@ -1476,7 +1476,7 @@ function PirepEditor({ item, review, close }: PirepEditorProps) {
           <input type="checkbox" checked={f.notes_staff_only} onChange={(e) => set("notes_staff_only", e.target.checked)} className="size-4 accent-primary" />
           Notes for staff only
         </label>
-        <Textarea value={f.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Notes" className="sm:col-span-2 lg:col-span-3" rows={4} />
+        <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Notes</span><Textarea value={f.notes} onChange={(e) => set("notes", e.target.value)} className="sm:col-span-2 lg:col-span-3" rows={4} /></label>
       </div>
       <div className="mt-4 flex gap-2">
         <Button onClick={save}>Save PIREP</Button>
@@ -1540,11 +1540,11 @@ function AdminMembers({ data, request, refresh }: AdminMembersProps & { refresh:
             </Button>
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} placeholder="Callsign" />
-            <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} placeholder="Full name" />
-            <Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} placeholder="Infinite Flight username" />
-            <Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} placeholder="Discord username" />
-            <Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone" />
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Callsign</span><Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} /></label>
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Full name</span><Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} /></label>
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Infinite Flight username</span><Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} /></label>
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord username</span><Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} /></label>
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Timezone</span><Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} /></label>
             <Select value={form.status} onValueChange={(v) => set("status", v)}>
               <SelectTrigger>
                 <SelectValue />
@@ -1555,7 +1555,7 @@ function AdminMembers({ data, request, refresh }: AdminMembersProps & { refresh:
                 <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
-            <Input value={form.rank_id} onChange={(e) => set("rank_id", e.target.value)} placeholder="Rank ID (optional)" />
+            <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Rank ID (optional)</span><Input value={form.rank_id} onChange={(e) => set("rank_id", e.target.value)} /></label>
             <label className="flex items-center gap-2 text-xs font-bold">
               <input type="checkbox" checked={form.is_admin} onChange={(e) => set("is_admin", e.target.checked)} className="size-4 accent-primary" />
               Administrator
@@ -1632,15 +1632,15 @@ function ApplicationEditor({ item, request, refresh }: ApplicationEditorProps & 
       </div>
       {open && (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Input value={form.applicant_name} onChange={(e) => set("applicant_name", e.target.value)} placeholder="Applicant name" />
-          <Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} placeholder="IFC username" />
-          <Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} placeholder="Callsign" />
-          <Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} placeholder="Discord username" />
-          <Input value={form.discord_user_id} onChange={(e) => set("discord_user_id", e.target.value)} placeholder="Discord ID" />
-          <Input value={form.age} onChange={(e) => set("age", e.target.value)} type="number" placeholder="Age" />
-          <Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone" />
-          <Input value={form.experience} onChange={(e) => set("experience", e.target.value)} placeholder="Flight experience" />
-          <Input value={form.favourite_aircraft} onChange={(e) => set("favourite_aircraft", e.target.value)} placeholder="Favourite aircraft" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Applicant name</span><Input value={form.applicant_name} onChange={(e) => set("applicant_name", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">IFC username</span><Input value={form.ifc_username} onChange={(e) => set("ifc_username", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Callsign</span><Input value={form.callsign} onChange={(e) => set("callsign", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord username</span><Input value={form.discord_username} onChange={(e) => set("discord_username", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord ID</span><Input value={form.discord_user_id} onChange={(e) => set("discord_user_id", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Age</span><Input value={form.age} onChange={(e) => set("age", e.target.value)} type="number" /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Timezone</span><Input value={form.timezone} onChange={(e) => set("timezone", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Flight experience</span><Input value={form.experience} onChange={(e) => set("experience", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Favourite aircraft</span><Input value={form.favourite_aircraft} onChange={(e) => set("favourite_aircraft", e.target.value)} /></label>
           <Select value={form.status} onValueChange={(v) => set("status", v)}>
             <SelectTrigger>
               <SelectValue />
@@ -1656,8 +1656,8 @@ function ApplicationEditor({ item, request, refresh }: ApplicationEditorProps & 
             <input type="checkbox" checked={form.agreed_to_rules} onChange={(e) => set("agreed_to_rules", e.target.checked)} className="size-4 accent-primary" />
             Rules accepted
           </label>
-          <Textarea value={form.motivation} onChange={(e) => set("motivation", e.target.value)} placeholder="Motivation" className="sm:col-span-2 lg:col-span-3" rows={5} />
-          <Textarea value={form.rejection_reason} onChange={(e) => set("rejection_reason", e.target.value)} placeholder="Rejection / staff note" className="sm:col-span-2 lg:col-span-3" rows={3} />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Motivation</span><Textarea value={form.motivation} onChange={(e) => set("motivation", e.target.value)} className="sm:col-span-2 lg:col-span-3" rows={5} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Rejection / staff note</span><Textarea value={form.rejection_reason} onChange={(e) => set("rejection_reason", e.target.value)} className="sm:col-span-2 lg:col-span-3" rows={3} /></label>
           <Button onClick={save}>Save application</Button>
         </div>
       )}
@@ -1798,8 +1798,8 @@ function AdminEvents({ data, request, refresh }: AdminEventsProps) {
         <div className="kicker">Event editor</div>
         <h3 className="mt-2 text-2xl font-black">{id ? "Edit event" : "Create detailed event"}</h3>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Event title" />
-          <Input value={f.eventType} onChange={(e) => set("eventType", e.target.value)} placeholder="Event type" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Event title</span><Input value={f.title} onChange={(e) => set("title", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Event type</span><Input value={f.eventType} onChange={(e) => set("eventType", e.target.value)} /></label>
           <Select value={f.status} onValueChange={(v) => set("status", v)}>
             <SelectTrigger>
               <SelectValue />
@@ -1812,20 +1812,20 @@ function AdminEvents({ data, request, refresh }: AdminEventsProps) {
           </Select>
           <Input type="datetime-local" value={f.startsAt} onChange={(e) => set("startsAt", e.target.value)} />
           <Input type="datetime-local" value={f.endsAt} onChange={(e) => set("endsAt", e.target.value)} />
-          <Input value={f.timezone} onChange={(e) => set("timezone", e.target.value)} placeholder="Timezone e.g. UTC+5:30" />
-          <Input value={f.durationMinutes} onChange={(e) => set("durationMinutes", e.target.value)} type="number" placeholder="Duration (minutes)" />
-          <Input value={f.location} onChange={(e) => set("location", e.target.value)} placeholder="Location / server" />
-          <Input value={f.host} onChange={(e) => set("host", e.target.value)} placeholder="Host / organizer" />
-          <Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} placeholder="Aircraft" />
-          <Input value={f.route} onChange={(e) => set("route", e.target.value)} placeholder="Route" />
-          <Input value={f.meetingUrl} onChange={(e) => set("meetingUrl", e.target.value)} placeholder="Meeting / Discord URL" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Timezone e.g. UTC+5:30</span><Input value={f.timezone} onChange={(e) => set("timezone", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Duration (minutes)</span><Input value={f.durationMinutes} onChange={(e) => set("durationMinutes", e.target.value)} type="number" /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Location / server</span><Input value={f.location} onChange={(e) => set("location", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Host / organizer</span><Input value={f.host} onChange={(e) => set("host", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Aircraft</span><Input value={f.aircraft} onChange={(e) => set("aircraft", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Route</span><Input value={f.route} onChange={(e) => set("route", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Meeting / Discord URL</span><Input value={f.meetingUrl} onChange={(e) => set("meetingUrl", e.target.value)} /></label>
           <Input value={f.registrationDeadline} onChange={(e) => set("registrationDeadline", e.target.value)} type="datetime-local" />
-          <Input value={f.maxParticipants} onChange={(e) => set("maxParticipants", e.target.value)} type="number" placeholder="Max participants" />
-          <Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="Thumbnail image URL" />
-          <Input value={f.bannerUrl} onChange={(e) => set("bannerUrl", e.target.value)} placeholder="Banner image URL" />
-          <Textarea value={f.description} onChange={(e) => set("description", e.target.value)} placeholder="Public event description" className="sm:col-span-2 lg:col-span-3" rows={4} />
-          <Textarea value={f.briefing} onChange={(e) => set("briefing", e.target.value)} placeholder="Flight / event briefing" className="sm:col-span-2" rows={6} />
-          <Textarea value={f.requirements} onChange={(e) => set("requirements", e.target.value)} placeholder="Requirements / rules" className="sm:col-span-2" rows={6} />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Max participants</span><Input value={f.maxParticipants} onChange={(e) => set("maxParticipants", e.target.value)} type="number" /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Thumbnail image URL</span><Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Banner image URL</span><Input value={f.bannerUrl} onChange={(e) => set("bannerUrl", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Public event description</span><Textarea value={f.description} onChange={(e) => set("description", e.target.value)} className="sm:col-span-2 lg:col-span-3" rows={4} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Flight / event briefing</span><Textarea value={f.briefing} onChange={(e) => set("briefing", e.target.value)} className="sm:col-span-2" rows={6} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Requirements / rules</span><Textarea value={f.requirements} onChange={(e) => set("requirements", e.target.value)} className="sm:col-span-2" rows={6} /></label>
         </div>
         <div className="mt-4 flex flex-wrap gap-4 text-xs font-bold">
           <label className="flex items-center gap-2">
@@ -1900,7 +1900,7 @@ function AdminNotices({ data, request, refresh }: AdminNoticesProps) {
         <div className="kicker">NOTAM / Announcement desk</div>
         <h3 className="mt-2 text-2xl font-black">{id ? "Edit notice" : "Publish crew briefing"}</h3>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Input value={f.title} onChange={(e) => set("title", e.target.value)} placeholder="Headline" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Headline</span><Input value={f.title} onChange={(e) => set("title", e.target.value)} /></label>
           <Select value={f.priority} onValueChange={(v) => set("priority", v)}>
             <SelectTrigger>
               <SelectValue />
@@ -1912,10 +1912,10 @@ function AdminNotices({ data, request, refresh }: AdminNoticesProps) {
             </SelectContent>
           </Select>
           <Input value={f.expiresAt} onChange={(e) => set("expiresAt", e.target.value)} type="datetime-local" />
-          <Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} placeholder="Image URL" />
-          <Input value={f.actionLabel} onChange={(e) => set("actionLabel", e.target.value)} placeholder="Action button label" />
-          <Input value={f.actionUrl} onChange={(e) => set("actionUrl", e.target.value)} placeholder="Action URL" />
-          <Textarea value={f.body} onChange={(e) => set("body", e.target.value)} className="sm:col-span-2" rows={6} placeholder="Operational notice…" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Image URL</span><Input value={f.imageUrl} onChange={(e) => set("imageUrl", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Action button label</span><Input value={f.actionLabel} onChange={(e) => set("actionLabel", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Action URL</span><Input value={f.actionUrl} onChange={(e) => set("actionUrl", e.target.value)} /></label>
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Operational notice</span><Textarea value={f.body} onChange={(e) => set("body", e.target.value)} className="sm:col-span-2" rows={6} /></label>
         </div>
         <label className="mt-4 flex items-center gap-2 text-xs font-bold">
           <input type="checkbox" checked={f.active} onChange={(e) => set("active", e.target.checked)} className="size-4 accent-primary" /> Active on crew dashboard
@@ -1970,7 +1970,7 @@ function AdminRanks({ data, request, refresh }: { data: any; request: any; refre
   const [adding,setAdding]=useState(false);return <div className="space-y-5"><AdminTable title="Crew Ranks" subtitle="Build and edit the full career ladder. Add new ranks or remove obsolete ones.">{(data.ranks||[]).map((x:any)=><RankEditor key={x.id} item={x} request={request} refresh={refresh}/>)}<Button className="mt-4" onClick={()=>setAdding(true)}>+ Add rank</Button></AdminTable>{adding&&<RankEditor item={{id:"",name:"",min_hours:0,badge:"CREW",order_index:(data.ranks||[]).length+1}} request={request} refresh={async()=>{setAdding(false);await refresh()}}/>}</div>;
 }
 function RankEditor({ item, request, refresh }: RankEditorProps & { refresh: () => Promise<void> }) {
-  const [name,setName]=useState(item.name||"");const [h,setH]=useState(String(item.min_hours||0));const [badge,setBadge]=useState(item.badge||"CADET");const [order,setOrder]=useState(String(item.order_index||0));const save=async()=>{await request("admin-rank",{id:item.id||undefined,name,min_hours:Number(h),badge,order_index:Number(order)});await refresh()};const remove=async()=>{if(!item.id||!confirm("Delete this rank?"))return;await request("admin-rank",{id:item.id,delete:true});await refresh()};return <div className="grid gap-3 rounded-2xl border border-border bg-muted/20 p-4 mb-2 md:grid-cols-[1.2fr_.7fr_.7fr_.5fr_auto_auto] md:items-end"><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Rank name</span><Input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. First Officer"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Minimum hours</span><Input value={h} onChange={e=>setH(e.target.value)} type="number" placeholder="0"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Badge</span><Input value={badge} onChange={e=>setBadge(e.target.value)} placeholder="FO"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Order</span><Input value={order} onChange={e=>setOrder(e.target.value)} type="number" placeholder="1"/></label><Button size="sm" onClick={save}>{item.id?"Save":"Add"}</Button>{item.id&&<Button size="sm" variant="outline" onClick={remove}>Delete</Button>}</div>;
+  const [name,setName]=useState(item.name||"");const [h,setH]=useState(String(item.min_hours||0));const [badge,setBadge]=useState(item.badge||"CADET");const [order,setOrder]=useState(String(item.order_index||0));const save=async()=>{await request("admin-rank",{id:item.id||undefined,name,min_hours:Number(h),badge,order_index:Number(order)});await refresh()};const remove=async()=>{if(!item.id||!confirm("Delete this rank?"))return;await request("admin-rank",{id:item.id,delete:true});await refresh()};return <div className="grid gap-3 rounded-2xl border border-border bg-muted/20 p-4 mb-2 md:grid-cols-[1.2fr_.7fr_.7fr_.5fr_auto_auto] md:items-end"><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Rank name</span><Input value={name} onChange={e=>setName(e.target.value)}/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Minimum hours</span><Input value={h} onChange={e=>setH(e.target.value)} type="number"/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Badge</span><Input value={badge} onChange={e=>setBadge(e.target.value)}/></label><label><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Order</span><Input value={order} onChange={e=>setOrder(e.target.value)} type="number"/></label><Button size="sm" onClick={save}>{item.id?"Save":"Add"}</Button>{item.id&&<Button size="sm" variant="outline" onClick={remove}>Delete</Button>}</div>;
 }
 function AdminFleet({ routes }: AdminFleetProps) {
   const counts = routes.reduce((m: any, r) => {
@@ -2063,11 +2063,11 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
         <h3 className="mt-2 text-2xl font-black">Bot channel & reaction controls</h3>
         <label className="mt-4 block text-xs font-bold">
           Discord PIREP webhook URL (recommended)
-          <Input value={pWebhook} onChange={(e) => setPWebhook(e.target.value)} className="mt-2" placeholder="https://discord.com/api/webhooks/..." />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP webhook URL (recommended)</span><Input value={pWebhook} onChange={(e) => setPWebhook(e.target.value)} className="mt-2" /></label>
         </label>
         <label className="mt-4 block text-xs font-bold">
           Discord PIREP channel ID (bot fallback)
-          <Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP channel ID (bot fallback)</span><Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} className="mt-2" /></label>
         </label>
         <label className="mt-4 block text-xs font-bold">
           Embed colour
@@ -2130,11 +2130,11 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
         <h3 className="mt-2 text-2xl font-black">Event bot</h3>
         <label className="mt-4 block text-xs font-bold">
           Discord Events webhook URL (recommended)
-          <Input value={eWebhook} onChange={(e) => setEWebhook(e.target.value)} className="mt-2" placeholder="https://discord.com/api/webhooks/..." />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events webhook URL (recommended)</span><Input value={eWebhook} onChange={(e) => setEWebhook(e.target.value)} className="mt-2" /></label>
         </label>
         <label className="mt-4 block text-xs font-bold">
           Discord Events channel ID (bot fallback)
-          <Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} className="mt-2" placeholder="123456789012345678" />
+          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events channel ID (bot fallback)</span><Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} className="mt-2" /></label>
         </label>
         <label className="mt-4 block text-xs font-bold">
           Embed colour
