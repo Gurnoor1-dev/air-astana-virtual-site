@@ -30,6 +30,8 @@ async function clearStatusReactions(message) {
   }
 }
 const statusEmoji = status => status === "approved" ? "🟢" : status === "pending" ? "🟡" : "🔴";
+const crewCenterWebUrl = String(process.env.CREW_CENTER_WEB_URL || "https://air-arabia-virtual-hub.vercel.app").replace(/\/$/, "");
+const pirepEmbedImage = { url: crewCenterWebUrl + "/assets/PIREP-Submitted.jpg" };
 
 async function crewDispatchAction(payload) {
   const base = String(process.env.CREW_CENTER_API_URL || "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center").replace(/\/$/, "");
@@ -48,7 +50,8 @@ async function crewDispatchAction(payload) {
 
 async function sendEmbed(kind, body) {
   const channel = await getTextChannel(channelIdFor(kind, body.channelId));
-  const message = await channel.send({ content: body.content || undefined, embeds: [body.embed] });
+  const embed = { ...body.embed, image: body.embed?.image || pirepEmbedImage };
+  const message = await channel.send({ content: body.content || undefined, embeds: [embed] });
   return { channelId: channel.id, messageId: message.id };
 }
 
