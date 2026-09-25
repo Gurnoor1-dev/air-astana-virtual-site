@@ -2061,13 +2061,13 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
       <section className="premium-card">
         <div className="kicker">Discord Bot · PIREP</div>
         <h3 className="mt-2 text-2xl font-black">Bot channel & reaction controls</h3>
-        <label className="mt-4 block text-xs font-bold">
-          Discord PIREP webhook URL (recommended)
-          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP webhook URL (recommended)</span><Input value={pWebhook} onChange={(e) => setPWebhook(e.target.value)} className="mt-2" /></label>
+        <label className="mt-4 block">
+          <span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP webhook URL (recommended)</span>
+          <Input value={pWebhook} onChange={(e) => setPWebhook(e.target.value)} />
         </label>
-        <label className="mt-4 block text-xs font-bold">
-          Discord PIREP channel ID (bot fallback)
-          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP channel ID (bot fallback)</span><Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} className="mt-2" /></label>
+        <label className="mt-4 block">
+          <span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord PIREP channel ID (bot fallback)</span>
+          <Input value={pChannel} onChange={(e) => setPChannel(e.target.value)} />
         </label>
         <label className="mt-4 block text-xs font-bold">
           Embed colour
@@ -2128,13 +2128,13 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
       <section className="premium-card">
         <div className="kicker">Discord event styling</div>
         <h3 className="mt-2 text-2xl font-black">Event bot</h3>
-        <label className="mt-4 block text-xs font-bold">
-          Discord Events webhook URL (recommended)
-          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events webhook URL (recommended)</span><Input value={eWebhook} onChange={(e) => setEWebhook(e.target.value)} className="mt-2" /></label>
+        <label className="mt-4 block">
+          <span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events webhook URL (recommended)</span>
+          <Input value={eWebhook} onChange={(e) => setEWebhook(e.target.value)} />
         </label>
-        <label className="mt-4 block text-xs font-bold">
-          Discord Events channel ID (bot fallback)
-          <label className="block"><span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events channel ID (bot fallback)</span><Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} className="mt-2" /></label>
+        <label className="mt-4 block">
+          <span className="mb-2 block text-[10px] font-black uppercase tracking-wider text-muted-foreground">Discord Events channel ID (bot fallback)</span>
+          <Input value={eChannel} onChange={(e) => setEChannel(e.target.value)} />
         </label>
         <label className="mt-4 block text-xs font-bold">
           Embed colour
