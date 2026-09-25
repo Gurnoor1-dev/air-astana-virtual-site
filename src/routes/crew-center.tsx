@@ -5,6 +5,9 @@ import {
   ArrowRight,
   CalendarDays,
   CheckCircle2,
+  CircleDashedCheck,
+  CircleDotDashed,
+  Ban,
   Clock3,
   FileText,
   History,
@@ -1119,7 +1122,7 @@ function ChallengesView({ request }: ChallengesViewProps) {
                 <div className="text-lg font-black">{x.title}</div>
                 <p className="mt-1 text-xs text-muted-foreground">{x.description}</p>
               </div>
-              <span className="text-xl">{x.completed ? "🏆" : "🎯"}</span>
+              <span className="text-xl">{x.completed ? <Trophy className="size-5" /> : <Target className="size-5" />}</span>
             </div>
             <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
               <div className="h-full rounded-full brand-gradient" style={{ width: x.progress + "%" }} />
@@ -1395,15 +1398,15 @@ function AdminPireps({ data, review }: AdminPirepsProps) {
                   <Pencil className="mr-1 size-3" />
                   Edit all
                 </Button>
-                {x.status !== "approved" && <Button size="sm" onClick={() => review(x.id, "approved", "approve")}>Approve 🟢</Button>}
+                {x.status !== "approved" && <Button size="sm" onClick={() => review(x.id, "approved", "approve")}><CircleDashedCheck className="size-4" />Approve</Button>}
                 {x.status !== "pending" && (
                   <Button size="sm" variant="outline" onClick={() => review(x.id, "pending", "pending")}>
-                    Pending 🟡
+                    <CircleDotDashed className="size-4" />Pending
                   </Button>
                 )}
                 {x.status !== "rejected" && (
                   <Button size="sm" variant="destructive" onClick={() => review(x.id, "rejected", "reject")}>
-                    Reject 🔴
+                    <Ban className="size-4" />Reject
                   </Button>
                 )}
               </div>
@@ -1465,9 +1468,9 @@ function PirepEditor({ item, review, close }: PirepEditorProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="pending">Pending 🟡</SelectItem>
-            <SelectItem value="approved">Approved 🟢</SelectItem>
-            <SelectItem value="rejected">Rejected 🔴</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="approved">Approved</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
           </SelectContent>
         </Select>
         <label className="flex items-center gap-2 text-xs font-bold">
@@ -2042,7 +2045,7 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
   const [eWebhook, setEWebhook] = useState(ev.webhookUrl || "");
   const [pFooter, setPFooter] = useState(p.footer || "Managed by Gurnoor | CEO");
   const [eFooter, setEFooter] = useState(ev.footer || "Managed by Gurnoor | CEO");
-  const [pendingThreadName, setPendingThreadName] = useState(p.pendingThreadName || "PIREP Pending 🟡");
+  const [pendingThreadName, setPendingThreadName] = useState(p.pendingThreadName || "PIREP Pending");
   const [enabled, setEnabled] = useState(p.webhookEnabled !== false);
   const [eventWebhookEnabled, setEventWebhookEnabled] = useState(ev.webhookEnabled !== false);
   const [dispatchChannel, setDispatchChannel] = useState(dispatchCfg.channelId || "");
@@ -2103,7 +2106,7 @@ function AdminCustom({ data, request, refresh }: AdminCustomProps) {
               try {
                 await save("discord_pirep", { ...p, channelId: pChannel, embedColor: pColor, footer: pFooter, pendingThreadName, webhookEnabled: enabled });
                 const r = await request("admin-test-webhook", { kind: "pirep" });
-                setTest(r?.messageId ? "Test PIREP sent and 🔴 reaction added successfully." : "Discord bot returned no message ID.");
+                setTest(r?.messageId ? "Test PIREP sent and rejection reaction added successfully." : "Discord bot returned no message ID.");
               } catch (err) {
                 setTest(err instanceof Error ? err.message : "Discord bot test failed.");
               }
