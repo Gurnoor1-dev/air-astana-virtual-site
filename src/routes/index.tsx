@@ -94,16 +94,16 @@ function Home() {
   return (
     <div>
       <section className="relative overflow-hidden bg-white">
-        {/* Background Image Layer underneath text */}
+        {/* Background Image Layer - Opacity increased to 80% */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img 
             src={homeHero} 
             alt="Hero background" 
-            className="h-full w-full object-cover opacity-20"
+            className="h-full w-full object-cover opacity-80"
           />
-          {/* White Left-to-Right Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865620,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]" />
+          {/* Subtle Left-to-Right Fade for Text Contrast */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/30 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865615,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]" />
         </div>
 
         {/* Foreground Content Container */}
@@ -112,7 +112,7 @@ function Home() {
             <div className="kicker"><span className="kicker-dot"/> Infinite Flight Virtual Airline</div>
             <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
             
-            <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-foreground/80 sm:text-lg">
               Fly Air Astana Virtual across Kazakhstan, Central Asia, Europe, and Asia. Experience realistic operations, real-world schedules, custom dispatching, and a passionate pilot community built for Infinite Flight.
             </p>
 
