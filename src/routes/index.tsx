@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users, X, Newspaper, Award, Calendar, BarChart3, Navigation } from "lucide-react";
+import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users, X, Newspaper, Navigation, BarChart3, Calendar } from "lucide-react";
 import { Section, Stat } from "@/components/site/Page";
 
 export const Route = createFileRoute("/")({
@@ -17,7 +17,7 @@ const stats = [
   { value: "2", label: "Primary hubs" },
   { value: "37", label: "Destinations" },
   { value: "74", label: "Published sectors" },
-  { value: "5", label: "Aircraft types" }
+  { value: "4", label: "Aircraft types" }
 ];
 
 function NewsSection() {
@@ -93,29 +93,27 @@ function Home() {
   return (
     <div>
       <section className="relative overflow-hidden bg-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865620,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]"/>
-        <div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
+        {/* Background Image Layer underneath text */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="assets/site/home-hero.jpg" 
+            alt="Hero background" 
+            className="h-full w-full object-cover opacity-20"
+          />
+          {/* Black Left-to-Right Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865620,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]"/>
+        </div>
+
+        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
           <div className="max-w-3xl">
             <div className="kicker"><span className="kicker-dot"/> Infinite Flight Virtual Airline</div>
             <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
-
-            {/* Featured Image under top text with left-to-right black gradient overlay */}
-            <div className="relative mt-6 overflow-hidden rounded-2xl shadow-lg border border-border">
-              <img 
-                src="src/assets/site/home-hero.jpg" 
-                alt="Air Astana Virtual Hero" 
-                className="h-56 w-full object-cover sm:h-64"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center p-6 sm:p-8">
-                <p className="max-w-md text-sm font-medium leading-relaxed text-white/90 sm:text-base">
-                  Connecting East and West with precision. Fly across Kazakhstan, Central Asia, Europe, and Asia with realistic schedules and professional flight operations.
-                </p>
-              </div>
-            </div>
-
+            
             <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Air Astana Virtual offers a realistic, supportive, and engaging environment for Infinite Flight pilots. Tailored for all skill levels with automated flight logging, realistic dispatch procedures, and regular community events.
+              Fly Air Astana Virtual across Kazakhstan, Central Asia, Europe, and Asia. Experience realistic operations, real-world schedules, custom dispatching, and a passionate pilot community built for Infinite Flight.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/apply" className="inline-flex items-center gap-2 rounded-lg brand-gradient px-5 py-3 text-sm font-extrabold text-white shadow-brand transition hover:-translate-y-0.5">
                 Join the crew <ArrowRight className="size-4"/>
@@ -124,12 +122,13 @@ function Home() {
                 Explore routes <ArrowRight className="size-4"/>
               </Link>
             </div>
+
             <div className="mt-8 flex items-center gap-3 text-xs font-semibold text-muted-foreground">
               <span className="size-2 rounded-full bg-emerald-500"/> Network ready · Built for Infinite Flight
             </div>
           </div>
 
-          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] bg-[#1c2b4f] p-6 text-white shadow-[0_28px_80px_-35px_rgba(28,43,79,.55)] sm:p-8">
+          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] bg-[#1c2b4f]/90 backdrop-blur-sm p-6 text-white shadow-[0_28px_80px_-35px_rgba(28,43,79,.55)] sm:p-8">
             <div className="absolute inset-0 opacity-35" style={{backgroundImage:"radial-gradient(circle at 75% 20%,#a4865655,transparent 32%),linear-gradient(90deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%)",backgroundSize:"auto,56px 56px,56px 56px"}}/>
             <div className="relative flex h-full min-h-[308px] flex-col justify-between">
               <div className="flex items-center justify-between">
@@ -167,7 +166,7 @@ function Home() {
           </div>
         </div>
 
-        <div className="border-y border-border bg-[#fafafa]">
+        <div className="relative z-10 border-y border-border bg-[#fafafa]/90 backdrop-blur-sm">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 overflow-hidden px-4 py-5 sm:px-6">
             <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[.18em] text-muted-foreground">Our hubs</span>
             <div className="flex gap-8">
@@ -190,16 +189,16 @@ function Home() {
 
       <NewsSection/>
 
-      {/* Why Join Us / Operations Highlights Section for Pilots */}
-      <Section eyebrow="Why Fly With Us" title="Built by aviators, for aviators." description="Designed to offer Infinite Flight pilots a structured yet flexible virtual airline experience.">
-        <div className="grid gap-6 md:grid-cols-3 mb-8">
+      {/* Operational details section attracting pilots */}
+      <Section eyebrow="Why Fly With Us" title="Built for dedicated virtual aviators." description="Designed to offer Infinite Flight pilots a structured, engaging, and rewarding environment.">
+        <div className="grid gap-6 md:grid-cols-3 mb-6">
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
               <Navigation className="size-5" />
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Realistic Dispatch & Routes</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Realistic Dispatch & Operations</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Fly authentic Air Astana schedules using custom flight plans, accurate waypoint sequences, and realistic payload figures.
+              Fly accurate Air Astana routes with real-world sector times, waypoints, and custom flight planning tailored to Infinite Flight.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
@@ -208,16 +207,16 @@ function Home() {
             </div>
             <h3 className="text-lg font-extrabold text-foreground">Automated PIREP System</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Effortless flight tracking and automated logging. Submit reports seamlessly and watch your flight hours and stats update instantly.
+              Seamlessly log your flight hours and statistics. Track your progression and climb through our rank structure effortlessly.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
               <Calendar className="size-5" />
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Group Flights & Events</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Community & Group Events</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Participate in weekly crew fly-ins, joint IFATC operations, hub takeovers, and community challenges with pilots worldwide.
+              Join regular crew fly-ins, IFATC partner events, hub takeovers, and group flights across Europe and Asia.
             </p>
           </div>
         </div>
@@ -248,28 +247,28 @@ function Home() {
           <div className="premium-card">
             <Globe2 className="size-5 text-primary"/>
             <h3 className="mt-8 text-2xl font-extrabold">Two main hubs.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Almaty (ALA) and Astana (NQZ) anchor a strategically positioned network across Central Asia.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">Almaty and Astana anchor a network at the centre of Eurasia.</p>
             <Link to="/hubs" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View hubs <ArrowRight className="size-4"/></Link>
           </div>
 
           <div className="premium-card">
             <Plane className="size-5 text-primary"/>
             <h3 className="mt-8 text-2xl font-extrabold">Four-aircraft fleet.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Modern fleet featuring A320-200, A321-200, 787-9, and selective 757-200 long-haul routes.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">A320-200, A321-200, 787-9 and a selective 757-200 operation cover the network.</p>
             <Link to="/fleet" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Explore fleet <ArrowRight className="size-4"/></Link>
           </div>
 
           <div className="premium-card">
             <Users className="size-5 text-primary"/>
             <h3 className="mt-8 text-2xl font-extrabold">Fly with a crew.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Join an active Discord community, meet fellow aviators, and build lasting crew connections.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">Meet the team, join events and build your pilot career one sector at a time.</p>
             <Link to="/staff" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Meet the crew <ArrowRight className="size-4"/></Link>
           </div>
 
           <div className="premium-card">
             <ShieldCheck className="size-5 text-primary"/>
             <h3 className="mt-8 text-2xl font-extrabold">Progress with purpose.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Unlock new ranks, aircraft type ratings, and prestigious awards as you log flight hours.</p>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">A clear rank structure turns every logged flight into part of a longer journey.</p>
             <Link to="/ranks" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View ranks <ArrowRight className="size-4"/></Link>
           </div>
         </div>
@@ -282,7 +281,7 @@ function Home() {
             <div className="relative max-w-2xl">
               <div className="text-[10px] font-extrabold uppercase tracking-[.2em] text-white/70">Ready for departure?</div>
               <h2 className="mt-4 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-5xl">Your Eurasian journey starts here.</h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">Join Air Astana Virtual today, step into the cockpit, and make every Infinite Flight sector part of our global network.</p>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">Join Air Astana Virtual and make every Infinite Flight sector part of the network.</p>
               <Link to="/apply" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold text-[#17213a]">
                 Apply now <ArrowRight className="size-4"/>
               </Link>
