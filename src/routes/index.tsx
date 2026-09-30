@@ -95,17 +95,19 @@ function Home() {
     <div>
       <section className="relative overflow-hidden bg-white">
         {/* Background Image Layer underneath text */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <img 
             src={homeHero} 
             alt="Hero background" 
             className="h-full w-full object-cover opacity-20"
           />
           {/* White Left-to-Right Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865620,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]" />
+        </div>
 
-        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20"/>
+        {/* Foreground Content Container */}
+        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
           <div className="max-w-3xl">
             <div className="kicker"><span className="kicker-dot"/> Infinite Flight Virtual Airline</div>
             <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
