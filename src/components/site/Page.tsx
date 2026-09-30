@@ -1,7 +1,8 @@
+import homeHero from "@/assets/site/home-hero.jpg";
 import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 
-export function PageHeader({ eyebrow, title, subtitle, backgroundImage, compact = false }: { eyebrow: string; title: string; subtitle?: string; backgroundImage?: string; compact?: boolean }) {
+export function PageHeader({ eyebrow, title, subtitle, backgroundImage = homeHero, compact = false }: { eyebrow: string; title: string; subtitle?: string; backgroundImage?: string; compact?: boolean }) {
   return (
     <section className="page-hero" style={backgroundImage ? { backgroundImage: `linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.84) 45%,rgba(255,255,255,.35) 100%), url(${backgroundImage})`, backgroundPosition: "center", backgroundSize: "cover" } : undefined}>
       {!backgroundImage && <><div className="hero-grid" /><div className="hero-orb orb-a" /><div className="hero-orb orb-b" /></>}
