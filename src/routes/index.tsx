@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users, X, Newspaper, Navigation, BarChart3, Calendar } from "lucide-react";
 import { Section, Stat } from "@/components/site/Page";
+import homeHero from '@/assets/site/home-hero.jpg'
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -96,7 +97,7 @@ function Home() {
         {/* Background Image Layer underneath text */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="assets/site/home-hero.jpg" 
+            src={homeHero} 
             alt="Hero background" 
             className="h-full w-full object-cover opacity-20"
           />
