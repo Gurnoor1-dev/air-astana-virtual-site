@@ -1,13 +1,11 @@
 import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 
-export function PageHeader({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
+export function PageHeader({ eyebrow, title, subtitle, backgroundImage, compact = false }: { eyebrow: string; title: string; subtitle?: string; backgroundImage?: string; compact?: boolean }) {
   return (
-    <section className="page-hero">
-      <div className="hero-grid" />
-      <div className="hero-orb orb-a" />
-      <div className="hero-orb orb-b" />
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+    <section className="page-hero" style={backgroundImage ? { backgroundImage: `linear-gradient(90deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.84) 45%,rgba(255,255,255,.35) 100%), url(${backgroundImage})`, backgroundPosition: "center", backgroundSize: "cover" } : undefined}>
+      {!backgroundImage && <><div className="hero-grid" /><div className="hero-orb orb-a" /><div className="hero-orb orb-b" /></>}
+      <div className={`relative mx-auto max-w-7xl px-4 sm:px-6 ${compact ? "py-12 sm:py-14" : "py-16 sm:py-20 lg:py-24"}`}>
         <div className="kicker"><span className="kicker-dot" />{eyebrow}</div>
         <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_390px] lg:items-end">
           <h1 className="display-xl max-w-5xl">{title}</h1>

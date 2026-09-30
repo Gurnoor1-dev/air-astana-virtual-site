@@ -18,7 +18,7 @@ const stats = [
   { value: "2", label: "Primary hubs" },
   { value: "37", label: "Destinations" },
   { value: "74", label: "Published sectors" },
-  { value: "4", label: "Aircraft types" }
+  { value: "5", label: "Aircraft types" }
 ];
 
 function NewsSection() {
@@ -59,7 +59,7 @@ function NewsSection() {
             className="group overflow-hidden rounded-[2rem] border border-border bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-xl"
           >
             <div className="aspect-[16/7] overflow-hidden bg-muted">
-              <img src={n.image_url || n.imageUrl} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+              <img src={homeHero} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
             </div>
             <div className="p-6">
               <h3 className="text-2xl font-black tracking-[-.03em]">{n.headline}</h3>
@@ -113,7 +113,7 @@ function Home() {
             <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
             
             <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-foreground/80 sm:text-lg">
-              Fly Air Astana Virtual across Kazakhstan, Central Asia, Europe, and Asia. Experience realistic operations, real-world schedules, custom dispatching, and a passionate pilot community built for Infinite Flight.
+              Fly with Air Astana Virtual in Infinite Flight and use the same network our crew works from every day. Pick a published KC sector, choose the aircraft that fits the route, plan your flight, and log the hours with the rest of the crew. From short Kazakhstan sectors to long-haul flights into Europe and Asia, there is always another route to try.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -234,13 +234,13 @@ function Home() {
                   <span className="flex size-11 items-center justify-center rounded-2xl bg-[#1c2b4f] text-white shadow-sm">
                     <Radio className="size-5"/>
                   </span>
-                  <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">66 sectors</span>
+                  <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">74 sectors</span>
                 </div>
                 <h3 className="mt-8 text-3xl font-extrabold text-[#17213a]">Explore the network.</h3>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f6b7d]">Follow published sectors from Almaty and Astana into Central Asia, the Caucasus, Europe and Asia.</p>
               </div>
               <div className="mt-8 flex items-center justify-between gap-4">
-                <span className="text-xs font-bold uppercase tracking-[.14em] text-[#5f6b7d]">A320-200 · A321-200 · 757-200 · 787-9</span>
+                <span className="text-xs font-bold uppercase tracking-[.14em] text-[#5f6b7d]">A320-200 · A321-200 · A321neo · 787-9 · 757-200</span>
                 <span className="inline-flex items-center gap-2 text-sm font-extrabold text-primary">View routes <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span>
               </div>
             </div>
@@ -255,8 +255,8 @@ function Home() {
 
           <div className="premium-card">
             <Plane className="size-5 text-primary"/>
-            <h3 className="mt-8 text-2xl font-extrabold">Four-aircraft fleet.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">A320-200, A321-200, 787-9 and a selective 757-200 operation cover the network.</p>
+            <h3 className="mt-8 text-2xl font-extrabold">Five-aircraft fleet.</h3>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">A320-200, A321-200, A321neo, 787-9 and 757-200 cover the published network.</p>
             <Link to="/fleet" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Explore fleet <ArrowRight className="size-4"/></Link>
           </div>
 
