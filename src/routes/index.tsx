@@ -17,7 +17,7 @@ const stats = [
   { value: "2", label: "Primary hubs" },
   { value: "37", label: "Destinations" },
   { value: "74", label: "Published sectors" },
-  { value: "4", label: "Aircraft types" }
+  { value: "5", label: "Aircraft types" }
 ];
 
 function NewsSection() {
