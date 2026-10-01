@@ -114,7 +114,7 @@ function Home() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-white/78 sm:text-lg">
-              Air Astana Virtual is a community-driven Infinite Flight airline built around structured Eurasian operations. Fly published KC sectors from Almaty and Astana, choose from five aircraft types, log every flight, and progress through a clear pilot rank structure while flying alongside a growing crew.
+              Air Astana Virtual is an Infinite Flight community built around the Air Astana network in Eurasia. Fly published KC sectors from Almaty and Astana, choose from five aircraft types, record your flights and build your pilot career alongside the crew.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -144,7 +144,7 @@ function Home() {
                 <div>
                   <div className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white/55">Route network</div>
                   <div className="mt-2 text-4xl font-black tracking-[-.06em]">74 sectors</div>
-                  <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">From two Kazakhstan hubs across Central Asia, Europe and Asia.</p>
+                  <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">From two Kazakhstan hubs to destinations across Central Asia, Europe and Asia.</p>
                   <Link to="/routes" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-extrabold text-[#17213a] shadow-lg">Browse the network <ArrowRight className="size-3.5"/></Link>
                 </div>
                 <div className="hidden size-36 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:flex">
@@ -195,39 +195,39 @@ function Home() {
       <NewsSection/>
 
       {/* Operational details section attracting pilots */}
-      <Section eyebrow="Why Fly With Us" title="Built for dedicated virtual aviators." description="Designed to offer Infinite Flight pilots a structured, engaging, and rewarding environment.">
+      <Section eyebrow="Why Fly With Us" title="Built for dedicated virtual aviators." description="A straightforward place for Infinite Flight pilots to fly, meet other aviators and keep discovering the network.">
         <div className="grid gap-6 md:grid-cols-3 mb-6">
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
               <Navigation className="size-5" />
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Realistic Dispatch & Operations</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Airline-style operations</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Fly accurate Air Astana routes with real-world sector times, waypoints, and custom flight planning tailored to Infinite Flight.
+              Follow published Air Astana sectors with clear routes, aircraft assignments and flight details made for Infinite Flight.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
               <BarChart3 className="size-5" />
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Automated PIREP System</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Flight records & progression</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Seamlessly log your flight hours and statistics. Track your progression and climb through our rank structure effortlessly.
+              Record your flights, keep track of your progress and work your way through the pilot rank structure.
             </p>
           </div>
           <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
               <Calendar className="size-5" />
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Community & Group Events</h3>
+            <h3 className="text-lg font-extrabold text-foreground">Crew & group flying</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Join regular crew fly-ins, IFATC partner events, hub takeovers, and group flights across Europe and Asia.
+              Meet the crew through group flights and events, and enjoy flying together across Europe and Asia.
             </p>
           </div>
         </div>
       </Section>
 
-      <Section eyebrow="The experience" title="A crew centre for Eurasian flying." description="Everything you need to explore the Air Astana Virtual network, aircraft and pilot community.">
+      <Section eyebrow="The experience" title="A crew centre for Eurasian flying." description="Explore the network, fleet and crew, then find your next flight and take it from there.">
         <div className="grid gap-4 md:grid-cols-3">
           <Link to="/routes" className="group premium-card md:col-span-2 min-h-[250px] border-[#1c2b4f]/20 bg-[linear-gradient(145deg,#ffffff_0%,#f6f8fb_62%,#eef2f6_100%)] shadow-[0_18px_50px_-28px_rgba(28,43,79,.42)] transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_24px_60px_-32px_rgba(28,43,79,.55)]">
             <div className="absolute right-[-4rem] top-[-5rem] size-44 rounded-full bg-[#1c2b4f]/[0.035]"/>
@@ -240,7 +240,7 @@ function Home() {
                   <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">74 sectors</span>
                 </div>
                 <h3 className="mt-8 text-3xl font-extrabold text-[#17213a]">Explore the network.</h3>
-                <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f6b7d]">Follow published sectors from Almaty and Astana into Central Asia, the Caucasus, Europe and Asia.</p>
+                <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f6b7d]">Browse published sectors from Almaty and Astana across Central Asia, the Caucasus, Europe and Asia.</p>
               </div>
               <div className="mt-8 flex items-center justify-between gap-4">
                 <span className="text-xs font-bold uppercase tracking-[.14em] text-[#5f6b7d]">A320-200 · A321-200 · A321neo · 787-9 · 757-200</span>
@@ -285,8 +285,8 @@ function Home() {
             <div className="absolute right-[-6rem] top-[-9rem] size-80 rounded-full border border-white/15"/>
             <div className="relative max-w-2xl">
               <div className="text-[10px] font-extrabold uppercase tracking-[.2em] text-white/70">Ready for departure?</div>
-              <h2 className="mt-4 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-5xl">Your Eurasian journey starts here.</h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">Join Air Astana Virtual and make every Infinite Flight sector part of the network.</p>
+              <h2 className="mt-4 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-5xl">Your next flight starts here.</h2>
+              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">Join Air Astana Virtual, choose a route and make your next Infinite Flight sector part of the network.</p>
               <Link to="/apply" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold text-[#17213a]">
                 Apply now <ArrowRight className="size-4"/>
               </Link>
