@@ -36,37 +36,37 @@ function escapeHtml(value: string) {
 
 function routePopup(r: RouteRecord) {
   return `
-    <div className="kc-route-card">
-      <div className="kc-card-header">
-        <div className="kc-header-tag">FLIGHT DETAILS</div>
-        <div className="kc-aircraft-badge">${escapeHtml(r.aircraft || "Air Astana Fleet")}</div>
+    <div class="kc-route-card">
+      <div class="kc-card-header">
+        <span class="kc-header-tag">FLIGHT DETAILS</span>
+        <span class="kc-aircraft-badge">${escapeHtml(r.aircraft || "Air Astana Fleet")}</span>
       </div>
       
-      <div className="kc-route-main">
-        <div className="kc-airport-node">
-          <span className="kc-icao">${escapeHtml(r.depIcao)}</span>
-          <span className="kc-airport-name" title="${escapeHtml(r.depAirport)}">${escapeHtml(r.depAirport)}</span>
+      <div class="kc-route-main">
+        <div class="kc-airport-node">
+          <span class="kc-icao">${escapeHtml(r.depIcao)}</span>
+          <span class="kc-airport-name" title="${escapeHtml(r.depAirport)}">${escapeHtml(r.depAirport)}</span>
         </div>
         
-        <div className="kc-flight-path">
-          <div className="kc-line"></div>
-          <div className="kc-plane-icon">✈</div>
+        <div class="kc-flight-path">
+          <div class="kc-line"></div>
+          <div class="kc-plane-icon">✈</div>
         </div>
         
-        <div className="kc-airport-node right">
-          <span className="kc-icao">${escapeHtml(r.arrIcao)}</span>
-          <span className="kc-airport-name" title="${escapeHtml(r.arrAirport)}">${escapeHtml(r.arrAirport)}</span>
+        <div class="kc-airport-node right">
+          <span class="kc-icao">${escapeHtml(r.arrIcao)}</span>
+          <span class="kc-airport-name" title="${escapeHtml(r.arrAirport)}">${escapeHtml(r.arrAirport)}</span>
         </div>
       </div>
 
-      <div className="kc-card-footer">
-        <div className="kc-info-block">
-          <span className="kc-label">Route Number</span>
-          <span className="kc-value">${escapeHtml(r.routeNo || "N/A")}</span>
+      <div class="kc-card-footer">
+        <div class="kc-info-block">
+          <span class="kc-label">Route No</span>
+          <span class="kc-value">${escapeHtml(r.routeNo || "KC-GLOBAL")}</span>
         </div>
-        <div className="kc-info-block right">
-          <span className="kc-label">Operator</span>
-          <span className="kc-value">Air Astana</span>
+        <div class="kc-info-block right">
+          <span class="kc-label">Operator</span>
+          <span class="kc-value">Air Astana</span>
         </div>
       </div>
     </div>
@@ -75,23 +75,23 @@ function routePopup(r: RouteRecord) {
 
 function airportPopup(a: AirportRecord) {
   return `
-    <div className="kc-route-card">
-      <div className="kc-card-header">
-        <div className="kc-header-tag">AIRPORT STATION</div>
-        <div className="kc-aircraft-badge gold">${escapeHtml(a.flights)} ROUTES</div>
+    <div class="kc-route-card">
+      <div class="kc-card-header">
+        <span class="kc-header-tag">AIRPORT STATION</span>
+        <span class="kc-aircraft-badge gold">${escapeHtml(a.flights)} ROUTES</span>
       </div>
       
-      <div className="kc-airport-header-single">
-        <div className="kc-icao-lg">${escapeHtml(a.icao)}</div>
-        <div className="kc-airport-fullname">${escapeHtml(a.name)}</div>
+      <div class="kc-airport-header-single">
+        <div class="kc-icao-lg">${escapeHtml(a.icao)}</div>
+        <div class="kc-airport-fullname">${escapeHtml(a.name)}</div>
       </div>
 
       ${
         a.moreToKnow
           ? `
-        <div className="kc-card-extra">
-          <span className="kc-label">Station Info</span>
-          <p className="kc-extra-text">${escapeHtml(a.moreToKnow)}</p>
+        <div class="kc-card-extra">
+          <span class="kc-label">Station Information</span>
+          <p class="kc-extra-text">${escapeHtml(a.moreToKnow)}</p>
         </div>
       `
           : ""
@@ -214,8 +214,8 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
       const popupOptions: import("leaflet").PopupOptions = {
         closeButton: true,
         className: "custom-leaflet-popup",
-        maxWidth: 320,
-        minWidth: 280,
+        maxWidth: 310,
+        minWidth: 270,
       };
 
       routes.forEach((r) => {
@@ -256,41 +256,47 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
 
   return (
     <div className="relative z-0 overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_24px_70px_-38px_rgba(20,25,40,0.35)]">
-      {/* Dynamic Pop-up Styles */}
+      {/* Font & Leaflet Pop-up Custom Styles */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
+
+        /* Leaflet popup overrides */
         .custom-leaflet-popup .leaflet-popup-content-wrapper {
           padding: 0 !important;
           background: transparent !important;
-          box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.35) !important;
+          box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.4) !important;
           border-radius: 1rem !important;
           overflow: hidden !important;
         }
         .custom-leaflet-popup .leaflet-popup-content {
           margin: 0 !important;
-          line-height: 1.4 !important;
-          font-family: var(--font-sans, system-ui, -apple-system, sans-serif) !important;
+          width: 100% !important;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
         }
         .custom-leaflet-popup .leaflet-popup-tip {
-          background: #0f172a !important;
+          background: #17213a !important;
         }
         .custom-leaflet-popup a.leaflet-popup-close-button {
           color: rgba(255, 255, 255, 0.7) !important;
-          padding: 8px 8px 0 0 !important;
-          font-size: 16px !important;
+          padding: 10px 10px 0 0 !important;
+          font-size: 18px !important;
           transition: color 0.2s ease;
+          z-index: 10;
         }
         .custom-leaflet-popup a.leaflet-popup-close-button:hover {
           color: #ffffff !important;
         }
 
+        /* Card component styling */
         .kc-route-card {
           background: #ffffff;
-          border: 1px solid rgba(15, 23, 42, 0.08);
+          border: 1px solid rgba(23, 33, 58, 0.12);
           border-radius: 1rem;
           overflow: hidden;
+          font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
         }
         .kc-card-header {
-          background: #0f172a;
+          background: #17213a;
           padding: 10px 14px;
           display: flex;
           align-items: center;
@@ -299,8 +305,9 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         .kc-header-tag {
           font-size: 9px;
           font-weight: 800;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.14em;
           color: #a48656;
+          text-transform: uppercase;
         }
         .kc-aircraft-badge {
           background: rgba(255, 255, 255, 0.12);
@@ -321,12 +328,12 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           justify-content: space-between;
           padding: 16px 14px;
           background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-          border-bottom: 1px dashed rgba(15, 23, 42, 0.1);
+          border-bottom: 1px dashed rgba(23, 33, 58, 0.12);
         }
         .kc-airport-node {
           display: flex;
           flex-direction: column;
-          max-width: 40%;
+          max-width: 42%;
         }
         .kc-airport-node.right {
           align-items: flex-end;
@@ -335,7 +342,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         .kc-icao {
           font-size: 20px;
           font-weight: 900;
-          color: #0f172a;
+          color: #17213a;
           letter-spacing: -0.02em;
           line-height: 1;
         }
@@ -347,7 +354,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 90px;
+          max-width: 100px;
         }
         .kc-flight-path {
           flex: 1;
@@ -355,7 +362,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           align-items: center;
           justify-content: center;
           position: relative;
-          margin: 0 10px;
+          margin: 0 8px;
         }
         .kc-line {
           position: absolute;
@@ -372,7 +379,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           padding: 2px 6px;
           border-radius: 9999px;
           color: #a48656;
-          font-size: 12px;
+          font-size: 11px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.06);
           border: 1px solid #e2e8f0;
         }
@@ -399,7 +406,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         .kc-value {
           font-size: 12px;
           font-weight: 800;
-          color: #1e293b;
+          color: #17213a;
           margin-top: 2px;
         }
         .kc-airport-header-single {
@@ -409,7 +416,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         .kc-icao-lg {
           font-size: 24px;
           font-weight: 900;
-          color: #0f172a;
+          color: #17213a;
           letter-spacing: -0.03em;
         }
         .kc-airport-fullname {
