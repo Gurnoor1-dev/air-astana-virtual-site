@@ -93,46 +93,47 @@ function NewsSection() {
 function Home() {
   return (
     <div>
-      <section className="relative overflow-hidden bg-white">
-        {/* Background Image Layer - Opacity increased to 80% */}
+      <section className="relative overflow-hidden bg-[#08111f]">
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <img 
-            src={homeHero} 
-            alt="Hero background" 
-            className="h-full w-full object-cover opacity-80"
+          <img
+            src={homeHero}
+            alt="Air Astana aircraft"
+            className="h-full w-full object-cover opacity-45"
           />
-          {/* Subtle Left-to-Right Fade for Text Contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/30 to-transparent" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,#a4865615,transparent_27%),radial-gradient(circle_at_10%_90%,#1c2b4f10,transparent_24%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,#07101fe8_0%,#0a1627d9_43%,#0a16278c_68%,#07101f52_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,#d7a94a35,transparent_28%),radial-gradient(circle_at_18%_88%,#2f78b755,transparent_30%)]" />
         </div>
 
-        {/* Foreground Content Container */}
-        <div className="relative z-10 mx-auto grid min-h-[620px] max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:py-20">
+        <div className="relative z-10 mx-auto grid min-h-[650px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:gap-14 lg:py-20">
           <div className="max-w-3xl">
-            <div className="kicker"><span className="kicker-dot"/> Infinite Flight Virtual Airline</div>
-            <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
-            
-            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-foreground/80 sm:text-lg">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white/85 backdrop-blur-md">
+              <span className="size-2 rounded-full bg-[#d7a94a] shadow-[0_0_14px_#d7a94a]"/> Infinite Flight Virtual Airline
+            </div>
+            <h1 className="mt-6 text-5xl font-black leading-[.94] tracking-[-.055em] text-white sm:text-6xl lg:text-7xl">
+              From the heart of <span className="text-[#e2b85a]">Eurasia.</span>
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-white/78 sm:text-lg">
               Air Astana Virtual is a community-driven Infinite Flight airline built around structured Eurasian operations. Fly published KC sectors from Almaty and Astana, choose from five aircraft types, log every flight, and progress through a clear pilot rank structure while flying alongside a growing crew.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/apply" className="inline-flex items-center gap-2 rounded-lg brand-gradient px-5 py-3 text-sm font-extrabold text-white shadow-brand transition hover:-translate-y-0.5">
+              <Link to="/apply" className="inline-flex items-center gap-2 rounded-xl bg-[#e2b85a] px-5 py-3 text-sm font-extrabold text-[#101827] shadow-[0_12px_35px_-12px_#e2b85a] transition hover:-translate-y-0.5 hover:bg-[#f0ca70]">
                 Join the crew <ArrowRight className="size-4"/>
               </Link>
-              <Link to="/routes" className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-5 py-3 text-sm font-extrabold transition hover:bg-muted">
+              <Link to="/routes" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-5 py-3 text-sm font-extrabold text-white backdrop-blur-md transition hover:bg-white/[0.14]">
                 Explore routes <ArrowRight className="size-4"/>
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
-              <span className="inline-flex items-center gap-2"><span className="size-2 rounded-full bg-emerald-500"/> 74 published sectors</span>
-              <span>37 destinations</span>
-              <span>2 primary hubs</span>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">74 published sectors</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">37 destinations</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">2 primary hubs</span>
             </div>
           </div>
 
-          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] bg-[#1c2b4f]/90 backdrop-blur-sm p-6 text-white shadow-[0_28px_80px_-35px_rgba(28,43,79,.55)] sm:p-8">
+          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 bg-[#101d31]/80 p-6 text-white shadow-[0_28px_90px_-35px_rgba(0,0,0,.75)] backdrop-blur-md sm:p-8">
             <div className="absolute inset-0 opacity-35" style={{backgroundImage:"radial-gradient(circle at 75% 20%,#a4865655,transparent 32%),linear-gradient(90deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%)",backgroundSize:"auto,56px 56px,56px 56px"}}/>
             <div className="relative flex h-full min-h-[308px] flex-col justify-between">
               <div className="flex items-center justify-between">
@@ -170,12 +171,12 @@ function Home() {
           </div>
         </div>
 
-        <div className="relative z-10 border-y border-border bg-[#fafafa]/90 backdrop-blur-sm">
+        <div className="relative z-10 border-y border-white/10 bg-[#0b1626]/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 overflow-hidden px-4 py-5 sm:px-6">
-            <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[.18em] text-muted-foreground">Our hubs</span>
+            <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/45">Our hubs</span>
             <div className="flex gap-8">
-              <span className="text-xs font-black tracking-[.2em] text-foreground/70">ALA · ALMATY</span>
-              <span className="text-xs font-black tracking-[.2em] text-foreground/70">NQZ · ASTANA</span>
+              <span className="text-xs font-black tracking-[.2em] text-white/80">ALA · ALMATY</span>
+              <span className="text-xs font-black tracking-[.2em] text-white/80">NQZ · ASTANA</span>
             </div>
           </div>
         </div>
