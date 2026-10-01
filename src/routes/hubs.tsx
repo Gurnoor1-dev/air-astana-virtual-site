@@ -227,8 +227,8 @@ function Hubs() {
     <>
       <PageHeader
         eyebrow="Principal hubs"
-        title="Two gateways. One Eurasian network."
-        subtitle="Explore Almaty and Astana, or discover key regional operating stations throughout Kazakhstan."
+        title="Our hubs in Kazakhstan."
+        subtitle="Almaty and Astana are the heart of our network, with regional airports supporting operations across Kazakhstan."
       />
 
       {/* Main Hubs Section */}
@@ -378,8 +378,8 @@ function Hubs() {
       {/* Regional Kazakh Stations */}
       <Section
         eyebrow="National Coverage"
-        title="Other Airports We Operate From"
-        description="Air Astana Virtual connects key economic and regional centers across Kazakhstan with modern aviation infrastructure."
+        title="Regional airports"
+        description="Explore other airports that form part of the wider Air Astana Virtual network."
       >
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {otherKazakhstanAirports.map((ap) => {
