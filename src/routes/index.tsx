@@ -59,7 +59,7 @@ function NewsSection() {
             className="group overflow-hidden rounded-[2rem] border border-border bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-xl"
           >
             <div className="aspect-[16/7] overflow-hidden bg-muted">
-              <img src={homeHero} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+              <img src={n.image_url || n.imageUrl || homeHero} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
             </div>
             <div className="p-6">
               <h3 className="text-2xl font-black tracking-[-.03em]">{n.headline}</h3>
@@ -113,7 +113,7 @@ function Home() {
             <h1 className="mt-5 display-xl">From the heart of <span className="text-primary">Eurasia.</span></h1>
             
             <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-foreground/80 sm:text-lg">
-              Fly with Air Astana Virtual in Infinite Flight and use the same network our crew works from every day. Pick a published KC sector, choose the aircraft that fits the route, plan your flight, and log the hours with the rest of the crew. From short Kazakhstan sectors to long-haul flights into Europe and Asia, there is always another route to try.
+              Air Astana Virtual is a community-driven Infinite Flight airline built around structured Eurasian operations. Fly published KC sectors from Almaty and Astana, choose from five aircraft types, log every flight, and progress through a clear pilot rank structure while flying alongside a growing crew.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -125,8 +125,10 @@ function Home() {
               </Link>
             </div>
 
-            <div className="mt-8 flex items-center gap-3 text-xs font-semibold text-muted-foreground">
-              <span className="size-2 rounded-full bg-emerald-500"/> Network ready · Built for Infinite Flight
+            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
+              <span className="inline-flex items-center gap-2"><span className="size-2 rounded-full bg-emerald-500"/> 74 published sectors</span>
+              <span>37 destinations</span>
+              <span>2 primary hubs</span>
             </div>
           </div>
 
