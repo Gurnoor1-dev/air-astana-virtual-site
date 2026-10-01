@@ -52,10 +52,8 @@ function RoutesPage() {
     fetchRoutes().then(setRoutes).catch(console.error);
   }, []);
 
-  const hubs = useMemo(
-    () => ["ALL", ...Array.from(new Set(routes.map((r) => r.depIcao)))],
-    [routes]
-  );
+  // Updated to render strictly ALL, UAAA, and UACC
+  const hubs = useMemo(() => ["ALL", "UAAA", "UACC"], []);
 
   const filtered = useMemo(() => {
     const s = q.trim().toUpperCase();
