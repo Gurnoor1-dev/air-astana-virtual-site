@@ -1,21 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   ChevronDown,
   Compass,
   MapPin,
-  Plane,
   Ruler,
-  Search,
 } from "lucide-react";
 import { Card, PageHeader, Section } from "@/components/site/Page";
-import {
-  fetchAirports,
-  fetchRoutes,
-  type AirportRecord,
-  type RouteRecord,
-} from "@/lib/csv";
+import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 import hubAlmaty from "@/assets/site/hub-almaty.jpg";
 import hubAstana from "@/assets/site/hub-astana.jpg";
@@ -30,18 +23,32 @@ import airportKyzylorda from "@/assets/site/kc-airports/kyzylorda.jpg";
 export const Route = createFileRoute("/hubs")({
   head: () => ({
     meta: [
-      { title: "Hubs & Stations — Air Astana Virtual" },
+      { title: "Hubs & Operating Bases — Air Astana Virtual" },
       {
         name: "description",
         content:
-          "Explore Air Astana Virtual's principal hubs, domestic Kazakhstan operating bases, and network stations.",
+          "Explore Air Astana Virtual's principal hubs and regional operating airports across Kazakhstan.",
       },
     ],
   }),
   component: Hubs,
 });
 
-const hubs = [
+interface AirportHub {
+  icao: string;
+  code: string;
+  name: string;
+  city: string;
+  image: string;
+  body: string;
+  runways: {
+    designation: string;
+    length: string;
+    surface: string;
+  }[];
+}
+
+const hubs: AirportHub[] = [
   {
     icao: "UAAA",
     code: "ALA",
@@ -116,7 +123,7 @@ const otherKazakhstanAirports: RegionalAirport[] = [
     ],
   },
   {
-    icao: "UAAA", // Note: Replace with specific airport code if Sary-Arka (UAKK)
+    icao: "UAKK",
     code: "KGF",
     name: "Sary-Arka Airport",
     city: "Karaganda, Kazakhstan",
@@ -151,9 +158,7 @@ const otherKazakhstanAirports: RegionalAirport[] = [
 ];
 
 function Hubs() {
-  const [airports, setAirports] = useState<AirportRecord[]>([]);
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
-  const [q, setQ] = useState("");
   const [expandedAirports, setExpandedAirports] = useState<Record<string, boolean>>({});
 
   const toggleAirportExpand = (code: string) => {
@@ -164,128 +169,159 @@ function Hubs() {
   };
 
   useEffect(() => {
-    Promise.all([fetchAirports(), fetchRoutes()])
-      .then(([a, r]) => {
-        const map = new Map(a.map((x) => [x.icao, x]));
-        r.forEach((x) => {
-          if (!map.has(x.depIcao)) {
-            map.set(x.depIcao, {
-              icao: x.depIcao,
-              name: x.depAirport,
-              coords: x.dep,
-              flights: String(r.filter((y) => y.depIcao === x.depIcao).length),
-              moreToKnow: "Published route station.",
-            });
-          }
-          if (!map.has(x.arrIcao)) {
-            map.set(x.arrIcao, {
-              icao: x.arrIcao,
-              name: x.arrAirport,
-              coords: x.arr,
-              flights: String(r.filter((y) => y.arrIcao === x.arrIcao).length),
-              moreToKnow: "Published route station.",
-            });
-          }
-        });
-        setAirports(Array.from(map.values()));
-        setRoutes(r);
-      })
+    fetchRoutes()
+      .then((r) => setRoutes(r))
       .catch(console.error);
   }, []);
-
-  const stations = useMemo(
-    () =>
-      airports.filter((a) => {
-        const s = q.toUpperCase();
-        return !s || `${a.icao} ${a.name}`.toUpperCase().includes(s);
-      }),
-    [airports, q]
-  );
 
   return (
     <>
       <PageHeader
         eyebrow="Principal hubs"
         title="Two gateways. One Eurasian network."
-        subtitle="Explore Almaty and Astana, discover regional Kazakhstan operating stations, or search the global network directory."
+        subtitle="Explore Almaty and Astana, or discover key regional operating stations throughout Kazakhstan."
       />
 
       {/* Main Hubs Section */}
       <Section>
         <div className="grid gap-6 md:grid-cols-2">
-          {hubs.map((h, i) => (
-            <Card key={h.icao} className="overflow-hidden p-0 transition-all hover:shadow-xl">
-              <div className="p-2">
-                <div className="relative h-56 overflow-hidden rounded-2xl">
-                  <img
-                    src={h.image}
-                    alt={h.name}
-                    className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/90 via-[#17213a]/30 to-transparent" />
-                  <div className="absolute bottom-5 left-6 text-white">
-                    <div className="text-xs font-extrabold uppercase tracking-[.18em] text-white/70">
-                      {h.code} · {h.icao}
-                    </div>
-                    <div className="mt-1 text-3xl font-black">
-                      {h.name.replace(" International Airport", "")}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-6 pt-4">
-                <div className="flex items-start justify-between">
-                  <div className="kicker">
-                    <MapPin className="size-3" /> {h.code}
-                  </div>
-                  <span className="text-[10px] font-black text-muted-foreground">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <h3 className="mt-3 text-xl font-extrabold text-foreground">
-                  {h.name}
-                </h3>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {h.city} · {h.icao}
-                </p>
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                  {h.body}
-                </p>
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  <div className="rounded-xl bg-muted p-3">
-                    <div className="text-lg font-black">
-                      {
-                        new Set(
-                          routes
-                            .filter((r) => r.depIcao === h.icao)
-                            .map((r) => r.arrIcao)
-                        ).size
-                      }
-                    </div>
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Destinations
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-muted p-3">
-                    <div className="text-sm font-black">
-                      {h.runways[0].length.split(" ")[0]} m
-                    </div>
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Max Runway
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-muted p-3">
-                    <div className="text-sm font-black">
-                      {routes.filter((r) => r.depIcao === h.icao).length}
-                    </div>
-                    <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Departures
+          {hubs.map((h, i) => {
+            const isExpanded = !!expandedAirports[h.code];
+            return (
+              <Card
+                key={h.icao}
+                onClick={() => toggleAirportExpand(h.code)}
+                className="group cursor-pointer overflow-hidden p-0 transition-all duration-300 hover:border-primary/40 hover:shadow-xl"
+              >
+                <div className="p-2">
+                  <div className="relative h-60 overflow-hidden rounded-2xl">
+                    <img
+                      src={h.image}
+                      alt={h.name}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/90 via-[#17213a]/30 to-transparent" />
+                    <div className="absolute bottom-5 left-6 text-white">
+                      <div className="text-xs font-extrabold uppercase tracking-[.18em] text-white/70">
+                        {h.code} · {h.icao}
+                      </div>
+                      <div className="mt-1 text-3xl font-black">
+                        {h.name.replace(" International Airport", "")}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+
+                <div className="p-6 pt-4">
+                  <div className="flex items-start justify-between">
+                    <div className="kicker">
+                      <MapPin className="size-3" /> {h.code}
+                    </div>
+                    <span className="text-[10px] font-black text-muted-foreground">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  <h3 className="mt-3 text-2xl font-black text-foreground">
+                    {h.name}
+                  </h3>
+                  <p className="mt-1 text-xs font-medium text-muted-foreground">
+                    {h.city} · {h.icao}
+                  </p>
+                  <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                    {h.body}
+                  </p>
+
+                  {/* Summary Grid */}
+                  <div className="mt-6 grid grid-cols-3 gap-3">
+                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
+                      <div className="text-xl font-black">
+                        {
+                          new Set(
+                            routes
+                              .filter((r) => r.depIcao === h.icao)
+                              .map((r) => r.arrIcao)
+                          ).size
+                        }
+                      </div>
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Destinations
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
+                      <div className="text-xl font-black">
+                        {routes.filter((r) => r.depIcao === h.icao).length}
+                      </div>
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Departures
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
+                      <div className="text-xl font-black">
+                        {h.runways.length}
+                      </div>
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {h.runways.length === 1 ? "Runway" : "Runways"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Toggle Action Bar */}
+                  <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-semibold text-primary">
+                    <span className="flex items-center gap-1.5 font-bold">
+                      <Ruler className="size-4" />
+                      Runway Information
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="Toggle runway details"
+                      className="flex items-center gap-1.5 font-extrabold"
+                    >
+                      <span>{isExpanded ? "Hide Details" : "View Details"}</span>
+                      <ChevronDown
+                        className={`size-4 transition-transform duration-300 ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Collapsible Runway Information Drawer */}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isExpanded
+                        ? "grid-rows-[1fr] opacity-100 mt-4"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden space-y-2.5">
+                      {h.runways.map((rw) => (
+                        <div
+                          key={rw.designation}
+                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3.5 text-xs transition hover:bg-muted"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2 font-extrabold text-foreground">
+                              <Compass className="size-3.5 text-primary" />
+                              Runway {rw.designation}
+                            </div>
+                            <div className="mt-1 text-[11px] text-muted-foreground">
+                              Surface: {rw.surface}
+                            </div>
+                          </div>
+                          <div className="text-right font-black text-sm text-foreground">
+                            {rw.length}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       </Section>
 
@@ -293,7 +329,7 @@ function Hubs() {
       <Section
         eyebrow="National Coverage"
         title="Other Airports We Operate From"
-        description="Air Astana Virtual connects key economic and regional centers across Kazakhstan with modern infrastructure."
+        description="Air Astana Virtual connects key economic and regional centers across Kazakhstan with modern aviation infrastructure."
       >
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {otherKazakhstanAirports.map((ap) => {
@@ -304,16 +340,16 @@ function Hubs() {
                 onClick={() => toggleAirportExpand(ap.code)}
                 className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
               >
-                <div className="relative h-40 overflow-hidden">
+                <div className="relative h-44 overflow-hidden">
                   <img
                     src={ap.image}
                     alt={ap.name}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                   <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
                     <div>
-                      <span className="rounded bg-primary/80 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider">
+                      <span className="rounded bg-primary/90 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
                         {ap.code} · {ap.icao}
                       </span>
                       <h4 className="mt-1 font-extrabold text-white text-base leading-snug">
@@ -323,22 +359,22 @@ function Hubs() {
                   </div>
                 </div>
 
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground line-clamp-2">
+                <div className="p-5">
+                  <p className="text-xs leading-5 text-muted-foreground line-clamp-2">
                     {ap.description}
                   </p>
 
-                  <div className="mt-4 flex items-center justify-between text-xs font-semibold text-primary">
-                    <span className="flex items-center gap-1">
+                  <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3 text-xs font-semibold text-primary">
+                    <span className="flex items-center gap-1 font-bold">
                       <Ruler className="size-3.5" />
                       {ap.runways.length} {ap.runways.length === 1 ? "Runway" : "Runways"}
                     </span>
                     <button
                       type="button"
                       aria-label="Toggle runway details"
-                      className="flex items-center gap-1 text-xs font-bold transition-transform"
+                      className="flex items-center gap-1 font-extrabold"
                     >
-                      <span>{isExpanded ? "Hide info" : "Runway details"}</span>
+                      <span>{isExpanded ? "Hide" : "Runway details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
@@ -347,11 +383,11 @@ function Hubs() {
                     </button>
                   </div>
 
-                  {/* Expandable Runway Info Drawer */}
+                  {/* Collapsible Runway Info Drawer */}
                   <div
                     className={`grid transition-all duration-300 ease-in-out ${
                       isExpanded
-                        ? "grid-rows-[1fr] opacity-100 mt-3 pt-3 border-t border-border"
+                        ? "grid-rows-[1fr] opacity-100 mt-3"
                         : "grid-rows-[0fr] opacity-0"
                     }`}
                   >
@@ -359,14 +395,14 @@ function Hubs() {
                       {ap.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="rounded-lg bg-muted/60 p-2.5 text-xs flex items-center justify-between"
+                          className="flex items-center justify-between rounded-lg bg-muted/70 p-2.5 text-xs"
                         >
                           <div>
-                            <div className="font-extrabold text-foreground flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 font-extrabold text-foreground">
                               <Compass className="size-3 text-primary" />
                               Runway {rw.designation}
                             </div>
-                            <div className="text-[10px] text-muted-foreground mt-0.5">
+                            <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
@@ -384,47 +420,6 @@ function Hubs() {
         </div>
       </Section>
 
-      {/* Network Search Directory */}
-      <Section
-        eyebrow="Network Search"
-        title="Find Any Scheduled Station"
-        description="This directory uses the same route-backed airport data as the interactive network map, including international stations like Tokyo Haneda (RJTT)."
-      >
-        <div className="relative mb-6 max-w-lg">
-          <Search className="absolute left-3 top-3.5 size-4 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search airport or ICAO, e.g. RJTT…"
-            className="w-full rounded-xl border border-border bg-background py-2.5 pl-9 pr-4 text-sm font-medium outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
-          />
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {stations.map((a) => (
-            <div
-              key={a.icao}
-              className="group rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-1 hover:border-primary/20 hover:shadow-soft"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-primary">
-                  {a.icao}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  {a.flights} departures
-                </span>
-              </div>
-              <h3 className="mt-3 font-extrabold text-foreground">{a.name}</h3>
-              {a.moreToKnow && (
-                <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
-                  {a.moreToKnow}
-                </p>
-              )}
-              <Plane className="mt-5 size-4 text-border transition group-hover:text-primary" />
-            </div>
-          ))}
-        </div>
-      </Section>
-
       {/* Call to Action Banner */}
       <section className="mx-auto mb-20 max-w-7xl px-4 sm:px-6">
         <div className="brand-gradient flex flex-col justify-between gap-7 rounded-[2rem] p-8 text-white shadow-brand sm:flex-row sm:items-end sm:p-12">
@@ -436,7 +431,7 @@ function Hubs() {
           </div>
           <a
             href="/routes"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-extrabold text-primary transition hover:bg-white/90"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-extrabold text-primary transition hover:bg-white/90 hover:shadow-lg"
           >
             Explore network <ArrowRight className="size-4" />
           </a>
