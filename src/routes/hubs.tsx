@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -7,7 +7,7 @@ import {
   MapPin,
   Ruler,
 } from "lucide-react";
-import { Card, PageHeader, Section } from "@/components/site/Page";
+import { PageHeader, Section } from "@/components/site/Page";
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 import hubAlmaty from "@/assets/site/hub-almaty.jpg";
@@ -161,47 +161,58 @@ function Hubs() {
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
   const [expandedAirports, setExpandedAirports] = useState<Record<string, boolean>>({});
 
-  const toggleAirportExpand = (icao: string) => {
+  const toggleAirportExpand = useCallback((icao: string) => {
     setExpandedAirports((prev) => ({
       ...prev,
       [icao]: !prev[icao],
     }));
-  };
+  }, []);
 
   useEffect(() => {
+    let isMounted = true;
     fetchRoutes()
       .then((data) => {
-        if (Array.isArray(data)) {
+        if (isMounted && Array.isArray(data)) {
           setRoutes(data);
         }
       })
       .catch((err) => console.error("Error fetching routes:", err));
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Pre-calculate route statistics by departure ICAO with multi-key support
+  // Pre-calculate route statistics by departure ICAO with multi-key support and string cleaning
   const hubStats = useMemo(() => {
     const stats: Record<string, { destinations: number; departures: number }> = {};
 
     hubs.forEach((h) => {
-      const targetIcao = h.icao.toUpperCase();
-      const targetCode = h.code.toUpperCase();
+      const targetIcao = h.icao.trim().toUpperCase();
+      const targetCode = h.code.trim().toUpperCase();
 
-      const matchingRoutes = routes.filter((r) => {
-        const depIcao = (r.depIcao || (r as any).departureIcao || (r as any).dep_icao || "").toUpperCase();
-        const depCode = (r.depIata || (r as any).departureIata || (r as any).dep_iata || "").toUpperCase();
+      const matchingRoutes = routes.filter((r: any) => {
+        const depIcao = (r.depIcao || r.departureIcao || r.dep_icao || r.departure_icao || "").toString().trim().toUpperCase();
+        const depCode = (r.depIata || r.departureIata || r.dep_iata || r.departure_iata || "").toString().trim().toUpperCase();
         return depIcao === targetIcao || depCode === targetCode;
       });
 
-      const destinations = new Set(
-        matchingRoutes.map(
-          (r) =>
-            r.arrIcao ||
-            (r as any).arrivalIcao ||
-            (r as any).arr_icao ||
-            r.arrIata ||
-            (r as any).arr_iata
-        )
-      );
+      const destinations = new Set<string>();
+      matchingRoutes.forEach((r: any) => {
+        const arr = (
+          r.arrIcao ||
+          r.arrivalIcao ||
+          r.arr_icao ||
+          r.arrival_icao ||
+          r.arrIata ||
+          r.arrivalIata ||
+          r.arr_iata ||
+          ""
+        ).toString().trim().toUpperCase();
+
+        if (arr) {
+          destinations.add(arr);
+        }
+      });
 
       stats[h.icao] = {
         destinations: destinations.size,
@@ -224,22 +235,14 @@ function Hubs() {
       <Section>
         <div className="grid gap-6 md:grid-cols-2">
           {hubs.map((h, i) => {
-            const isExpanded = !!expandedAirports[h.icao];
+            const isExpanded = Boolean(expandedAirports[h.icao]);
             const stats = hubStats[h.icao] || { destinations: 0, departures: 0 };
 
             return (
-              <div
+              <article
                 key={h.icao}
                 onClick={() => toggleAirportExpand(h.icao)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleAirportExpand(h.icao);
-                  }
-                }}
-                className="group cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="group relative cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg touch-manipulation"
               >
                 <div className="p-2">
                   <div className="relative h-48 overflow-hidden rounded-2xl">
@@ -311,7 +314,14 @@ function Hubs() {
                   </div>
 
                   {/* Toggle Controls */}
-                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-bold text-primary">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleAirportExpand(h.icao);
+                    }}
+                    className="mt-5 flex w-full items-center justify-between border-t border-border/60 pt-4 text-xs font-bold text-primary focus:outline-none"
+                  >
                     <span className="flex items-center gap-1.5">
                       <Ruler className="size-4" />
                       Runway Details
@@ -324,34 +334,42 @@ function Hubs() {
                         }`}
                       />
                     </div>
-                  </div>
+                  </button>
 
-                  {/* Collapsible Runway Information */}
-                  {isExpanded && (
-                    <div className="mt-3 space-y-2 pt-1 animate-in fade-in duration-200">
-                      {h.runways.map((rw) => (
-                        <div
-                          key={rw.designation}
-                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3 text-xs"
-                        >
-                          <div>
-                            <div className="flex items-center gap-2 font-extrabold text-foreground">
-                              <Compass className="size-3.5 shrink-0 text-primary" />
-                              Runway {rw.designation}
+                  {/* Animated Collapsible Runway Information */}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isExpanded
+                        ? "grid-rows-[1fr] opacity-100 mt-3"
+                        : "grid-rows-[0fr] opacity-0 mt-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="space-y-2 pt-1">
+                        {h.runways.map((rw) => (
+                          <div
+                            key={rw.designation}
+                            className="flex items-center justify-between rounded-xl bg-muted/80 p-3 text-xs"
+                          >
+                            <div>
+                              <div className="flex items-center gap-2 font-extrabold text-foreground">
+                                <Compass className="size-3.5 shrink-0 text-primary" />
+                                Runway {rw.designation}
+                              </div>
+                              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                Surface: {rw.surface}
+                              </div>
                             </div>
-                            <div className="mt-0.5 text-[10px] text-muted-foreground">
-                              Surface: {rw.surface}
+                            <div className="shrink-0 text-right font-black text-foreground">
+                              {rw.length}
                             </div>
                           </div>
-                          <div className="shrink-0 text-right font-black text-foreground">
-                            {rw.length}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
@@ -365,20 +383,13 @@ function Hubs() {
       >
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {otherKazakhstanAirports.map((ap) => {
-            const isExpanded = !!expandedAirports[ap.icao];
+            const isExpanded = Boolean(expandedAirports[ap.icao]);
+
             return (
-              <div
+              <article
                 key={ap.icao}
                 onClick={() => toggleAirportExpand(ap.icao)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleAirportExpand(ap.icao);
-                  }
-                }}
-                className="group cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="group relative cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md touch-manipulation"
               >
                 <div className="p-2">
                   <div className="relative h-40 overflow-hidden rounded-2xl">
@@ -404,7 +415,14 @@ function Hubs() {
                     {ap.description}
                   </p>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-xs font-bold text-primary">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleAirportExpand(ap.icao);
+                    }}
+                    className="mt-4 flex w-full items-center justify-between border-t border-border/60 pt-3 text-xs font-bold text-primary focus:outline-none"
+                  >
                     <span className="flex items-center gap-1 font-semibold text-muted-foreground">
                       <Ruler className="size-3.5" />
                       {ap.runways.length} {ap.runways.length === 1 ? "Runway" : "Runways"}
@@ -417,34 +435,42 @@ function Hubs() {
                         }`}
                       />
                     </div>
-                  </div>
+                  </button>
 
-                  {/* Collapsible Runway Information */}
-                  {isExpanded && (
-                    <div className="mt-3 space-y-2 pt-1 animate-in fade-in duration-200">
-                      {ap.runways.map((rw) => (
-                        <div
-                          key={rw.designation}
-                          className="flex items-center justify-between rounded-lg bg-muted/80 p-2.5 text-xs"
-                        >
-                          <div>
-                            <div className="flex items-center gap-1.5 font-extrabold text-foreground">
-                              <Compass className="size-3 shrink-0 text-primary" />
-                              Runway {rw.designation}
+                  {/* Animated Collapsible Runway Information */}
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      isExpanded
+                        ? "grid-rows-[1fr] opacity-100 mt-3"
+                        : "grid-rows-[0fr] opacity-0 mt-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="space-y-2 pt-1">
+                        {ap.runways.map((rw) => (
+                          <div
+                            key={rw.designation}
+                            className="flex items-center justify-between rounded-lg bg-muted/80 p-2.5 text-xs"
+                          >
+                            <div>
+                              <div className="flex items-center gap-1.5 font-extrabold text-foreground">
+                                <Compass className="size-3 shrink-0 text-primary" />
+                                Runway {rw.designation}
+                              </div>
+                              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                                Surface: {rw.surface}
+                              </div>
                             </div>
-                            <div className="mt-0.5 text-[10px] text-muted-foreground">
-                              Surface: {rw.surface}
+                            <div className="shrink-0 text-right font-black text-foreground">
+                              {rw.length}
                             </div>
                           </div>
-                          <div className="shrink-0 text-right font-black text-foreground">
-                            {rw.length}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
