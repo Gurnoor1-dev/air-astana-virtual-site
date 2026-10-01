@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   ArrowRight,
   ChevronDown,
@@ -161,18 +161,56 @@ function Hubs() {
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
   const [expandedAirports, setExpandedAirports] = useState<Record<string, boolean>>({});
 
-  const toggleAirportExpand = (id: string) => {
+  const toggleAirportExpand = (icao: string) => {
     setExpandedAirports((prev) => ({
       ...prev,
-      [id]: !prev[id],
+      [icao]: !prev[icao],
     }));
   };
 
   useEffect(() => {
     fetchRoutes()
-      .then((r) => setRoutes(r))
-      .catch(console.error);
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setRoutes(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching routes:", err));
   }, []);
+
+  // Pre-calculate route statistics by departure ICAO with multi-key support
+  const hubStats = useMemo(() => {
+    const stats: Record<string, { destinations: number; departures: number }> = {};
+
+    hubs.forEach((h) => {
+      const targetIcao = h.icao.toUpperCase();
+      const targetCode = h.code.toUpperCase();
+
+      const matchingRoutes = routes.filter((r) => {
+        const depIcao = (r.depIcao || (r as any).departureIcao || (r as any).dep_icao || "").toUpperCase();
+        const depCode = (r.depIata || (r as any).departureIata || (r as any).dep_iata || "").toUpperCase();
+        return depIcao === targetIcao || depCode === targetCode;
+      });
+
+      const destinations = new Set(
+        matchingRoutes.map(
+          (r) =>
+            r.arrIcao ||
+            (r as any).arrivalIcao ||
+            (r as any).arr_icao ||
+            r.arrIata ||
+            (r as any).arr_iata
+        )
+      );
+
+      stats[h.icao] = {
+        destinations: destinations.size,
+        departures: matchingRoutes.length,
+      };
+    });
+
+    return stats;
+  }, [routes]);
 
   return (
     <>
@@ -184,14 +222,24 @@ function Hubs() {
 
       {/* Main Hubs Section */}
       <Section>
-        <div className="grid gap-5 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           {hubs.map((h, i) => {
             const isExpanded = !!expandedAirports[h.icao];
+            const stats = hubStats[h.icao] || { destinations: 0, departures: 0 };
+
             return (
-              <Card
+              <div
                 key={h.icao}
                 onClick={() => toggleAirportExpand(h.icao)}
-                className="group cursor-pointer overflow-hidden p-0 transition duration-300 hover:border-primary/40 hover:shadow-lg"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleAirportExpand(h.icao);
+                  }
+                }}
+                className="group cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <div className="p-2">
                   <div className="relative h-48 overflow-hidden rounded-2xl">
@@ -201,84 +249,75 @@ function Hubs() {
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/85 via-[#17213a]/20 to-transparent" />
-                    <div className="absolute bottom-5 left-6 text-white">
+                    <div className="absolute bottom-4 left-5 right-5 text-white">
                       <div className="text-xs font-extrabold uppercase tracking-[.18em] text-white/70">
                         {h.code} · {h.icao}
                       </div>
-                      <div className="mt-1 text-2xl sm:text-3xl font-black">
+                      <div className="mt-1 text-2xl font-black sm:text-3xl">
                         {h.name.replace(" International Airport", "")}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-6 pt-4">
+                <div className="p-5 sm:p-6 pt-3">
                   <div className="flex items-start justify-between">
-                    <div className="kicker">
-                      <MapPin className="size-3" /> {h.code}
+                    <div className="kicker flex items-center gap-1.5 text-xs font-bold text-primary">
+                      <MapPin className="size-3.5" /> {h.code}
                     </div>
                     <span className="text-[10px] font-black text-muted-foreground">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
 
-                  <div className="mt-4 sm:mt-6 text-3xl sm:text-4xl font-black tracking-[-.07em] text-foreground">
-                    {h.code}
-                  </div>
-                  <h3 className="mt-2 text-lg sm:text-xl font-extrabold text-foreground">
+                  <h3 className="mt-3 text-xl font-black text-foreground">
                     {h.name}
                   </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-xs font-semibold text-muted-foreground">
                     {h.city} · {h.icao}
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
                     {h.body}
                   </p>
 
                   {/* Operational Stats Grid */}
-                  <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    <div className="rounded-xl bg-muted p-3">
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    <div className="rounded-xl bg-muted/70 p-3 text-center sm:text-left">
                       <div className="text-xl font-black text-foreground">
-                        {
-                          new Set(
-                            routes
-                              .filter((r) => r.depIcao === h.icao)
-                              .map((r) => r.arrIcao)
-                          ).size
-                        }
+                        {stats.destinations}
                       </div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Destinations served
+                      <div className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-tight">
+                        Destinations
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-muted p-3">
+                    <div className="rounded-xl bg-muted/70 p-3 text-center sm:text-left">
                       <div className="text-xl font-black text-foreground">
-                        {routes.filter((r) => r.depIcao === h.icao).length}
+                        {stats.departures}
                       </div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Published departures
+                      <div className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-tight">
+                        Departures
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-muted p-3">
+                    <div className="rounded-xl bg-muted/70 p-3 text-center sm:text-left">
                       <div className="text-xl font-black text-foreground">
                         {h.runways.length}
                       </div>
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <div className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-muted-foreground leading-tight">
                         {h.runways.length === 1 ? "Runway" : "Runways"}
                       </div>
                     </div>
                   </div>
 
                   {/* Toggle Controls */}
-                  <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-xs font-semibold text-primary">
-                    <span className="flex items-center gap-1.5 font-bold">
+                  <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-bold text-primary">
+                    <span className="flex items-center gap-1.5">
                       <Ruler className="size-4" />
-                      Runway Information
+                      Runway Details
                     </span>
                     <div className="flex items-center gap-1 font-extrabold">
-                      <span>{isExpanded ? "Hide details" : "View details"}</span>
+                      <span>{isExpanded ? "Hide Details" : "View Details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
@@ -287,36 +326,32 @@ function Hubs() {
                     </div>
                   </div>
 
-                  {/* Collapsible Drawer */}
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      isExpanded ? "max-h-96 opacity-100 mt-3" : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <div className="space-y-2 pt-1">
+                  {/* Collapsible Runway Information */}
+                  {isExpanded && (
+                    <div className="mt-3 space-y-2 pt-1 animate-in fade-in duration-200">
                       {h.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between gap-2 rounded-xl bg-muted/80 p-3 text-xs"
+                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-2 font-extrabold text-foreground">
-                              <Compass className="size-3.5 text-primary shrink-0" />
+                              <Compass className="size-3.5 shrink-0 text-primary" />
                               Runway {rw.designation}
                             </div>
                             <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
-                          <div className="text-right font-black text-foreground shrink-0">
+                          <div className="shrink-0 text-right font-black text-foreground">
                             {rw.length}
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
@@ -332,10 +367,18 @@ function Hubs() {
           {otherKazakhstanAirports.map((ap) => {
             const isExpanded = !!expandedAirports[ap.icao];
             return (
-              <Card
+              <div
                 key={ap.icao}
                 onClick={() => toggleAirportExpand(ap.icao)}
-                className="group cursor-pointer overflow-hidden p-0 transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-soft"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleAirportExpand(ap.icao);
+                  }
+                }}
+                className="group cursor-pointer select-none overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <div className="p-2">
                   <div className="relative h-40 overflow-hidden rounded-2xl">
@@ -345,24 +388,24 @@ function Hubs() {
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/85 via-[#17213a]/20 to-transparent" />
-                    <div className="absolute bottom-3 left-4 text-white">
+                    <div className="absolute bottom-3 left-4 right-4 text-white">
                       <div className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">
                         {ap.code} · {ap.icao}
                       </div>
-                      <div className="mt-0.5 text-lg font-black leading-tight">
+                      <div className="mt-0.5 text-base font-black leading-tight">
                         {ap.name}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5 pt-3">
-                  <p className="text-xs leading-5 text-muted-foreground line-clamp-2">
+                <div className="p-4 pt-2 sm:p-5">
+                  <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">
                     {ap.description}
                   </p>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs font-semibold text-primary">
-                    <span className="flex items-center gap-1 font-bold text-muted-foreground">
+                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-xs font-bold text-primary">
+                    <span className="flex items-center gap-1 font-semibold text-muted-foreground">
                       <Ruler className="size-3.5" />
                       {ap.runways.length} {ap.runways.length === 1 ? "Runway" : "Runways"}
                     </span>
@@ -376,36 +419,32 @@ function Hubs() {
                     </div>
                   </div>
 
-                  {/* Collapsible Drawer */}
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      isExpanded ? "max-h-96 opacity-100 mt-3" : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <div className="space-y-2 pt-1">
+                  {/* Collapsible Runway Information */}
+                  {isExpanded && (
+                    <div className="mt-3 space-y-2 pt-1 animate-in fade-in duration-200">
                       {ap.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between gap-2 rounded-lg bg-muted/80 p-2.5 text-xs"
+                          className="flex items-center justify-between rounded-lg bg-muted/80 p-2.5 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-1.5 font-extrabold text-foreground">
-                              <Compass className="size-3 text-primary shrink-0" />
+                              <Compass className="size-3 shrink-0 text-primary" />
                               Runway {rw.designation}
                             </div>
                             <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
-                          <div className="text-right font-black text-foreground shrink-0">
+                          <div className="shrink-0 text-right font-black text-foreground">
                             {rw.length}
                           </div>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
