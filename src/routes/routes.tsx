@@ -98,8 +98,8 @@ function RoutesPage() {
     <>
       <PageHeader
         eyebrow="Network control"
-        title="The world, connected through Eurasia."
-        subtitle="Explore the published Air Astana Virtual network. Search a route or airport, filter an origin hub or aircraft type, and the map will update with the same matching sectors."
+        title="Explore the network."
+        subtitle="Browse our published sectors, search by airport or route, and filter the network by hub or aircraft."
       />
       <Section className="!pt-10">
         <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
@@ -111,7 +111,7 @@ function RoutesPage() {
           <div className="space-y-4">
             <Card className="p-5">
               <div className="kicker">
-                <SlidersHorizontal className="size-3" /> Network filter
+                <SlidersHorizontal className="size-3" /> Find a flight
               </div>
               <label className="mt-5 block text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 Search
@@ -168,10 +168,10 @@ function RoutesPage() {
                 {filtered.length}
               </div>
               <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/65">
-                Matching sectors
+                Sectors found
               </div>
               <p className="mt-5 text-sm leading-6 text-white/70">
-                Click any route on the map for its full sector card.
+                Select a route on the map to see the sector details.
               </p>
             </div>
           </div>
@@ -179,8 +179,8 @@ function RoutesPage() {
       </Section>
       <Section
         eyebrow="Schedule"
-        title="Published sectors"
-        description="A searchable operational view of the same CSV-backed data powering the map. Routes are divided by aircraft group, with the 787-9 leading long-haul and the A321neo leading medium-haul international sectors. Flight numbers use the Air Astana KC format for virtual operations."
+        title="Our published routes"
+        description="A simple view of the routes available to our pilots. Browse the schedule, check the aircraft and find a sector that suits your next flight."
       >
         <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-soft">
           <div className="hidden grid-cols-[1fr_1.2fr_1.2fr_.8fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.16em] text-white/55 sm:grid">
@@ -295,8 +295,8 @@ function RoutesPage() {
       </Section>
       <Section
         eyebrow="Featured destinations"
-        title="Places worth planning for."
-        description="A few headline international destinations, all searchable in the route database."
+        title="Destinations to explore."
+        description="A few destinations from across the network. Search the route database to see what is currently available."
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
