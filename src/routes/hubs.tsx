@@ -205,14 +205,14 @@ function Hubs() {
                       <div className="text-xs font-extrabold uppercase tracking-[.18em] text-white/70">
                         {h.code} · {h.icao}
                       </div>
-                      <div className="mt-1 text-3xl font-black">
+                      <div className="mt-1 text-2xl sm:text-3xl font-black">
                         {h.name.replace(" International Airport", "")}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 pt-4">
+                <div className="p-4 sm:p-6 pt-4">
                   <div className="flex items-start justify-between">
                     <div className="kicker">
                       <MapPin className="size-3" /> {h.code}
@@ -222,23 +222,23 @@ function Hubs() {
                     </span>
                   </div>
 
-                  <div className="mt-6 text-4xl font-black tracking-[-.07em] text-foreground">
+                  <div className="mt-4 sm:mt-6 text-3xl sm:text-4xl font-black tracking-[-.07em] text-foreground">
                     {h.code}
                   </div>
-                  <h3 className="mt-3 text-xl font-extrabold text-foreground">
+                  <h3 className="mt-2 text-lg sm:text-xl font-extrabold text-foreground">
                     {h.name}
                   </h3>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {h.city} · {h.icao}
                   </p>
-                  <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
                     {h.body}
                   </p>
 
                   {/* Operational Stats Grid */}
-                  <div className="mt-6 grid grid-cols-3 gap-2">
+                  <div className="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
                     <div className="rounded-xl bg-muted p-3">
-                      <div className="text-lg font-black">
+                      <div className="text-xl font-black text-foreground">
                         {
                           new Set(
                             routes
@@ -253,7 +253,7 @@ function Hubs() {
                     </div>
 
                     <div className="rounded-xl bg-muted p-3">
-                      <div className="text-sm font-black">
+                      <div className="text-xl font-black text-foreground">
                         {routes.filter((r) => r.depIcao === h.icao).length}
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -262,7 +262,7 @@ function Hubs() {
                     </div>
 
                     <div className="rounded-xl bg-muted p-3">
-                      <div className="text-sm font-black">
+                      <div className="text-xl font-black text-foreground">
                         {h.runways.length}
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -277,18 +277,14 @@ function Hubs() {
                       <Ruler className="size-4" />
                       Runway Information
                     </span>
-                    <button
-                      type="button"
-                      aria-label="Toggle runway details"
-                      className="flex items-center gap-1 font-extrabold"
-                    >
+                    <div className="flex items-center gap-1 font-extrabold">
                       <span>{isExpanded ? "Hide details" : "View details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
                         }`}
                       />
-                    </button>
+                    </div>
                   </div>
 
                   {/* Collapsible Drawer */}
@@ -301,18 +297,18 @@ function Hubs() {
                       {h.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3 text-xs"
+                          className="flex items-center justify-between gap-2 rounded-xl bg-muted/80 p-3 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-2 font-extrabold text-foreground">
-                              <Compass className="size-3.5 text-primary" />
+                              <Compass className="size-3.5 text-primary shrink-0" />
                               Runway {rw.designation}
                             </div>
                             <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
-                          <div className="text-right font-black text-foreground">
+                          <div className="text-right font-black text-foreground shrink-0">
                             {rw.length}
                           </div>
                         </div>
@@ -360,7 +356,7 @@ function Hubs() {
                   </div>
                 </div>
 
-                <div className="p-5 pt-3">
+                <div className="p-4 sm:p-5 pt-3">
                   <p className="text-xs leading-5 text-muted-foreground line-clamp-2">
                     {ap.description}
                   </p>
@@ -370,18 +366,14 @@ function Hubs() {
                       <Ruler className="size-3.5" />
                       {ap.runways.length} {ap.runways.length === 1 ? "Runway" : "Runways"}
                     </span>
-                    <button
-                      type="button"
-                      aria-label="Toggle runway details"
-                      className="flex items-center gap-1 font-extrabold"
-                    >
+                    <div className="flex items-center gap-1 font-extrabold">
                       <span>{isExpanded ? "Hide" : "Details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
                         }`}
                       />
-                    </button>
+                    </div>
                   </div>
 
                   {/* Collapsible Drawer */}
@@ -394,18 +386,18 @@ function Hubs() {
                       {ap.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between rounded-lg bg-muted/80 p-2.5 text-xs"
+                          className="flex items-center justify-between gap-2 rounded-lg bg-muted/80 p-2.5 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-1.5 font-extrabold text-foreground">
-                              <Compass className="size-3 text-primary" />
+                              <Compass className="size-3 text-primary shrink-0" />
                               Runway {rw.designation}
                             </div>
                             <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
-                          <div className="text-right font-black text-foreground">
+                          <div className="text-right font-black text-foreground shrink-0">
                             {rw.length}
                           </div>
                         </div>
