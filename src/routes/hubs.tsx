@@ -161,10 +161,10 @@ function Hubs() {
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
   const [expandedAirports, setExpandedAirports] = useState<Record<string, boolean>>({});
 
-  const toggleAirportExpand = (code: string) => {
+  const toggleAirportExpand = (id: string) => {
     setExpandedAirports((prev) => ({
       ...prev,
-      [code]: !prev[code],
+      [id]: !prev[id],
     }));
   };
 
@@ -184,23 +184,23 @@ function Hubs() {
 
       {/* Main Hubs Section */}
       <Section>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2">
           {hubs.map((h, i) => {
-            const isExpanded = !!expandedAirports[h.code];
+            const isExpanded = !!expandedAirports[h.icao];
             return (
               <Card
                 key={h.icao}
-                onClick={() => toggleAirportExpand(h.code)}
-                className="group cursor-pointer overflow-hidden p-0 transition-all duration-300 hover:border-primary/40 hover:shadow-xl"
+                onClick={() => toggleAirportExpand(h.icao)}
+                className="group cursor-pointer overflow-hidden p-0 transition duration-300 hover:border-primary/40 hover:shadow-lg"
               >
                 <div className="p-2">
-                  <div className="relative h-60 overflow-hidden rounded-2xl">
+                  <div className="relative h-48 overflow-hidden rounded-2xl">
                     <img
                       src={h.image}
                       alt={h.name}
                       className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/90 via-[#17213a]/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/85 via-[#17213a]/20 to-transparent" />
                     <div className="absolute bottom-5 left-6 text-white">
                       <div className="text-xs font-extrabold uppercase tracking-[.18em] text-white/70">
                         {h.code} · {h.icao}
@@ -222,20 +222,23 @@ function Hubs() {
                     </span>
                   </div>
 
-                  <h3 className="mt-3 text-2xl font-black text-foreground">
+                  <div className="mt-6 text-4xl font-black tracking-[-.07em] text-foreground">
+                    {h.code}
+                  </div>
+                  <h3 className="mt-3 text-xl font-extrabold text-foreground">
                     {h.name}
                   </h3>
-                  <p className="mt-1 text-xs font-medium text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {h.city} · {h.icao}
                   </p>
                   <p className="mt-4 text-sm leading-6 text-muted-foreground">
                     {h.body}
                   </p>
 
-                  {/* Summary Grid */}
-                  <div className="mt-6 grid grid-cols-3 gap-3">
-                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
-                      <div className="text-xl font-black">
+                  {/* Operational Stats Grid */}
+                  <div className="mt-6 grid grid-cols-3 gap-2">
+                    <div className="rounded-xl bg-muted p-3">
+                      <div className="text-lg font-black">
                         {
                           new Set(
                             routes
@@ -245,21 +248,21 @@ function Hubs() {
                         }
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Destinations
+                        Destinations served
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
-                      <div className="text-xl font-black">
+                    <div className="rounded-xl bg-muted p-3">
+                      <div className="text-sm font-black">
                         {routes.filter((r) => r.depIcao === h.icao).length}
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Departures
+                        Published departures
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-muted/70 p-3.5 transition group-hover:bg-muted">
-                      <div className="text-xl font-black">
+                    <div className="rounded-xl bg-muted p-3">
+                      <div className="text-sm font-black">
                         {h.runways.length}
                       </div>
                       <div className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -268,8 +271,8 @@ function Hubs() {
                     </div>
                   </div>
 
-                  {/* Toggle Action Bar */}
-                  <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs font-semibold text-primary">
+                  {/* Toggle Controls */}
+                  <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-xs font-semibold text-primary">
                     <span className="flex items-center gap-1.5 font-bold">
                       <Ruler className="size-4" />
                       Runway Information
@@ -277,9 +280,9 @@ function Hubs() {
                     <button
                       type="button"
                       aria-label="Toggle runway details"
-                      className="flex items-center gap-1.5 font-extrabold"
+                      className="flex items-center gap-1 font-extrabold"
                     >
-                      <span>{isExpanded ? "Hide Details" : "View Details"}</span>
+                      <span>{isExpanded ? "Hide details" : "View details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
@@ -288,30 +291,28 @@ function Hubs() {
                     </button>
                   </div>
 
-                  {/* Collapsible Runway Information Drawer */}
+                  {/* Collapsible Drawer */}
                   <div
-                    className={`grid transition-all duration-300 ease-in-out ${
-                      isExpanded
-                        ? "grid-rows-[1fr] opacity-100 mt-4"
-                        : "grid-rows-[0fr] opacity-0"
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isExpanded ? "max-h-96 opacity-100 mt-3" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className="overflow-hidden space-y-2.5">
+                    <div className="space-y-2 pt-1">
                       {h.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3.5 text-xs transition hover:bg-muted"
+                          className="flex items-center justify-between rounded-xl bg-muted/80 p-3 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-2 font-extrabold text-foreground">
                               <Compass className="size-3.5 text-primary" />
                               Runway {rw.designation}
                             </div>
-                            <div className="mt-1 text-[11px] text-muted-foreground">
+                            <div className="mt-0.5 text-[10px] text-muted-foreground">
                               Surface: {rw.surface}
                             </div>
                           </div>
-                          <div className="text-right font-black text-sm text-foreground">
+                          <div className="text-right font-black text-foreground">
                             {rw.length}
                           </div>
                         </div>
@@ -331,41 +332,41 @@ function Hubs() {
         title="Other Airports We Operate From"
         description="Air Astana Virtual connects key economic and regional centers across Kazakhstan with modern aviation infrastructure."
       >
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {otherKazakhstanAirports.map((ap) => {
-            const isExpanded = !!expandedAirports[ap.code];
+            const isExpanded = !!expandedAirports[ap.icao];
             return (
-              <div
-                key={ap.code}
-                onClick={() => toggleAirportExpand(ap.code)}
-                className="group cursor-pointer overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+              <Card
+                key={ap.icao}
+                onClick={() => toggleAirportExpand(ap.icao)}
+                className="group cursor-pointer overflow-hidden p-0 transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-soft"
               >
-                <div className="relative h-44 overflow-hidden">
-                  <img
-                    src={ap.image}
-                    alt={ap.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-                  <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
-                    <div>
-                      <span className="rounded bg-primary/90 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                <div className="p-2">
+                  <div className="relative h-40 overflow-hidden rounded-2xl">
+                    <img
+                      src={ap.image}
+                      alt={ap.name}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/85 via-[#17213a]/20 to-transparent" />
+                    <div className="absolute bottom-3 left-4 text-white">
+                      <div className="text-[10px] font-extrabold uppercase tracking-wider text-white/70">
                         {ap.code} · {ap.icao}
-                      </span>
-                      <h4 className="mt-1 font-extrabold text-white text-base leading-snug">
+                      </div>
+                      <div className="mt-0.5 text-lg font-black leading-tight">
                         {ap.name}
-                      </h4>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-5">
+                <div className="p-5 pt-3">
                   <p className="text-xs leading-5 text-muted-foreground line-clamp-2">
                     {ap.description}
                   </p>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-3 text-xs font-semibold text-primary">
-                    <span className="flex items-center gap-1 font-bold">
+                  <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-xs font-semibold text-primary">
+                    <span className="flex items-center gap-1 font-bold text-muted-foreground">
                       <Ruler className="size-3.5" />
                       {ap.runways.length} {ap.runways.length === 1 ? "Runway" : "Runways"}
                     </span>
@@ -374,7 +375,7 @@ function Hubs() {
                       aria-label="Toggle runway details"
                       className="flex items-center gap-1 font-extrabold"
                     >
-                      <span>{isExpanded ? "Hide" : "Runway details"}</span>
+                      <span>{isExpanded ? "Hide" : "Details"}</span>
                       <ChevronDown
                         className={`size-4 transition-transform duration-300 ${
                           isExpanded ? "rotate-180" : ""
@@ -383,19 +384,17 @@ function Hubs() {
                     </button>
                   </div>
 
-                  {/* Collapsible Runway Info Drawer */}
+                  {/* Collapsible Drawer */}
                   <div
-                    className={`grid transition-all duration-300 ease-in-out ${
-                      isExpanded
-                        ? "grid-rows-[1fr] opacity-100 mt-3"
-                        : "grid-rows-[0fr] opacity-0"
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isExpanded ? "max-h-96 opacity-100 mt-3" : "max-h-0 opacity-0"
                     }`}
                   >
-                    <div className="overflow-hidden space-y-2">
+                    <div className="space-y-2 pt-1">
                       {ap.runways.map((rw) => (
                         <div
                           key={rw.designation}
-                          className="flex items-center justify-between rounded-lg bg-muted/70 p-2.5 text-xs"
+                          className="flex items-center justify-between rounded-lg bg-muted/80 p-2.5 text-xs"
                         >
                           <div>
                             <div className="flex items-center gap-1.5 font-extrabold text-foreground">
@@ -414,7 +413,7 @@ function Hubs() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
@@ -431,7 +430,7 @@ function Hubs() {
           </div>
           <a
             href="/routes"
-            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3.5 text-sm font-extrabold text-primary transition hover:bg-white/90 hover:shadow-lg"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-extrabold text-primary transition hover:bg-white/90"
           >
             Explore network <ArrowRight className="size-4" />
           </a>
