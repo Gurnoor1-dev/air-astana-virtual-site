@@ -2,15 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
-  Compass,
   Globe2,
   Users2,
   PlaneTakeoff,
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
-import { PageHeader, Section } from "@/components/site/Page";
-import heroBg from "@/assets/site/hero-bg.jpg";
+import { Section } from "@/components/site/Page";
+import heroBg from "@/assets/site/home-hero.jpg";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -73,24 +72,47 @@ function RevealBox({
 function About() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
-      {/* Background Ambience & Gradient Orbs */}
-      <div
-        className="pointer-events-none fixed inset-0 bg-cover bg-center bg-no-repeat opacity-15 mix-blend-luminosity"
-        style={{ backgroundImage: `url(${heroBg})` }}
-      />
-      <div className="pointer-events-none fixed -left-36 top-20 h-96 w-96 rounded-full bg-primary/20 blur-[130px] animate-pulse" />
-      <div className="pointer-events-none fixed -right-36 top-1/2 h-[30rem] w-[30rem] rounded-full bg-cyan-500/15 blur-[150px]" />
-      <div className="pointer-events-none fixed left-1/3 bottom-10 h-80 w-80 rounded-full bg-amber-400/10 blur-[130px]" />
-
-      <div className="relative z-10">
-        {/* Page Header */}
-        <PageHeader
-          eyebrow="About Air Astana Virtual"
-          title="A virtual airline shaped by the people who fly it."
-          subtitle="An independent Infinite Flight community inspired by Air Astana, built around realistic operations, shared flying and a distinctly Eurasian network."
+      {/* HERO SECTION MATCHING SCREENSHOT */}
+      <section className="relative overflow-hidden pt-10 pb-20 sm:pt-16 sm:pb-28">
+        {/* Background Image: visible, centered with subtle contrast */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-45 sm:opacity-55"
+          style={{ backgroundImage: `url(${heroBg})` }}
         />
 
-        {/* Section 1: Story */}
+        {/* Vertical gradient wash fading to the background color at the bottom */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/30 via-background/15 to-background" />
+
+        {/* Hero Content */}
+        <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="max-w-2xl">
+            {/* Dot + Eyebrow */}
+            <div className="inline-flex items-center gap-2.5 text-xs font-black uppercase tracking-[0.2em] text-[#b89358]">
+              <span className="size-2 rounded-full bg-[#b89358]" />
+              About Air Astana Virtual
+            </div>
+
+            {/* Main Title */}
+            <h1 className="mt-5 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+              A virtual airline shaped by the people who fly it.
+            </h1>
+
+            {/* Subtitle */}
+            <p className="mt-6 text-base font-normal leading-relaxed text-muted-foreground sm:text-xl sm:leading-8">
+              An independent Infinite Flight community inspired by Air Astana,
+              built around realistic operations, shared flying and a distinctly
+              Eurasian network.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* AMBIENT GLOW ORBS */}
+      <div className="pointer-events-none fixed -left-36 top-1/3 h-96 w-96 rounded-full bg-primary/15 blur-[140px] animate-pulse" />
+      <div className="pointer-events-none fixed -right-36 bottom-20 h-96 w-96 rounded-full bg-cyan-500/15 blur-[140px]" />
+
+      <div className="relative z-10">
+        {/* SECTION 1: STORY */}
         <Section eyebrow="Our Story" title="Welcome to Air Astana Virtual.">
           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:items-start">
             <div className="space-y-8">
@@ -177,7 +199,7 @@ function About() {
                   </h4>
                   <p className="mt-2 text-xs leading-5 text-muted-foreground sm:text-sm">
                     Authentic scheduling, modern airframes, and progressive
-                    pilot ladder progression.
+                    pilot progression.
                   </p>
                 </div>
               </RevealBox>
@@ -185,7 +207,7 @@ function About() {
           </div>
         </Section>
 
-        {/* Section 2: Why We Exist */}
+        {/* SECTION 2: WHY WE EXIST */}
         <section className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6">
           <div className="relative overflow-hidden rounded-[2.5rem] border border-border/70 bg-gradient-to-br from-white/80 via-background/60 to-primary/5 p-8 shadow-2xl backdrop-blur-md sm:p-14 dark:bg-card/40">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-16">
@@ -228,11 +250,11 @@ function About() {
           </div>
         </section>
 
-        {/* Section 3: Identity & CEO Link */}
+        {/* SECTION 3: IDENTITY & CEO LINK */}
         <section className="mx-auto mb-24 max-w-7xl px-4 sm:px-6">
           <RevealBox>
             <div className="rounded-[2rem] border border-border/80 bg-white/60 p-8 shadow-sm backdrop-blur-sm sm:p-12 dark:bg-card/50">
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#b89358]">
                 <ShieldCheck className="size-4" />
                 Our identity &amp; disclaimer
               </div>
@@ -249,7 +271,7 @@ function About() {
                 property of their respective owners.
               </p>
 
-              <div className="mt-8 pt-6 border-t border-border/60">
+              <div className="mt-8 border-t border-border/60 pt-6">
                 <a
                   href="/ceo-message"
                   className="group inline-flex items-center gap-3 rounded-2xl bg-primary px-6 py-3 text-sm font-extrabold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-300 hover:scale-[1.02] hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30"
