@@ -9,6 +9,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApplyRouteImport } from './routes/apply'
+import { Route as CEOMessageRouteImport } from './routes/ceo-message'
 import { Route as FleetRouteImport } from './routes/fleet'
 import { Route as HubsRouteImport } from './routes/hubs'
 import { Route as RanksRouteImport } from './routes/ranks'
@@ -20,6 +21,7 @@ import { Route as CrewLoginRouteImport } from './routes/crew-login'
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 const AboutRoute = AboutRouteImport.update({ id: '/about', path: '/about', getParentRoute: () => rootRouteImport } as any)
 const ApplyRoute = ApplyRouteImport.update({ id: '/apply', path: '/apply', getParentRoute: () => rootRouteImport } as any)
+const CEOMessageRoute = CEOMessageRouteImport.update({ id: '/ceo-message', path: '/ceo-message', getParentRoute: () => rootRouteImport } as any)
 const FleetRoute = FleetRouteImport.update({ id: '/fleet', path: '/fleet', getParentRoute: () => rootRouteImport } as any)
 const HubsRoute = HubsRouteImport.update({ id: '/hubs', path: '/hubs', getParentRoute: () => rootRouteImport } as any)
 const RanksRoute = RanksRouteImport.update({ id: '/ranks', path: '/ranks', getParentRoute: () => rootRouteImport } as any)
@@ -32,6 +34,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/apply': typeof ApplyRoute
+  '/ceo-message': typeof CEOMessageRoute
   '/fleet': typeof FleetRoute
   '/hubs': typeof HubsRoute
   '/ranks': typeof RanksRoute
@@ -56,10 +59,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  fullPaths: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
-  id: '__root__' | '/' | '/about' | '/apply' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  to: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  id: '__root__' | '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -80,6 +83,8 @@ declare module '@tanstack/react-router' {
     '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
     '/about': { id: '/about'; path: '/about'; fullPath: '/about'; preLoaderRoute: typeof AboutRouteImport; parentRoute: typeof rootRouteImport }
     '/apply': { id: '/apply'; path: '/apply'; fullPath: '/apply'; preLoaderRoute: typeof ApplyRouteImport; parentRoute: typeof rootRouteImport }
+    '/ceo-message': { id: '/ceo-message'; path: '/ceo-message'; fullPath: '/ceo-message'; preLoaderRoute: typeof CEOMessageRouteImport; parentRoute: typeof rootRouteImport }
+    '/ceo-message': { id: '/ceo-message'; path: '/ceo-message'; fullPath: '/ceo-message'; preLoaderRoute: typeof CEOMessageRouteImport; parentRoute: typeof rootRouteImport }
     '/fleet': { id: '/fleet'; path: '/fleet'; fullPath: '/fleet'; preLoaderRoute: typeof FleetRouteImport; parentRoute: typeof rootRouteImport }
     '/hubs': { id: '/hubs'; path: '/hubs'; fullPath: '/hubs'; preLoaderRoute: typeof HubsRouteImport; parentRoute: typeof rootRouteImport }
     '/ranks': { id: '/ranks'; path: '/ranks'; fullPath: '/ranks'; preLoaderRoute: typeof RanksRouteImport; parentRoute: typeof rootRouteImport }
@@ -94,6 +99,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute,
   AboutRoute,
   ApplyRoute,
+  CEOMessageRoute,
   FleetRoute,
   HubsRoute,
   RanksRoute,
