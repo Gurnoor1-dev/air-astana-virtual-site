@@ -127,7 +127,7 @@ function Home() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">74 published sectors</span>
+              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">142 published sectors</span>
               <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">37 destinations</span>
               <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">2 primary hubs</span>
             </div>
@@ -143,7 +143,7 @@ function Home() {
               <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
                 <div>
                   <div className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white/55">Route network</div>
-                  <div className="mt-2 text-4xl font-black tracking-[-.06em]">74 sectors</div>
+                  <div className="mt-2 text-4xl font-black tracking-[-.06em]">142 sectors</div>
                   <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">From two Kazakhstan hubs to destinations across Central Asia, Europe and Asia.</p>
                   <Link to="/routes" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-extrabold text-[#17213a] shadow-lg">Browse the network <ArrowRight className="size-3.5"/></Link>
                 </div>
@@ -237,7 +237,7 @@ function Home() {
                   <span className="flex size-11 items-center justify-center rounded-2xl bg-[#1c2b4f] text-white shadow-sm">
                     <Radio className="size-5"/>
                   </span>
-                  <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">74 sectors</span>
+                  <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">142 sectors</span>
                 </div>
                 <h3 className="mt-8 text-3xl font-extrabold text-[#17213a]">Explore the network.</h3>
                 <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f6b7d]">Browse published sectors from Almaty and Astana across Central Asia, the Caucasus, Europe and Asia.</p>
