@@ -119,95 +119,95 @@ function RoutesPage() {
 
       <div className="font-jakarta min-h-screen bg-background text-foreground antialiased selection:bg-[#b89358]/20 selection:text-[#b89358]">
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24">
+        <section className="relative overflow-hidden pt-8 pb-14 sm:pt-14 sm:pb-20 text-center">
           <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-40 sm:opacity-50"
+            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-35 sm:opacity-45"
             style={{ backgroundImage: `url(${heroBg})` }}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/60" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/40 via-background/25 to-background" />
 
-          <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#b89358]">
-                <span className="size-2 rounded-full bg-[#b89358]" />
-                Network Control
+          <div className="relative z-10 mx-auto max-w-4xl px-5 sm:px-8 flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#b89358]">
+              <span className="size-2 rounded-full bg-[#b89358]" />
+              Network Control
+            </div>
+
+            <h1 className="mt-4 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+              Explore the network.
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-base font-normal leading-relaxed text-muted-foreground sm:text-xl sm:leading-8">
+              Browse our published sectors, search by airport or route, and
+              filter the Eurasian network by hub or aircraft type.
+            </p>
+
+            {/* TOGGLE BAR */}
+            <div className="mt-8 flex justify-center w-full">
+              <div className="inline-flex items-center rounded-2xl border border-border bg-white p-1.5 shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setNetworkTab("standard")}
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition sm:text-sm ${
+                    networkTab === "standard"
+                      ? "brand-gradient text-white shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Plane className="size-3.5" />
+                  <span>Air Astana Routes</span>
+                </button>
+
+                <button
+                  type="button"
+                  disabled
+                  className="flex cursor-not-allowed items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-muted-foreground/60 transition sm:text-sm"
+                  title="Codeshare operations are launching soon"
+                >
+                  <Lock className="size-3" />
+                  <span>Codeshares</span>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
+                    Coming Soon
+                  </span>
+                </button>
               </div>
-
-              <h1 className="mt-4 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
-                Explore the network.
-              </h1>
-
-              <p className="mt-5 max-w-2xl text-base font-normal leading-relaxed text-muted-foreground sm:text-xl sm:leading-8">
-                Browse our published sectors, search by airport or route, and
-                filter the Eurasian network by hub or aircraft type.
-              </p>
             </div>
           </div>
         </section>
 
-        {/* TOGGLE BAR (Clean, perfectly styled) */}
-        <div className="relative z-10 mx-auto -mt-6 max-w-7xl px-5 sm:px-8">
-          <div className="inline-flex items-center rounded-2xl border border-border bg-white p-1.5 shadow-sm">
-            <button
-              onClick={() => setNetworkTab("standard")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition sm:text-sm ${
-                networkTab === "standard"
-                  ? "brand-gradient text-white shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Plane className="size-3.5" />
-              <span>Air Astana Routes</span>
-            </button>
-
-            <button
-              disabled
-              className="flex cursor-not-allowed items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-muted-foreground/60 transition sm:text-sm"
-              title="Codeshare operations are launching soon"
-            >
-              <Lock className="size-3" />
-              <span>Codeshares</span>
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
-                Coming Soon
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* MAP & FILTER CONTROLS */}
-        <Section className="!pt-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <Section className="!pt-2">
+          <div className="grid gap-6 lg:grid-cols-[1fr_320px] items-start">
             {/* Map Container */}
-            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-white p-2 shadow-soft">
-              <div className="relative overflow-hidden rounded-[1.5rem]">
+            <div className="overflow-hidden rounded-[2rem] border border-border bg-white p-3 shadow-soft">
+              <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50 min-h-[420px]">
                 <RouteMap search={q} aircraft={aircraft} />
+              </div>
 
-                {/* Bottom Legend Pill Bar */}
-                <div className="pointer-events-none absolute bottom-4 left-4 z-[400] flex flex-wrap items-center gap-2.5 rounded-2xl border border-border/80 bg-white/95 px-4 py-2 text-[11px] font-bold text-foreground/85 shadow-md backdrop-blur-sm sm:gap-3.5 sm:text-xs">
+              {/* Bottom Legend Pill Bar */}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/30 px-4 py-2.5 text-xs font-semibold text-foreground/80">
+                <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <span className="size-2 rounded-full bg-emerald-600" />
-                    <span>Hub</span>
+                    <span className="font-bold">Hub</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className="size-2 rounded-full bg-sky-500" />
-                    <span>Destination</span>
+                    <span className="font-bold">Destination</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="h-0.5 w-3 rounded-full bg-[#b89358]" />
-                    <span>Route</span>
+                    <span className="h-0.5 w-3.5 rounded-full bg-[#b89358]" />
+                    <span className="font-bold">Route</span>
                   </div>
-                  <span className="text-border">|</span>
-                  <span className="font-extrabold text-muted-foreground">
-                    {filtered.length} Direct Routes
-                  </span>
+                </div>
+                <div className="text-xs font-black text-muted-foreground">
+                  {filtered.length} Direct Routes
                 </div>
               </div>
             </div>
 
             {/* Side Filter Cards */}
             <div className="space-y-4">
-              <Card className="rounded-[1.75rem] p-6 shadow-sm">
+              <Card className="rounded-[1.75rem] p-6 shadow-soft">
                 <div className="kicker flex items-center gap-2">
                   <SlidersHorizontal className="size-3" />
                   <span>Find a flight</span>
@@ -233,6 +233,7 @@ function RoutesPage() {
                   {hubs.map((h) => (
                     <button
                       key={h}
+                      type="button"
                       onClick={() => setHub(h)}
                       className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
                         hub === h
@@ -252,6 +253,7 @@ function RoutesPage() {
                   {AIRCRAFT_GROUPS.map((a) => (
                     <button
                       key={a}
+                      type="button"
                       onClick={() => setAircraft(a)}
                       className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
                         aircraft === a
@@ -271,10 +273,10 @@ function RoutesPage() {
                 <div className="mt-6 text-4xl font-black tracking-tight">
                   {filtered.length}
                 </div>
-                <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/70">
+                <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/75">
                   Sectors Available
                 </div>
-                <p className="mt-4 text-xs leading-5 text-white/75">
+                <p className="mt-4 text-xs leading-5 text-white/80">
                   Select a sector on the map or the schedule table below to view
                   dispatch details.
                 </p>
@@ -353,6 +355,7 @@ function RoutesPage() {
               </span>
               <div className="flex items-center gap-1.5">
                 <button
+                  type="button"
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}
                   aria-label="Previous page"
@@ -377,6 +380,7 @@ function RoutesPage() {
                           </span>
                         )}
                         <button
+                          type="button"
                           onClick={() => setCurrentPage(page)}
                           className={`size-9 rounded-xl text-xs font-extrabold transition ${
                             currentPage === page
@@ -390,6 +394,7 @@ function RoutesPage() {
                     );
                   })}
                 <button
+                  type="button"
                   onClick={() =>
                     setCurrentPage((p) => Math.min(p + 1, totalPages))
                   }
@@ -478,6 +483,7 @@ function RoutesPage() {
                     {d.description}
                   </p>
                   <button
+                    type="button"
                     onClick={() => setQ(d.icao)}
                     className="mt-4 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-primary transition hover:text-[#b89358]"
                   >
