@@ -7,9 +7,6 @@ import {
   Search,
   SlidersHorizontal,
   Lock,
-  Plus,
-  Minus,
-  RotateCcw,
   Plane,
   Sparkles,
 } from "lucide-react";
@@ -122,34 +119,26 @@ function RoutesPage() {
 
       <div className="font-jakarta min-h-screen bg-background text-foreground antialiased selection:bg-[#b89358]/20 selection:text-[#b89358]">
         {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24">
+        <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24">
           <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_25%] bg-no-repeat opacity-45 sm:opacity-55"
+            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-40 sm:opacity-50"
             style={{ backgroundImage: `url(${heroBg})` }}
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/60" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/95 via-background/50 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
 
           <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2.5 rounded-full border border-[#b89358]/30 bg-background/80 px-4 py-1.5 shadow-sm backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#b89358] opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#b89358]" />
-                </span>
-                <span className="text-[11px] font-black uppercase tracking-[0.22em] text-[#b89358]">
-                  Network Control
-                </span>
+              <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#b89358]">
+                <span className="size-2 rounded-full bg-[#b89358]" />
+                Network Control
               </div>
 
-              <h1 className="mt-6 text-4xl font-extrabold leading-[1.06] tracking-[-0.035em] text-foreground sm:text-6xl md:text-7xl">
-                Explore the{" "}
-                <span className="bg-gradient-to-r from-primary via-[#b89358] to-cyan-500 bg-clip-text text-transparent">
-                  network.
-                </span>
+              <h1 className="mt-4 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+                Explore the network.
               </h1>
 
-              <p className="mt-6 max-w-2xl text-base font-normal leading-relaxed text-muted-foreground sm:text-xl sm:leading-8">
+              <p className="mt-5 max-w-2xl text-base font-normal leading-relaxed text-muted-foreground sm:text-xl sm:leading-8">
                 Browse our published sectors, search by airport or route, and
                 filter the Eurasian network by hub or aircraft type.
               </p>
@@ -157,29 +146,29 @@ function RoutesPage() {
           </div>
         </section>
 
-        {/* TOGGLE BAR (Air Astana Routes vs Codeshares) */}
-        <div className="relative z-20 mx-auto -mt-6 max-w-7xl px-5 sm:px-8">
-          <div className="inline-flex items-center rounded-2xl border border-border/80 bg-card/90 p-1.5 shadow-xl shadow-slate-900/5 backdrop-blur-xl">
+        {/* TOGGLE BAR (Clean, perfectly styled) */}
+        <div className="relative z-10 mx-auto -mt-6 max-w-7xl px-5 sm:px-8">
+          <div className="inline-flex items-center rounded-2xl border border-border bg-white p-1.5 shadow-sm">
             <button
               onClick={() => setNetworkTab("standard")}
-              className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all sm:text-sm ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition sm:text-sm ${
                 networkTab === "standard"
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                  ? "brand-gradient text-white shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Plane className="size-4" />
+              <Plane className="size-3.5" />
               <span>Air Astana Routes</span>
             </button>
 
             <button
               disabled
-              className="flex cursor-not-allowed items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold text-muted-foreground/50 transition-all sm:text-sm"
+              className="flex cursor-not-allowed items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-muted-foreground/60 transition sm:text-sm"
               title="Codeshare operations are launching soon"
             >
-              <Lock className="size-3.5" />
+              <Lock className="size-3" />
               <span>Codeshares</span>
-              <span className="rounded-full bg-muted/80 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
                 Coming Soon
               </span>
             </button>
@@ -187,74 +176,29 @@ function RoutesPage() {
         </div>
 
         {/* MAP & FILTER CONTROLS */}
-        <Section className="!pt-8">
+        <Section className="!pt-6">
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-            {/* Map Container with Image-style Overlays */}
-            <div className="relative overflow-hidden rounded-[2.25rem] border border-border/80 bg-card/70 p-2 shadow-2xl shadow-slate-200/50 backdrop-blur-md dark:shadow-none">
-              <div className="relative overflow-hidden rounded-[1.75rem]">
+            {/* Map Container */}
+            <div className="relative overflow-hidden rounded-[2rem] border border-border bg-white p-2 shadow-soft">
+              <div className="relative overflow-hidden rounded-[1.5rem]">
                 <RouteMap search={q} aircraft={aircraft} />
 
-                {/* Top Center Route Preview Callout (Reference match) */}
-                <div className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 rounded-full border border-border/70 bg-background/90 px-5 py-2 shadow-lg backdrop-blur-md">
-                  <span className="text-xs font-black tracking-tight text-foreground sm:text-sm">
-                    Almaty (UAAA) <span className="text-primary font-bold">⇄</span> Astana (UACC)
-                  </span>
-                </div>
-
-                {/* Top Right Zoom / Reset Controls (Reference match) */}
-                <div className="absolute right-4 top-4 flex flex-col overflow-hidden rounded-xl border border-border/80 bg-background/90 shadow-md backdrop-blur-md">
-                  <button
-                    type="button"
-                    title="Zoom in"
-                    aria-label="Zoom in"
-                    className="flex size-8 items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-95"
-                  >
-                    <Plus className="size-4" />
-                  </button>
-                  <div className="h-px w-full bg-border/60" />
-                  <button
-                    type="button"
-                    title="Zoom out"
-                    aria-label="Zoom out"
-                    className="flex size-8 items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-95"
-                  >
-                    <Minus className="size-4" />
-                  </button>
-                  <div className="h-px w-full bg-border/60" />
-                  <button
-                    type="button"
-                    title="Reset view"
-                    aria-label="Reset view"
-                    className="flex size-8 items-center justify-center text-muted-foreground transition hover:bg-muted hover:text-foreground active:scale-95"
-                  >
-                    <RotateCcw className="size-3.5" />
-                  </button>
-                </div>
-
-                {/* Bottom Legend Pill Bar (Reference match) */}
-                <div className="absolute bottom-4 right-4 flex flex-wrap items-center gap-3 sm:gap-4 rounded-full border border-border/70 bg-background/90 px-4 py-2 text-xs font-semibold text-foreground/80 shadow-lg backdrop-blur-md">
-                  {/* Hub Dot */}
+                {/* Bottom Legend Pill Bar */}
+                <div className="pointer-events-none absolute bottom-4 left-4 z-[400] flex flex-wrap items-center gap-2.5 rounded-2xl border border-border/80 bg-white/95 px-4 py-2 text-[11px] font-bold text-foreground/85 shadow-md backdrop-blur-sm sm:gap-3.5 sm:text-xs">
                   <div className="flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
-                    <span className="font-bold">Hub</span>
+                    <span className="size-2 rounded-full bg-emerald-600" />
+                    <span>Hub</span>
                   </div>
-
-                  {/* Destination Dot */}
                   <div className="flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-[#0ea5e9] shadow-sm shadow-[#0ea5e9]/50" />
-                    <span className="font-bold">Destination</span>
+                    <span className="size-2 rounded-full bg-sky-500" />
+                    <span>Destination</span>
                   </div>
-
-                  {/* Route Line indicator */}
                   <div className="flex items-center gap-1.5">
-                    <span className="h-0.5 w-3.5 rounded-full bg-primary" />
-                    <span className="font-bold">Route</span>
+                    <span className="h-0.5 w-3 rounded-full bg-[#b89358]" />
+                    <span>Route</span>
                   </div>
-
-                  <span className="hidden text-border sm:inline">|</span>
-
-                  {/* Direct Routes Counter */}
-                  <span className="text-xs font-extrabold text-muted-foreground">
+                  <span className="text-border">|</span>
+                  <span className="font-extrabold text-muted-foreground">
                     {filtered.length} Direct Routes
                   </span>
                 </div>
@@ -263,9 +207,9 @@ function RoutesPage() {
 
             {/* Side Filter Cards */}
             <div className="space-y-4">
-              <Card className="rounded-[2rem] border-border/80 bg-card/80 p-6 shadow-sm backdrop-blur-md">
-                <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#b89358]">
-                  <SlidersHorizontal className="size-3.5" />
+              <Card className="rounded-[1.75rem] p-6 shadow-sm">
+                <div className="kicker flex items-center gap-2">
+                  <SlidersHorizontal className="size-3" />
                   <span>Find a flight</span>
                 </div>
 
@@ -278,7 +222,7 @@ function RoutesPage() {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="ICAO, airport, route…"
-                    className="w-full rounded-xl border border-border/80 bg-background/80 py-2.5 pl-10 pr-3 text-sm font-medium text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    className="form-input w-full pl-10 text-sm"
                   />
                 </div>
 
@@ -290,10 +234,10 @@ function RoutesPage() {
                     <button
                       key={h}
                       onClick={() => setHub(h)}
-                      className={`rounded-xl px-2 py-2.5 text-xs font-black transition-all ${
+                      className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
                         hub === h
-                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                          : "border border-border/60 bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                          ? "brand-gradient text-white shadow-brand"
+                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
                       {h}
@@ -309,10 +253,10 @@ function RoutesPage() {
                     <button
                       key={a}
                       onClick={() => setAircraft(a)}
-                      className={`rounded-xl px-2 py-2 text-xs font-bold transition-all ${
+                      className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
                         aircraft === a
-                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                          : "border border-border/60 bg-muted/60 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                          ? "brand-gradient text-white shadow-brand"
+                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
                       {a}
@@ -322,17 +266,15 @@ function RoutesPage() {
               </Card>
 
               {/* Total Sectors Badge Card */}
-              <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1c2b4f] via-primary to-emerald-950 p-6 text-white shadow-xl">
-                <div className="flex size-10 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-md">
-                  <RouteIcon className="size-5 text-white" />
-                </div>
-                <div className="mt-6 text-5xl font-black tracking-tight">
+              <div className="rounded-[1.75rem] brand-gradient p-6 text-white shadow-brand">
+                <RouteIcon className="size-5" />
+                <div className="mt-6 text-4xl font-black tracking-tight">
                   {filtered.length}
                 </div>
-                <div className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-white/70">
+                <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/70">
                   Sectors Available
                 </div>
-                <p className="mt-4 text-xs leading-5 text-white/70">
+                <p className="mt-4 text-xs leading-5 text-white/75">
                   Select a sector on the map or the schedule table below to view
                   dispatch details.
                 </p>
@@ -347,7 +289,7 @@ function RoutesPage() {
           title="Our published routes"
           description="A detailed view of the routes available to our pilots. Browse the schedule, check the aircraft and find a sector that suits your next flight."
         >
-          <div className="overflow-hidden rounded-3xl border border-border/80 bg-card/80 shadow-lg backdrop-blur-md">
+          <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-soft">
             <div className="hidden grid-cols-[1fr_1.2fr_1.2fr_.8fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70 sm:grid">
               <div>Flight</div>
               <div>Departure</div>
@@ -358,11 +300,11 @@ function RoutesPage() {
               <div
                 key={r.routeId}
                 className={`grid gap-3 px-5 py-5 sm:grid-cols-[1fr_1.2fr_1.2fr_.8fr] sm:items-center sm:gap-4 sm:px-6 ${
-                  i ? "border-t border-border/60" : ""
+                  i ? "border-t border-border" : ""
                 } transition hover:bg-muted/30`}
               >
                 <div>
-                  <div className="text-sm font-extrabold text-primary">
+                  <div className="text-sm font-black text-primary">
                     {r.routeNo}
                   </div>
                   <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -370,13 +312,13 @@ function RoutesPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="font-extrabold text-foreground">{r.depIcao}</div>
+                  <div className="font-extrabold">{r.depIcao}</div>
                   <div className="text-xs text-muted-foreground">
                     {r.depAirport}
                   </div>
                 </div>
                 <div>
-                  <div className="font-extrabold text-foreground">{r.arrIcao}</div>
+                  <div className="font-extrabold">{r.arrIcao}</div>
                   <div className="text-xs text-muted-foreground">
                     {r.arrAirport}
                   </div>
@@ -414,7 +356,7 @@ function RoutesPage() {
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}
                   aria-label="Previous page"
-                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -438,8 +380,8 @@ function RoutesPage() {
                           onClick={() => setCurrentPage(page)}
                           className={`size-9 rounded-xl text-xs font-extrabold transition ${
                             currentPage === page
-                              ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
-                              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+                              ? "brand-gradient text-white shadow-brand"
+                              : "border border-border bg-white text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
                         >
                           {page}
@@ -453,7 +395,7 @@ function RoutesPage() {
                   }
                   disabled={currentPage === totalPages}
                   aria-label="Next page"
-                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
                 >
                   <ChevronRight className="size-4" />
                 </button>
@@ -515,15 +457,15 @@ function RoutesPage() {
             ].map((d) => (
               <div
                 key={d.icao}
-                className="group overflow-hidden rounded-[2rem] border border-border/80 bg-card/70 shadow-sm backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#b89358]/40 hover:shadow-xl"
+                className="group overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-brand"
               >
                 <div className="relative h-44 overflow-hidden">
                   <img
                     src={d.image}
                     alt={d.name}
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/90 via-[#17213a]/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/80 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-5 text-white">
                     <div className="text-[10px] font-black uppercase tracking-[.18em] text-[#b89358]">
                       {d.icao}
@@ -550,10 +492,10 @@ function RoutesPage() {
 
         {/* OPERATIONS BANNER */}
         <section className="mx-auto mb-20 max-w-7xl px-4 sm:px-6">
-          <div className="relative overflow-hidden rounded-[2.25rem] border border-[#b89358]/20 bg-gradient-to-br from-card/90 via-card/60 to-primary/5 p-8 shadow-xl backdrop-blur-md sm:p-12">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#b89358]">
-              <Sparkles className="size-4" />
-              Flight Operations
+          <div className="rounded-[2rem] border border-primary/20 bg-primary/5 p-8 sm:p-12">
+            <div className="kicker flex items-center gap-2">
+              <Sparkles className="size-3.5" />
+              <span>Flight Operations</span>
             </div>
             <h3 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
               SimBrief &amp; Flight Dispatch Ready
