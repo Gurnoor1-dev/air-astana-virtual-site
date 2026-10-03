@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import {
   Award,
   ChevronRight,
@@ -8,6 +8,7 @@ import {
   Compass,
   ShieldCheck,
   Plane,
+  Star,
 } from "lucide-react";
 import { Card, PageHeader, Section } from "@/components/site/Page";
 
@@ -183,12 +184,24 @@ function Ranks() {
                         <div
                           className={`relative flex h-14 w-full max-w-[170px] items-center justify-end gap-1.5 rounded-2xl px-4 shadow-inner ${
                             r.isElite
-                              ? "bg-gradient-to-r from-amber-600 via-primary to-emerald-600"
+                              ? "bg-gradient-to-r from-[#A48656] via-[#2A3B66] to-[#1C2B4F] shadow-[#1C2B4F]/30"
                               : r.isSenior
                               ? "bg-gradient-to-r from-primary/90 to-primary"
                               : "bg-gradient-to-r from-primary/80 to-primary"
                           }`}
                         >
+                          {/* Leftmost Commander / Fleet Star for Senior & Fleet Captain */}
+                          {(r.isElite || r.isSenior) && (
+                            <Star
+                              className={`mr-auto size-5 drop-shadow ${
+                                r.isElite
+                                  ? "fill-[#E9D8A6] text-[#E9D8A6]"
+                                  : "fill-white/95 text-white/95"
+                              }`}
+                            />
+                          )}
+
+                          {/* Pilot stripes indicator */}
                           {r.stripes === 0 ? (
                             <span className="w-full text-center text-[10px] font-bold tracking-widest text-white/80 uppercase">
                               Cadet
@@ -197,7 +210,9 @@ function Ranks() {
                             Array.from({ length: r.stripes }).map((_, idx) => (
                               <div
                                 key={idx}
-                                className="h-9 w-2 rounded-full bg-white shadow-sm"
+                                className={`h-9 w-2 rounded-full shadow-sm ${
+                                  r.isElite ? "bg-amber-100" : "bg-white"
+                                }`}
                               />
                             ))
                           )}
