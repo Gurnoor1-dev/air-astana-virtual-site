@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import {
   Award,
   ChevronRight,
@@ -91,6 +93,21 @@ const ranks = [
 ];
 
 function Ranks() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Tracks scroll progress through the rank list container
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start center", "end 80%"],
+  });
+
+  // Smooth out raw scroll movements
+  const scaleY = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
   return (
     <>
       <PageHeader
@@ -100,9 +117,15 @@ function Ranks() {
       />
 
       <Section>
-        <div className="relative mx-auto max-w-4xl">
-          {/* Continuous progressive vertical connector line */}
-          <div className="absolute left-[33px] sm:left-[45px] top-6 bottom-16 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-border" />
+        <div ref={containerRef} className="relative mx-auto max-w-4xl">
+          {/* Static background track */}
+          <div className="absolute left-[31px] sm:left-[39px] top-6 bottom-16 w-1 rounded-full bg-muted/60 dark:bg-muted/30" />
+
+          {/* Animated fill line */}
+          <motion.div
+            style={{ scaleY }}
+            className="absolute left-[31px] sm:left-[39px] top-6 bottom-16 w-1 origin-top rounded-full bg-gradient-to-b from-primary via-primary to-primary/80 shadow-[0_0_12px_rgba(var(--primary),0.5)]"
+          />
 
           <div className="space-y-10 sm:space-y-12">
             {ranks.map((r, i) => (
@@ -112,7 +135,7 @@ function Ranks() {
               >
                 {/* Milestone Node */}
                 <div className="relative z-10 flex flex-col items-center">
-                  <div className="flex h-11 w-16 sm:h-12 sm:w-20 items-center justify-center rounded-2xl border-2 border-primary/20 bg-background/90 text-xs sm:text-sm font-black text-primary shadow-md backdrop-blur-md transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:shadow-primary/20">
+                  <div className="flex h-11 w-16 sm:h-12 sm:w-20 items-center justify-center rounded-2xl border-2 border-primary/20 bg-background/95 text-xs sm:text-sm font-black text-primary shadow-md backdrop-blur-md transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:shadow-primary/20">
                     {r.minHours}
                   </div>
                 </div>
@@ -120,7 +143,7 @@ function Ranks() {
                 {/* Progressive Rank Card */}
                 <div className="w-full flex-1">
                   <div className="relative overflow-hidden rounded-[2rem] border border-border/80 bg-white/95 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl sm:p-8 dark:bg-card">
-                    {/* Top pill bar matching the reference */}
+                    {/* Top pill bar */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-5">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">
@@ -166,7 +189,6 @@ function Ranks() {
                               : "bg-gradient-to-r from-primary/80 to-primary"
                           }`}
                         >
-                          {/* Pilot stripes indicator */}
                           {r.stripes === 0 ? (
                             <span className="w-full text-center text-[10px] font-bold tracking-widest text-white/80 uppercase">
                               Cadet
