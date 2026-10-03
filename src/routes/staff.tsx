@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, Sparkles, BriefcaseBusiness, Users, Ban } from "lucide-react";
-import { Card, Section } from "@/components/site/Page";
+import { ArrowUpRight, BriefcaseBusiness, Users, Ban } from "lucide-react";
+import { Card, PageHeader, Section } from "@/components/site/Page";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({
@@ -58,21 +58,15 @@ function Staff() {
       `}</style>
 
       <div className="font-jakarta min-h-screen bg-background text-foreground antialiased selection:bg-[#b89358]/20 selection:text-[#b89358]">
-        {/* ACTIVE ROSTER HEADER */}
-        <section className="pt-12 pb-6 sm:pt-20 sm:pb-8">
-          <div className="mx-auto max-w-4xl px-5 sm:px-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl md:text-5xl">
-              Active Roster
-            </h1>
-            <p className="mt-3 text-sm font-medium text-muted-foreground sm:text-base">
-              Meet the dedicated staff members currently leading{" "}
-              <span className="font-bold text-[#b89358]">Air Astana Virtual</span>.
-            </p>
-          </div>
-        </section>
+        {/* PAGE HEADER */}
+        <PageHeader
+          eyebrow="Active Roster"
+          title="Meet the team behind the airline."
+          subtitle="Meet the dedicated staff members and leadership who keep Air Astana Virtual running, from operations and route planning to the community experience."
+        />
 
         {/* STAFF CARDS SECTION */}
-        <section className="pb-16 sm:pb-24">
+        <Section className="!pt-4 pb-16 sm:pb-24">
           <div className="mx-auto max-w-4xl space-y-8 px-5 sm:px-8">
             {staffRoster.map((member) => (
               <div
@@ -205,7 +199,7 @@ function Staff() {
               </div>
             </div>
           </div>
-        </section>
+        </Section>
 
         {/* DEPARTMENTS OVERVIEW */}
         <Section eyebrow="Departments" title="Different roles, one crew.">
