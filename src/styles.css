@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -11,7 +11,7 @@ body { overflow-y: auto; }
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px); --radius-md: calc(var(--radius) - 2px); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) + 4px); --radius-2xl: calc(var(--radius) + 8px); --radius-3xl: calc(var(--radius) + 12px);
   --color-background: var(--background); --color-foreground: var(--foreground); --color-surface: var(--surface); --color-card: var(--card); --color-card-foreground: var(--card-foreground); --color-primary: var(--primary); --color-primary-foreground: var(--primary-foreground); --color-primary-dark: var(--primary-dark); --color-muted: var(--muted); --color-muted-foreground: var(--muted-foreground); --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif; --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif; --font-display: "Manrope", ui-sans-serif, system-ui, sans-serif; --font-footer: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --shadow-soft: 0 10px 35px -22px rgb(17 19 25 / .24); --shadow-brand: 0 16px 36px -20px rgb(164 134 86 / .45);
 }
 :root { --radius: 1rem; --background: #f4f6f8; --foreground: #17213a; --surface: #fff; --card: #fff; --card-foreground: #17213a; --primary: #a48656; --primary-dark: #80663c; --primary-foreground: #fff; --muted: #edf1f5; --muted-foreground: #697386; --border: #dfe4eb; --input: #d4dbe4; --ring: #a48656; }
@@ -24,3 +24,5 @@ body { overflow-y: auto; }
 .site-main { position:relative;overflow:clip; } .hairline-grid { background-image:linear-gradient(to right,#ffffff16 1px,transparent 1px),linear-gradient(to bottom,#ffffff16 1px,transparent 1px);background-size:56px 56px; } .flight-line { position:absolute;height:1px;background:linear-gradient(90deg,transparent,#ffffffaa,#fff,transparent);transform-origin:left center;animation:route-pulse 4s ease-in-out infinite; } .float-slow { animation:float-slow 7s ease-in-out infinite; } .pulse-soft { animation:pulse-soft 3.5s ease-in-out infinite; } .marquee { animation:marquee 24s linear infinite; }
 .leaflet-container { background:#e9edf2;font-family:var(--font-sans); } .leaflet-popup-content-wrapper { border-radius:.9rem;box-shadow:var(--shadow-soft);border:1px solid var(--border); } .leaflet-popup-content { margin:0; } .leaflet-control-zoom a { color:var(--foreground); }
 @keyframes float-slow { 0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-8px,0)} } @keyframes pulse-soft { 0%,100%{opacity:.4;transform:scale(.97)}50%{opacity:.85;transform:scale(1.03)} } @keyframes route-pulse { 0%,100%{opacity:.3}50%{opacity:1} } @keyframes marquee { to{transform:translateX(-50%)} } @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+.footer-jakarta { font-family: var(--font-footer); letter-spacing: -.012em; } .footer-jakarta h4 { font-family: var(--font-footer); letter-spacing: .2em; } .footer-jakarta a, .footer-jakarta p, .footer-jakarta span { font-family: var(--font-footer); }
