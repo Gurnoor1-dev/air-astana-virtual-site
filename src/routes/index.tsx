@@ -104,7 +104,7 @@ function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,#d7a94a35,transparent_28%),radial-gradient(circle_at_18%_88%,#2f78b755,transparent_30%)]" />
         </div>
 
-        <div className="relative z-10 mx-auto grid min-h-[650px] max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.08fr_.92fr] lg:gap-14 lg:py-20">
+        <div className="relative z-10 mx-auto grid min-h-[650px] max-w-7xl items-start gap-10 px-4 pt-28 pb-16 sm:px-6 sm:pt-32 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:gap-14 lg:py-20">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white/85 backdrop-blur-md">
               <span className="size-2 rounded-full bg-[#d7a94a] shadow-[0_0_14px_#d7a94a]"/> Infinite Flight Virtual Airline
