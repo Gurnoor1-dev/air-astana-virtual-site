@@ -27,12 +27,12 @@ export function BrandIntro() {
           <div className="relative flex h-full items-center justify-center">
             <motion.div className="relative flex flex-col items-center" initial={{ opacity: 0, scale: 0.58, y: 18 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ delay: 0.35, duration: 1.05, ease: [0.16, 1, 0.3, 1] }}>
               <motion.div className="absolute -inset-20 rounded-full bg-[#e2b85a]/10 blur-3xl" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1.2 }} transition={{ delay: 0.65, duration: 1.2 }} />
-              <img src={logo} alt="Air Astana Virtual" className="relative h-24 w-auto object-contain drop-shadow-[0_0_35px_rgba(226,184,90,.2)] sm:h-32" width={288} height={144} />
-              <motion.div className="mt-7 h-px bg-[#e2b85a]" initial={{ width: 0, opacity: 0 }} animate={{ width: 180, opacity: 1 }} transition={{ delay: 1.05, duration: 0.7 }} />
-              <motion.p className="mt-5 text-[10px] font-extrabold uppercase tracking-[.42em] text-white/65 sm:text-xs" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.15, duration: 0.65 }}>From the heart of Eurasia</motion.p>
+              <img src={logo} alt="Air Astana Virtual" className="relative h-28 w-auto object-contain drop-shadow-[0_0_45px_rgba(226,184,90,.24)] sm:h-36" width={288} height={144} />
+              <motion.div className="mt-8 h-px bg-gradient-to-r from-transparent via-[#e2b85a] to-transparent" initial={{ width: 0, opacity: 0 }} animate={{ width: 220, opacity: 1 }} transition={{ delay: 1.05, duration: 0.7 }} />
+              <motion.p className="mt-5 text-[10px] font-extrabold uppercase tracking-[.48em] text-white/65 sm:text-xs" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.15, duration: 0.65 }}>From the heart of Eurasia</motion.p>
             </motion.div>
           </div>
-          <motion.div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-[.35em] text-white/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.45, duration: 0.5 }}>Infinite Flight Virtual Airline</motion.div>
+          <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-bold uppercase tracking-[.35em] text-white/30" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.45, duration: 0.5 }}>Infinite Flight Virtual Airline</motion.div>
           <motion.div className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[-18deg]" initial={{ x: "-20vw", opacity: 0 }} animate={{ x: "420vw", opacity: [0, 1, 0] }} transition={{ delay: 1.15, duration: 1.1, ease: "easeInOut" }} />
         </motion.div>
       )}
