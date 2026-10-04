@@ -213,7 +213,7 @@ function CEOMessage() {
                           Gurnoor1
                         </span>
                         <span className="rounded-full bg-[#b89358]/15 px-2 py-0.5 font-mono text-[10px] font-extrabold text-[#b89358]">
-                          #1
+                          KC001
                         </span>
                       </div>
                       <span className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#b89358]">
