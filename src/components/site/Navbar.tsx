@@ -13,15 +13,35 @@ const SESSION_KEY = "aav_crew_session";
 
 export function Navbar() {
   const [open, setOpen] = useState(false), [loggedIn, setLoggedIn] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const sync = () => setLoggedIn(Boolean(sessionStorage.getItem(SESSION_KEY)));
-    sync(); window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    sync();
+    onScroll();
+    window.addEventListener("storage", sync);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
   const crewPath = loggedIn ? "/crew-center" : "/crew-login";
   return (
-    <header className="absolute inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
-      <nav className="mx-auto flex h-[68px] max-w-6xl items-center gap-3 rounded-2xl border border-border/80 bg-white/95 px-3 shadow-[0_12px_35px_-25px_rgba(23,33,58,.45)] backdrop-blur-xl sm:px-4">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
+      <motion.nav
+        className="mx-auto flex h-[68px] max-w-6xl items-center gap-3 rounded-2xl border px-3 sm:px-4"
+        animate={{
+          backgroundColor: scrolled ? "rgba(255,255,255,0.76)" : "rgba(255,255,255,1)",
+          borderColor: scrolled ? "rgba(223,228,235,0.72)" : "rgba(223,228,235,1)",
+          boxShadow: scrolled
+            ? "0 18px 45px -24px rgba(23,33,58,.34)"
+            : "0 12px 35px -25px rgba(23,33,58,.45)",
+          backdropFilter: scrolled ? "blur(18px) saturate(135%)" : "blur(0px) saturate(100%)",
+          WebkitBackdropFilter: scrolled ? "blur(18px) saturate(135%)" : "blur(0px) saturate(100%)",
+        }}
+        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      >
         <Link to="/" onClick={() => setOpen(false)} className="group flex min-w-0 shrink-0 items-center gap-2.5 rounded-xl px-2 py-1.5">
           <img src={logo} alt="Air Astana Virtual" className="h-8 w-auto transition duration-500 group-hover:scale-[1.02] group-hover:opacity-85 sm:h-9" width={288} height={144} />
         </Link>
@@ -42,7 +62,7 @@ export function Navbar() {
             </motion.span>
           </AnimatePresence>
         </motion.button>
-      </nav>
+      </motion.nav>
       <AnimatePresence>
         {open && (
           <motion.div initial={{opacity:0,y:-8,scale:.98}} animate={{opacity:1,y:0,scale:1}} exit={{opacity:0,y:-6,scale:.98}} transition={{duration:.22,ease:[.16,1,.3,1]}} className="mx-auto mt-2 max-w-6xl overflow-hidden rounded-2xl border border-border/80 bg-white/95 p-3 shadow-2xl backdrop-blur-xl md:hidden">
