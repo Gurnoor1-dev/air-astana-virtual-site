@@ -180,7 +180,7 @@ function FooterFlightTraffic() {
 
   return (
     <div ref={rootRef} className="relative mx-auto mt-3 h-16 max-w-3xl overflow-hidden" aria-hidden="true">
-      <svg className="pointer-events-none absolute inset-0 size-full overflow-visible" viewBox="0 0 100 64" preserveAspectRatio="none">
+      <svg className="pointer-events-none absolute inset-0 size-full overflow-visible" preserveAspectRatio="none">
         <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
         <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
         <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
