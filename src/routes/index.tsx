@@ -194,36 +194,54 @@ function Home() {
 
       <NewsSection/>
 
-      {/* Operational details section attracting pilots */}
-      <Section eyebrow="Why Fly With Us" title="Built for dedicated virtual aviators." description="A straightforward place for Infinite Flight pilots to fly, meet other aviators and keep discovering the network.">
-        <div className="grid gap-6 md:grid-cols-3 mb-6">
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-              <Navigation className="size-5" />
+      <Section eyebrow="Why Fly With Us" title="More than a flight log." description="A focused virtual airline experience built around the things that make every sector worth flying: structure, progress and crew.">
+        <div className="grid gap-4 md:grid-cols-3">
+          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-[#f7f8fa] p-7 transition duration-500 hover:-translate-y-1 hover:border-[#d7a94a]/45 hover:shadow-[0_28px_70px_-34px_rgba(23,33,58,.38)] sm:p-9">
+            <div className="absolute -right-14 -top-14 size-44 rounded-full border border-[#17213a]/[.06] transition duration-700 group-hover:scale-125" />
+            <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#d7a94a] transition-all duration-500 group-hover:w-full" />
+            <div className="relative flex h-full flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-[#17213a]/45">01 · Operations</span>
+                  <Navigation className="size-5 text-[#17213a]/55 transition duration-300 group-hover:-translate-y-0.5 group-hover:rotate-12 group-hover:text-[#d7a94a]" />
+                </div>
+                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em] text-[#17213a]">Fly with a real plan.</h3>
+                <p className="mt-4 max-w-sm text-sm leading-7 text-[#687386]">Published sectors, aircraft assignments and clear flight details give every Infinite Flight sortie an airline-style purpose.</p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[#17213a]/55"><span className="size-1.5 rounded-full bg-[#d7a94a]" /> Structured flying</div>
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Airline-style operations</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Follow published Air Astana sectors with clear routes, aircraft assignments and flight details made for Infinite Flight.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-              <BarChart3 className="size-5" />
+          </article>
+
+          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-[#17213a] p-7 text-white transition duration-500 hover:-translate-y-1 hover:shadow-[0_30px_75px_-34px_rgba(23,33,58,.6)] sm:p-9">
+            <div className="absolute -bottom-20 -right-10 size-52 rounded-full border border-white/10" />
+            <div className="absolute -bottom-10 -right-2 size-32 rounded-full border border-[#d7a94a]/20" />
+            <div className="relative flex h-full flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-white/45">02 · Progress</span>
+                  <BarChart3 className="size-5 text-[#e2b85a]" />
+                </div>
+                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em]">Every sector moves you forward.</h3>
+                <p className="mt-4 max-w-sm text-sm leading-7 text-white/65">Log your flights, build hours and climb the ranks. Your flying becomes a visible career, not just another session.</p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/50"><span className="size-1.5 rounded-full bg-[#e2b85a]" /> Pilot progression</div>
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Flight records & progression</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Record your flights, keep track of your progress and work your way through the pilot rank structure.
-            </p>
-          </div>
-          <div className="rounded-2xl border border-border bg-white p-6 shadow-soft">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-4">
-              <Calendar className="size-5" />
+          </article>
+
+          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:border-[#17213a]/20 hover:shadow-[0_28px_70px_-34px_rgba(23,33,58,.32)] sm:p-9">
+            <div className="absolute right-0 top-0 h-full w-1/2 bg-[linear-gradient(135deg,transparent_35%,rgba(226,184,90,.09)_100%)] opacity-0 transition duration-500 group-hover:opacity-100" />
+            <div className="relative flex h-full flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-[#17213a]/45">03 · Crew</span>
+                  <Calendar className="size-5 text-[#17213a]/55 transition duration-300 group-hover:rotate-6 group-hover:text-[#d7a94a]" />
+                </div>
+                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em] text-[#17213a]">Don't fly the network alone.</h3>
+                <p className="mt-4 max-w-sm text-sm leading-7 text-[#687386]">Join group flights, meet fellow aviators and turn a route network into a crew you actually want to come back to.</p>
+              </div>
+              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[#17213a]/55"><span className="size-1.5 rounded-full bg-[#d7a94a]" /> Community flying</div>
             </div>
-            <h3 className="text-lg font-extrabold text-foreground">Crew & group flying</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Meet the crew through group flights and events, and enjoy flying together across Europe and Asia.
-            </p>
-          </div>
+          </article>
         </div>
       </Section>
 
