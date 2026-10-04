@@ -5,7 +5,7 @@ import ifLogo from "@/assets/if-logo.png";
 
 export function Footer() {
   return (
-    <footer className="relative mt-20 overflow-hidden bg-[#07111f] text-white">
+    <footer className="footer-jakarta relative mt-20 overflow-hidden bg-[#07111f] text-white">
       <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:64px_64px]" />
       <div className="pointer-events-none absolute left-1/2 top-0 size-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#a48656]/10 blur-3xl" />
       <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-18">
@@ -18,7 +18,7 @@ export function Footer() {
             <a href="https://community.infiniteflight.com" target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[.06] px-5 py-3 text-xs font-extrabold text-white/80 transition hover:bg-white/[.1]"><img src={ifLogo} alt="" className="size-4 invert opacity-80" />Infinite Flight Community<ExternalLink className="size-3" /></a>
           </div>
         </div>
-        <div className="mx-auto mt-12 grid max-w-4xl gap-8 border-y border-white/10 py-9 text-center sm:grid-cols-3 sm:text-left">
+        <div className="mx-auto mt-12 grid max-w-4xl gap-8 border-y border-white/10 py-9 text-center font-[var(--font-footer)] sm:grid-cols-3 sm:text-left">
           <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Explore</h4><div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-white/65 sm:justify-start"><Link to="/about" className="hover:text-[#e2b85a]">About</Link><Link to="/staff" className="hover:text-[#e2b85a]">Crew</Link><Link to="/fleet" className="hover:text-[#e2b85a]">Fleet</Link><Link to="/routes" className="hover:text-[#e2b85a]">Routes</Link></div></div>
           <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Network</h4><div className="mt-4 flex items-center justify-center gap-2 text-sm text-white/65 sm:justify-start"><MapPin className="size-4 text-[#e2b85a]" /> ALA · Almaty <span className="text-white/20">•</span> NQZ · Astana</div></div>
           <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Virtual airline</h4><p className="mt-4 text-xs leading-5 text-white/45">Independent fan community. Not affiliated with Air Astana or Infinite Flight.</p></div>
