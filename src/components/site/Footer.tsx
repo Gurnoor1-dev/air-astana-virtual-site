@@ -20,184 +20,29 @@ type Flight = {
 };
 
 function FooterFlightTraffic() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const flightsRef = useRef<Flight[]>([]);
-
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches) return;
-
-    const rand = (min: number, max: number) => min + Math.random() * (max - min);
-    const wrap = (value: number, min: number, max: number) => {
-      const range = max - min;
-      return ((value - min) % range + range) % range + min;
-    };
-
-    const makeFlight = (flight?: Flight): Flight => {
-      const w = root.clientWidth || 900;
-      const h = root.clientHeight || 64;
-      const pad = Math.max(40, w * 0.08);
-      const edge = Math.random();
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      const start = {
-        x: direction > 0 ? -pad : w + pad,
-        y: rand(10, h - 10),
-      };
-      const end = {
-        x: direction > 0 ? w + pad : -pad,
-        y: rand(8, h - 8),
-      };
-      const bend = rand(-h * 0.75, h * 0.75);
-      const c1 = {
-        x: start.x + (end.x - start.x) * rand(0.22, 0.38),
-        y: wrap(start.y + bend + rand(-12, 12), -h * 0.5, h * 1.5),
-      };
-      const c2 = {
-        x: start.x + (end.x - start.x) * rand(0.58, 0.8),
-        y: wrap(end.y - bend * rand(0.65, 1.05) + rand(-14, 14), -h * 0.5, h * 1.5),
-      };
-
-      if (flight) {
-        flight.start = start;
-        flight.end = end;
-        flight.c1 = c1;
-        flight.c2 = c2;
-        flight.duration = rand(15000, 27000);
-        flight.elapsed = 0;
-        flight.history = [];
-        flight.seed = Math.random() * Math.PI * 2;
-        return flight;
-      }
-
-      return {
-        node: null,
-        trail: null,
-        glowTrail: null,
-        start,
-        end,
-        c1,
-        c2,
-        duration: rand(15000, 27000),
-        elapsed: rand(0, 22000),
-        history: [],
-        previousAngle: direction > 0 ? 0 : 180,
-        seed: Math.random() * Math.PI * 2,
-      };
-    };
-
-    const flights = Array.from({ length: 5 }, () => makeFlight());
-    const nodes = Array.from(root.querySelectorAll<HTMLElement>("[data-footer-flight]"));
-    const trails = Array.from(root.querySelectorAll<SVGPathElement>("[data-footer-trail]"));
-    const glows = Array.from(root.querySelectorAll<SVGPathElement>("[data-footer-trail-glow]"));
-    flights.forEach((flight, i) => {
-      flight.node = nodes[i] ?? null;
-      flight.trail = trails[i] ?? null;
-      flight.glowTrail = glows[i] ?? null;
-    });
-    flightsRef.current = flights;
-
-    const pointAt = (flight: Flight, t: number) => {
-      const u = 1 - t;
-      return {
-        x: u * u * u * flight.start.x +
-          3 * u * u * t * flight.c1.x +
-          3 * u * t * t * flight.c2.x +
-          t * t * t * flight.end.x,
-        y: u * u * u * flight.start.y +
-          3 * u * u * t * flight.c1.y +
-          3 * u * t * t * flight.c2.y +
-          t * t * t * flight.end.y,
-      };
-    };
-
-    const tangentAt = (flight: Flight, t: number) => {
-      const u = 1 - t;
-      return {
-        x: 3 * u * u * (flight.c1.x - flight.start.x) +
-          6 * u * t * (flight.c2.x - flight.c1.x) +
-          3 * t * t * (flight.end.x - flight.c2.x),
-        y: 3 * u * u * (flight.c1.y - flight.start.y) +
-          6 * u * t * (flight.c2.y - flight.c1.y) +
-          3 * t * t * (flight.end.y - flight.c2.y),
-      };
-    };
-
-    const pathD = (history: { x: number; y: number }[]) => {
-      if (history.length < 2) return "";
-      return history.reduce(
-        (d, p, i) => d + (i === 0 ? `M ${p.x.toFixed(1)} ${p.y.toFixed(1)}` : ` L ${p.x.toFixed(1)} ${p.y.toFixed(1)}`),
-        "",
-      );
-    };
-
-    let raf = 0;
-    let last = performance.now();
-
-    const tick = (now: number) => {
-      const dt = Math.min(64, now - last);
-      last = now;
-
-      flights.forEach((flight) => {
-        flight.elapsed += dt;
-        if (flight.elapsed >= flight.duration) {
-          makeFlight(flight);
-        }
-
-        const t = Math.min(0.999, flight.elapsed / flight.duration);
-        const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        const p = pointAt(flight, eased);
-        const tangent = tangentAt(flight, eased);
-        const angle = Math.atan2(tangent.y, tangent.x) * 180 / Math.PI;
-        const deltaAngle = ((angle - flight.previousAngle + 540) % 360) - 180;
-        const bank = Math.max(-8, Math.min(8, deltaAngle * 1.7));
-        flight.previousAngle = angle;
-
-        flight.history.push(p);
-        if (flight.history.length > 26) flight.history.shift();
-
-        const d = pathD(flight.history);
-        if (flight.trail) flight.trail.setAttribute("d", d);
-        if (flight.glowTrail) flight.glowTrail.setAttribute("d", d);
-
-        if (flight.node) {
-          const bob = Math.sin(now / 900 + flight.seed) * 0.8;
-          flight.node.style.transform = `translate3d(${p.x.toFixed(1)}px, ${(p.y + bob).toFixed(1)}px, 0) rotate(${(angle + bank).toFixed(1)}deg)`;
-        }
-      });
-
-      raf = requestAnimationFrame(tick);
-    };
-
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      flightsRef.current = [];
-    };
-  }, []);
-
   return (
-    <div ref={rootRef} className="relative mx-auto mt-3 h-16 max-w-3xl overflow-hidden" aria-hidden="true">
-      <svg className="pointer-events-none absolute inset-0 size-full overflow-visible" preserveAspectRatio="none">
-        <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail-glow className="footer-flight-trail-glow" d="" vectorEffect="non-scaling-stroke" />
-        <path data-footer-trail className="footer-flight-trail" d="" vectorEffect="non-scaling-stroke" />
+    <div className="footer-flight-traffic" aria-hidden="true">
+      <svg className="footer-flight-route" viewBox="0 0 900 64" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="footerFlightTrail" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#A48656" stopOpacity="0" />
+            <stop offset="38%" stopColor="#A48656" stopOpacity=".05" />
+            <stop offset="100%" stopColor="#A48656" stopOpacity=".22" />
+          </linearGradient>
+        </defs>
+        <path
+          className="footer-flight-path"
+          d="M -80 38 C 170 38, 320 38, 455 36 C 560 34, 660 28, 980 24"
+        />
+        <path
+          className="footer-flight-trail"
+          d="M -80 38 C 170 38, 320 38, 455 36 C 560 34, 660 28, 980 24"
+        />
       </svg>
-      <div data-footer-flight className="footer-flight footer-flight-a"><Plane className="size-4" /></div>
-      <div data-footer-flight className="footer-flight footer-flight-b"><Plane className="size-3.5" /></div>
-      <div data-footer-flight className="footer-flight footer-flight-c"><Plane className="size-5" /></div>
-      <div data-footer-flight className="footer-flight footer-flight-d"><Plane className="size-3" /></div>
-      <div data-footer-flight className="footer-flight footer-flight-e"><Plane className="size-4" /></div>
-      <div className="absolute inset-x-8 bottom-2 h-px bg-gradient-to-r from-transparent via-[#a48656]/10 to-transparent" />
+
+      <div className="footer-flight-aircraft">
+        <Plane className="size-4" strokeWidth={1.7} />
+      </div>
     </div>
   );
 }
@@ -226,39 +71,66 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-3 text-[10px] text-white/35 sm:flex-row"><span>© {new Date().getFullYear()} Air Astana Virtual</span><p>Developed by <a href="https://community.infiniteflight.com/u/gurnoor1/summary" target="_blank" rel="noreferrer noopener" className="font-bold text-white/65 hover:text-[#e2b85a]">Gurnoor</a></p><span>From the heart of Eurasia.</span></div>
       </div>
       <style>{`
-        .footer-flight {
+        .footer-flight-traffic {
+          position: relative;
+          height: 64px;
+          max-width: 900px;
+          margin: 12px auto 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .footer-flight-route {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+        }
+        .footer-flight-path {
+          fill: none;
+          stroke: #A48656;
+          stroke-width: 0.7;
+          stroke-linecap: round;
+          opacity: .045;
+        }
+        .footer-flight-trail {
+          fill: none;
+          stroke: url(#footerFlightTrail);
+          stroke-width: 1.2;
+          stroke-linecap: round;
+          stroke-dasharray: 5 895;
+          stroke-dashoffset: 900;
+          animation: footer-trail-follow 19s linear infinite;
+          filter: drop-shadow(0 0 4px rgba(164,134,86,.08));
+        }
+        .footer-flight-aircraft {
           position: absolute;
           left: 0;
           top: 0;
           color: #A48656;
-          opacity: .18;
+          opacity: .17;
           transform-origin: center;
           will-change: transform;
-          transition: filter 180ms ease;
-          filter: drop-shadow(0 0 6px rgba(164,134,86,.12));
+          offset-path: path("M -80px 38px C 170px 38px, 320px 38px, 455px 36px C 560px 34px, 660px 28px, 980px 24px");
+          offset-distance: -5%;
+          offset-rotate: auto;
+          animation: footer-aircraft-flight 19s cubic-bezier(.55,.08,.28,1) infinite;
+          filter: drop-shadow(0 0 7px rgba(164,134,86,.1));
         }
-        .footer-flight-trail {
-          fill: none;
-          stroke: #A48656;
-          stroke-width: 1.15;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          opacity: .14;
-          filter: drop-shadow(0 0 3px rgba(164,134,86,.16));
+        @keyframes footer-aircraft-flight {
+          0% { offset-distance: -8%; opacity: 0; }
+          8% { opacity: .17; }
+          78% { opacity: .17; }
+          100% { offset-distance: 108%; opacity: 0; }
         }
-        .footer-flight-trail-glow {
-          fill: none;
-          stroke: #A48656;
-          stroke-width: 3.5;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-          opacity: .045;
-          filter: blur(2.5px);
+        @keyframes footer-trail-follow {
+          0% { stroke-dashoffset: 900; opacity: 0; }
+          8% { opacity: .8; }
+          78% { opacity: .8; }
+          100% { stroke-dashoffset: 0; opacity: 0; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .footer-flight { opacity: .12; }
-          .footer-flight-trail,
-          .footer-flight-trail-glow { opacity: .06; }
+          .footer-flight-aircraft { animation: none; offset-distance: 55%; opacity: .1; }
+          .footer-flight-trail { animation: none; stroke-dasharray: 0; opacity: .35; }
         }
       `}</style>
     </footer>
