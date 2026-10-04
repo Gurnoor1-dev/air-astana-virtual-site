@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
 const stats = [
   { value: "2", label: "Primary hubs" },
   { value: "37", label: "Destinations" },
-  { value: "74", label: "Published sectors" },
+  { value: "142", label: "Published sectors" },
   { value: "5", label: "Aircraft types" }
 ];
 
