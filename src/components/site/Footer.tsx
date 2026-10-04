@@ -1,150 +1,27 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowRight, ExternalLink, Plane, MapPin } from "lucide-react";
 import logo from "@/assets/logo.png";
 import ifLogo from "@/assets/if-logo.png";
 
 export function Footer() {
-  return (
-    <footer className="relative mt-16 overflow-hidden border-t border-border/80 bg-white">
-      {/* Subtle decorative background gradient */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-slate-50/60 to-transparent"
-        aria-hidden="true"
-      />
-
-      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-10 lg:grid-cols-[1.5fr_.7fr_.7fr_1.1fr]">
-          {/* Brand & Community info */}
-          <div className="space-y-4">
-            <img
-              src={logo}
-              alt="Air Astana Virtual"
-              className="h-10 w-auto transition-opacity hover:opacity-90"
-              width={288}
-              height={144}
-            />
-
-            <div>
-              <a
-                href="https://community.infiniteflight.com"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group inline-flex items-center gap-2 rounded-full border border-border/80 bg-slate-50/80 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-muted-foreground shadow-xs transition-all hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
-              >
-                <img
-                  src={ifLogo}
-                  alt="Infinite Flight"
-                  className="size-3.5 object-contain invert opacity-75 group-hover:opacity-100 transition-opacity"
-                />
-                Infinite Flight Community
-                <ExternalLink className="size-2.5 opacity-50 group-hover:opacity-100 transition-opacity" />
-              </a>
-            </div>
-
-            <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-              An independent virtual airline for Infinite Flight pilots who enjoy flying the Air Astana network across the globe.
-            </p>
-          </div>
-
-          {/* Navigation Links: Airline */}
-          <div>
-            <h4 className="text-[11px] font-black uppercase tracking-[.2em] text-foreground/80">
-              Airline
-            </h4>
-            <div className="mt-4 flex flex-col gap-2.5 text-sm font-medium text-muted-foreground">
-              <Link
-                to="/about"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                About Us
-              </Link>
-              <Link
-                to="/staff"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                Our Staff
-              </Link>
-              <Link
-                to="/ranks"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                Ranks
-              </Link>
-            </div>
-          </div>
-
-          {/* Navigation Links: Operations */}
-          <div>
-            <h4 className="text-[11px] font-black uppercase tracking-[.2em] text-foreground/80">
-              Operations
-            </h4>
-            <div className="mt-4 flex flex-col gap-2.5 text-sm font-medium text-muted-foreground">
-              <Link
-                to="/fleet"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                Fleet
-              </Link>
-              <Link
-                to="/routes"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                Route Network
-              </Link>
-              <Link
-                to="/hubs"
-                className="transition-all hover:translate-x-1 hover:text-primary"
-              >
-                Hubs
-              </Link>
-            </div>
-          </div>
-
-          {/* Call to action card */}
-          <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-slate-50 via-white to-slate-100/70 p-6 shadow-xs">
-            <span className="inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[.18em] text-primary">
-              Ready to fly?
-            </span>
-            <h4 className="mt-3 text-lg font-black tracking-tight text-foreground leading-snug">
-              Join the crew and get your KC callsign.
-            </h4>
-            <Link
-              to="/apply"
-              className="group mt-5 inline-flex items-center gap-2 rounded-xl brand-gradient px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:shadow-md hover:brightness-105 active:scale-[0.98]"
-            >
-              Apply now
-              <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Divider with subtle legal copy */}
-        <div className="mt-12 border-t border-border/80 pt-6">
-          <div className="flex flex-col justify-between gap-4 text-[11px] leading-relaxed text-muted-foreground/80 sm:flex-row sm:items-start">
-            <span className="font-semibold text-foreground/90 whitespace-nowrap">
-              © {new Date().getFullYear()} Air Astana Virtual
-            </span>
-            <p className="max-w-2xl sm:text-right">
-              Air Astana Virtual is a virtual airline exclusively for the Infinite Flight platform. We have no connection or affiliation with Air Astana or any other real-world airlines, organizations, or subsidiaries. All logos and trademarks remain the property of Air Astana.
-            </p>
-          </div>
-
-          {/* Developer credit badge */}
-          <div className="mt-6 flex justify-center border-t border-border/40 pt-4">
-            <p className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-slate-50/70 px-3 py-1 text-[11px] text-muted-foreground transition hover:border-border">
-              <span>Developed by</span>
-              <a
-                href="https://community.infiniteflight.com/u/gurnoor1/summary"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-bold text-foreground transition-colors hover:text-primary hover:underline"
-              >
-                Gurnoor
-              </a>
-            </p>
-          </div>
+  return <footer className="relative mt-20 overflow-hidden bg-[#07111f] text-white">
+    <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.06)_1px,transparent_1px)] [background-size:64px_64px]"/>
+    <div className="pointer-events-none absolute left-1/2 top-0 size-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#a48656]/10 blur-3xl"/>
+    <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-18">
+      <div className="mx-auto max-w-4xl text-center">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[.06] shadow-2xl"><Plane className="size-6 rotate-[-12deg] text-[#e2b85a]"/></div>
+        <img src={logo} alt="Air Astana Virtual" className="mx-auto mt-5 h-12 w-auto brightness-0 invert opacity-95" width={288} height={144}/>
+        <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/55">A community-driven Infinite Flight virtual airline inspired by the Air Astana network across Eurasia.</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Link to="/apply" className="group inline-flex items-center gap-2 rounded-xl bg-[#e2b85a] px-5 py-3 text-xs font-extrabold text-[#101827] shadow-[0_15px_35px_-18px_#e2b85a] transition hover:-translate-y-0.5">Join the crew <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1"/></Link>
+          <a href="https://community.infiniteflight.com" target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[.06] px-5 py-3 text-xs font-extrabold text-white/80 transition hover:bg-white/[.1]"><img src={ifLogo} alt="" className="size-4 invert opacity-80"/>Infinite Flight Community<ExternalLink className="size-3"/></a>
         </div>
       </div>
-    </footer>
-  );
-}
+      <div className="mx-auto mt-12 grid max-w-4xl gap-8 border-y border-white/10 py-9 text-center sm:grid-cols-3 sm:text-left">
+        <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Explore</h4><div className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-white/65 sm:justify-start"><Link to="/about" className="hover:text-[#e2b85a]">About</Link><Link to="/staff" className="hover:text-[#e2b85a]">Crew</Link><Link to="/fleet" className="hover:text-[#e2b85a]">Fleet</Link><Link to="/routes" className="hover:text-[#e2b85a]">Routes</Link></div></div>
+        <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Network</h4><div className="mt-4 flex items-center justify-center gap-2 text-sm text-white/65 sm:justify-start"><MapPin className="size-4 text-[#e2b85a]"/> ALA · Almaty <span className="text-white/20">•</span> NQZ · Astana</div></div>
+        <div><h4 className="text-[10px] font-black uppercase tracking-[.22em] text-white/40">Virtual airline</h4><p className="mt-4 text-xs leading-5 text-white/45">Independent fan community. Not affiliated with Air Astana or Infinite Flight.</p></div>
+      </div>
+      <div className="flex flex-col items-center justify-between gap-3 text-[10px] text-white/35 sm:flex-row"><span>© {new Date().getFullYear()} Air Astana Virtual</span><p>Developed by <a href="https://community.infiniteflight.com/u/gurnoor1/summary" target="_blank" rel="noreferrer noopener" className="font-bold text-white/65 hover:text-[#e2b85a]">Gurnoor</a></p><span>From the heart of Eurasia.</span></div>
+    </div>
+  </footer>
