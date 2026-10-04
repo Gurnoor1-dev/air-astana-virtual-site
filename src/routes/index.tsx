@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users, X, Newspaper, Navigation, BarChart3, Calendar } from "lucide-react";
 import { Section, Stat } from "@/components/site/Page";
 import homeHero from '@/assets/site/home-hero.jpg'
-import { BrandIntro } from "@/components/site/BrandIntro";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -94,7 +93,6 @@ function NewsSection() {
 function Home() {
   return (
     <div>
-      <BrandIntro />
       <section className="relative overflow-hidden bg-[#08111f]">
         <div className="absolute inset-0 z-0 pointer-events-none">
           <img

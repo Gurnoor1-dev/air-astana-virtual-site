@@ -5,11 +5,13 @@ import logo from "@/assets/logo.png";
 const SESSION_KEY = "aav_brand_intro_seen";
 
 export function BrandIntro() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY)) return;
-    setVisible(true);
+    if (sessionStorage.getItem(SESSION_KEY)) {
+      setVisible(false);
+      return;
+    }
     sessionStorage.setItem(SESSION_KEY, "1");
     const timer = window.setTimeout(() => setVisible(false), 3100);
     return () => window.clearTimeout(timer);

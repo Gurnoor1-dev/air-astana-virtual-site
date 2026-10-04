@@ -20,7 +20,7 @@ export function Navbar() {
   }, []);
   const crewPath = loggedIn ? "/crew-center" : "/crew-login";
   return (
-    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-5">
+    <header className="absolute inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5">
       <nav className="mx-auto flex h-[68px] max-w-6xl items-center gap-3 rounded-2xl border border-border/80 bg-white/95 px-3 shadow-[0_12px_35px_-25px_rgba(23,33,58,.45)] backdrop-blur-xl sm:px-4">
         <Link to="/" onClick={() => setOpen(false)} className="group flex min-w-0 shrink-0 items-center gap-2.5 rounded-xl px-2 py-1.5">
           <img src={logo} alt="Air Astana Virtual" className="h-8 w-auto transition duration-500 group-hover:scale-[1.02] group-hover:opacity-85 sm:h-9" width={288} height={144} />
