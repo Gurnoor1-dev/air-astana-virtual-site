@@ -19,12 +19,18 @@ function HiddenOperationsPage() {
     ran.current = true;
 
     const script = document.createElement("script");
+    const bootstrap = document.createElement("script");
+    bootstrap.src = "/0gsj85hdn/bootstrap.js";
+    bootstrap.async = false;
+    document.body.appendChild(bootstrap);
+
     script.src = "/0gsj85hdn/hero.js";
     script.async = false;
     document.body.appendChild(script);
 
     return () => {
       script.remove();
+      bootstrap.remove();
       delete (window as any).AMV;
       delete (window as any).AMV_DATA;
       delete (window as any).AMV_CREW;
