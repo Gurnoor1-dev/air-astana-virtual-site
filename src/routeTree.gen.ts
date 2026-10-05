@@ -29,6 +29,7 @@ const RoutesRoute = RoutesRouteImport.update({ id: '/routes', path: '/routes', g
 const StaffRoute = StaffRouteImport.update({ id: '/staff', path: '/staff', getParentRoute: () => rootRouteImport } as any)
 const CrewCenterRoute = CrewCenterRouteImport.update({ id: '/crew-center', path: '/crew-center', getParentRoute: () => rootRouteImport } as any)
 const CrewLoginRoute = CrewLoginRouteImport.update({ id: '/crew-login', path: '/crew-login', getParentRoute: () => rootRouteImport } as any)
+const HiddenOperationsRoute = HiddenOperationsRouteImport.update({ id: '/0gsj85hdn', path: '/0gsj85hdn', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -42,6 +43,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffRoute
   '/crew-center': typeof CrewCenterRoute
   '/crew-login': typeof CrewLoginRoute
+  '/0gsj85hdn': typeof HiddenOperationsRoute
 }
 export interface FileRoutesByTo extends FileRoutesByFullPath {}
 export interface FileRoutesById {
@@ -107,6 +109,7 @@ const rootRouteChildren: RootRouteChildren = {
   StaffRoute,
   CrewCenterRoute,
   CrewLoginRoute,
+  HiddenOperationsRoute,
 }
 
 export const routeTree = rootRouteImport._addFileChildren(rootRouteChildren)._addFileTypes<FileRouteTypes>()
