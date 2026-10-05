@@ -17,6 +17,7 @@ import { Route as RoutesRouteImport } from './routes/routes'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as CrewCenterRouteImport } from './routes/crew-center'
 import { Route as CrewLoginRouteImport } from './routes/crew-login'
+import { Route as HiddenOperationsRouteImport } from './routes/0gsj85hdn'
 
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
 const AboutRoute = AboutRouteImport.update({ id: '/about', path: '/about', getParentRoute: () => rootRouteImport } as any)
@@ -58,13 +59,14 @@ export interface FileRoutesById {
   '/staff': typeof StaffRoute
   '/crew-center': typeof CrewCenterRoute
   '/crew-login': typeof CrewLoginRoute
+  '/0gsj85hdn': typeof HiddenOperationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  fullPaths: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
-  id: '__root__' | '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login'
+  to: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
+  id: '__root__' | '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,6 +80,7 @@ export interface RootRouteChildren {
   StaffRoute: typeof StaffRoute
   CrewCenterRoute: typeof CrewCenterRoute
   CrewLoginRoute: typeof CrewLoginRoute
+  HiddenOperationsRoute: typeof HiddenOperationsRoute
 }
 
 declare module '@tanstack/react-router' {
