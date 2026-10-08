@@ -9,6 +9,7 @@ import {
   Lock,
   Plane,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import { Card, Section } from "@/components/site/Page";
 import { RouteMap } from "@/components/site/RouteMap";
@@ -56,6 +57,24 @@ const AIRCRAFT_GROUPS = [
   "A320-200",
   "757-200",
 ];
+
+const SIMBRIEF_AIRCRAFT: Record<string, string> = {
+  "787-9": "B789",
+  "A321neo": "A21N",
+  "A321-200": "A321",
+  "A320-200": "A320",
+  "757-200": "B752",
+};
+
+function simBriefUrl(route: RouteRecord) {
+  const params = new URLSearchParams({
+    orig: route.depIcao,
+    dest: route.arrIcao,
+    type: SIMBRIEF_AIRCRAFT[route.aircraft] ?? route.aircraft,
+    fltnum: route.routeNo.replace(/\D/g, ""),
+  });
+  return `https://dispatch.simbrief.com/options/new?${params.toString()}`;
+}
 
 function RoutesPage() {
   const [routes, setRoutes] = useState<RouteRecord[]>([]);
@@ -277,8 +296,8 @@ function RoutesPage() {
                   Sectors Available
                 </div>
                 <p className="mt-4 text-xs leading-5 text-white/80">
-                  Select a sector on the map or the schedule table below to view
-                  dispatch details.
+                  Use the SimBrief dispatch button on any schedule row to open
+                  a flight plan with the selected departure, arrival, aircraft and flight number.
                 </p>
               </div>
             </div>
@@ -325,10 +344,20 @@ function RoutesPage() {
                     {r.arrAirport}
                   </div>
                 </div>
-                <div className="text-xs font-extrabold text-foreground/80">
+                <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold text-foreground/80">
                   <span className="rounded-lg bg-muted px-2.5 py-1">
                     {r.aircraft}
                   </span>
+                  <a
+                    href={simBriefUrl(r)}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#b89358] px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wide text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#a9824b]"
+                    title={`Open SimBrief dispatch for ${r.routeNo}`}
+                  >
+                    <span>SimBrief</span>
+                    <ExternalLink className="size-3" />
+                  </a>
                 </div>
               </div>
             ))}
