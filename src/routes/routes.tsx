@@ -71,6 +71,7 @@ function simBriefUrl(route: RouteRecord) {
     orig: route.depIcao,
     dest: route.arrIcao,
     type: SIMBRIEF_AIRCRAFT[route.aircraft] ?? route.aircraft,
+    callsign: route.routeNo,
     fltnum: route.routeNo.replace(/\D/g, ""),
   });
   return `https://dispatch.simbrief.com/options/new?${params.toString()}`;
