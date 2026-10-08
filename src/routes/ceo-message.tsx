@@ -139,8 +139,8 @@ function CEOMessage() {
                     style={{ height: `${scrollProgress * 100}%` }}
                   />
 
-                  <div className="space-y-6 text-base font-normal leading-relaxed text-muted-foreground sm:text-lg sm:leading-loose">
-                    <p className="relative font-medium text-foreground/90">
+                  <div className="space-y-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg sm:leading-loose">
+                    <p className="relative font-medium">
                       Air Astana Virtual started with a straightforward
                       ambition: to build a virtual home for Air Astana inside
                       Infinite Flight and give pilots a reason to return to the
