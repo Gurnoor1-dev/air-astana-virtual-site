@@ -56,7 +56,7 @@ const fleet = [
     isFlagship: true,
     tagline: "Ultra-long range & intercontinental routes",
     description:
-      "The lead aircraft for the longest international sectors and high-capacity Asia, Europe and East Asia missions. Livery: Air Astana Virtual 787-9.",
+      "The lead aircraft for the longest international sectors and high-capacity Asia, Europe and East Asia missions. Infinite Flight livery: Generic.",
   },
   {
     type: "A321neo",
@@ -67,7 +67,7 @@ const fleet = [
     role: "Medium-haul lead",
     tagline: "Next-gen transcontinental workhorse",
     description:
-      "Primary narrowbody for medium-haul international flying across Central Asia, the Caucasus, South Asia and the Middle East. Livery: Air Astana Virtual A321neo.",
+      "Primary narrowbody for medium-haul international flying across Central Asia, the Caucasus, South Asia and the Middle East. Infinite Flight livery: Generic.",
   },
   {
     type: "A320-200",
@@ -78,7 +78,7 @@ const fleet = [
     role: "Domestic & regional backbone",
     tagline: "High-frequency domestic operations",
     description:
-      "Domestic and regional workhorse for Kazakhstan and shorter Central Asian sectors. Livery: Air Astana Virtual A320-200.",
+      "Domestic and regional workhorse for Kazakhstan and shorter Central Asian sectors. Infinite Flight livery: Generic.",
   },
   {
     type: "A321-200",
@@ -89,7 +89,7 @@ const fleet = [
     role: "Medium-haul workhorse",
     tagline: "Flexible capacity across the continent",
     description:
-      "Flexible narrowbody for secondary medium-haul sectors between domestic, regional and longer international missions. Livery: Air Astana Virtual A321-200.",
+      "Flexible narrowbody for secondary medium-haul sectors between domestic, regional and longer international missions. Infinite Flight livery: Generic.",
   },
   {
     type: "757-200",
@@ -100,7 +100,7 @@ const fleet = [
     role: "Selective long-haul",
     tagline: "Specialized performance for thin routes",
     description:
-      "Limited-use aircraft for selected longer sectors where a smaller long-range aircraft fits the schedule. Livery: Air Astana Virtual 757-200.",
+      "Limited-use aircraft for selected longer sectors where a smaller long-range aircraft fits the schedule. Infinite Flight livery: Air Astana 757-200.",
   },
 ];
 
@@ -175,6 +175,12 @@ function Fleet() {
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                     {aircraft.description}
                   </p>
+                  <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#b89358]/25 bg-[#b89358]/8 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-[#8f6e3f]">
+                    <Plane className="size-3" />
+                    {aircraft.type === "757-200"
+                      ? "Infinite Flight: Air Astana livery"
+                      : "Infinite Flight: Generic livery"}
+                  </div>
                 </div>
               </div>
 
