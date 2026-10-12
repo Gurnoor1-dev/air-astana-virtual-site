@@ -237,13 +237,24 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
       const canvasRenderer = L.canvas({ padding: 0.5 });
       routes.forEach((r) => {
         const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
+        // Keep a transparent, wide hit target so route clicks remain as forgiving as before.
+        const hit = L.polyline(path, {
+          color: "#A48656",
+          weight: 12,
+          opacity: 0,
+          renderer: canvasRenderer,
+        }).addTo(networkLayerRef.current!);
         const line = L.polyline(path, {
           color: "#A48656",
           weight: 1.4,
           opacity: 0.78,
           renderer: canvasRenderer,
         }).addTo(networkLayerRef.current!);
-        line.bindPopup(routePopup(r), popupOptions);
+        const popup = routePopup(r);
+        hit.bindPopup(popup, popupOptions);
+        line.bindPopup(popup, popupOptions);
+        hit.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
+        hit.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         line.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
         line.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         bounds.extend(path[0]).extend(path[path.length - 1]);
