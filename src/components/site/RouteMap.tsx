@@ -255,7 +255,6 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           weight: isHub ? 2 : 1.5,
           fillColor: isHub ? "#A48656" : "#ffffff",
           fillOpacity: 1,
-          renderer: canvasRenderer,
         })
           .addTo(networkLayerRef.current!)
           .bindPopup(airportPopup(a), popupOptions);
