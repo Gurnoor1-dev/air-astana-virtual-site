@@ -108,7 +108,11 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
   const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [counts, setCounts] = useState({ routes: 0, airports: 0, totalRoutes: 0, totalAirports: 0 });
-  const [mapData, setMapData] = useState<{ routes: RouteRecord[]; airports: AirportRecord[] } | null>(null);
+  const [mapData, setMapData] = useState<{
+    routes: RouteRecord[];
+    airports: AirportRecord[];
+    routePaths: Map<RouteRecord, LatLng[]>;
+  } | null>(null);
 
   const selectedHubData = useMemo(() => HUBS.find((h) => h.icao === selectedHub) ?? null, [selectedHub]);
 
@@ -121,13 +125,20 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         if (cancelled || !containerRef.current) return;
         const airports = new Map<string, AirportRecord>();
         airportRows.forEach((a) => airports.set(a.icao, a));
+
+        // Count departures in one pass instead of scanning every route per airport.
+        const departureCounts = new Map<string, number>();
+        routes.forEach((r) => {
+          departureCounts.set(r.depIcao, (departureCounts.get(r.depIcao) ?? 0) + 1);
+        });
+
         routes.forEach((r) => {
           if (!airports.has(r.depIcao))
             airports.set(r.depIcao, {
               icao: r.depIcao,
               name: r.depAirport,
               coords: r.dep,
-              flights: String(routes.filter((x) => x.depIcao === r.depIcao).length),
+              flights: String(departureCounts.get(r.depIcao) ?? 0),
               moreToKnow: "",
             });
           if (!airports.has(r.arrIcao))
@@ -135,11 +146,15 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
               icao: r.arrIcao,
               name: r.arrAirport,
               coords: r.arr,
-              flights: String(routes.filter((x) => x.depIcao === r.arrIcao).length),
+              flights: String(departureCounts.get(r.arrIcao) ?? 0),
               moreToKnow: "",
             });
         });
-        setMapData({ routes, airports: Array.from(airports.values()) });
+
+        // Great-circle geometry is stable across filters; calculate it only once per route.
+        const routePaths = new Map<RouteRecord, LatLng[]>();
+        routes.forEach((r) => routePaths.set(r, greatCircle(r.dep, r.arr)));
+        setMapData({ routes, airports: Array.from(airports.values()), routePaths });
         const [{ default: L }] = await Promise.all([import("leaflet")]);
         if (cancelled || !containerRef.current) return;
         const map = L.map(containerRef.current, {
@@ -218,15 +233,17 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         minWidth: 270,
       };
 
+      // Canvas batches route strokes into one renderer and avoids one SVG node per route.
+      const canvasRenderer = L.canvas({ padding: 0.5 });
       routes.forEach((r) => {
-        const path = greatCircle(r.dep, r.arr);
-        const hit = L.polyline(path, { color: "#A48656", weight: 12, opacity: 0 }).addTo(networkLayerRef.current!);
-        const line = L.polyline(path, { color: "#A48656", weight: 1.4, opacity: 0.78 }).addTo(networkLayerRef.current!);
-        const popup = routePopup(r);
-        hit.bindPopup(popup, popupOptions);
-        line.bindPopup(popup, popupOptions);
-        hit.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
-        hit.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
+        const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
+        const line = L.polyline(path, {
+          color: "#A48656",
+          weight: 1.4,
+          opacity: 0.78,
+          renderer: canvasRenderer,
+        }).addTo(networkLayerRef.current!);
+        line.bindPopup(routePopup(r), popupOptions);
         line.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
         line.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         bounds.extend(path[0]).extend(path[path.length - 1]);
@@ -240,6 +257,7 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           weight: isHub ? 2 : 1.5,
           fillColor: isHub ? "#A48656" : "#ffffff",
           fillOpacity: 1,
+          renderer: canvasRenderer,
         })
           .addTo(networkLayerRef.current!)
           .bindPopup(airportPopup(a), popupOptions);
