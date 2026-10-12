@@ -121,12 +121,39 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
     let cleanup: (() => void) | undefined;
     (async () => {
       try {
+        // Start Leaflet and map tiles immediately; don't wait for CSV downloads first.
+        const { default: L } = await import("leaflet");
+        if (cancelled || !containerRef.current) return;
+        const map = L.map(containerRef.current, {
+          center: [48, 60],
+          zoom: 3,
+          minZoom: 2,
+          maxZoom: 18,
+          worldCopyJump: true,
+          scrollWheelZoom: false,
+          attributionControl: true,
+        });
+        mapRef.current = map;
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          subdomains: ["a", "b", "c"],
+          maxZoom: 19,
+          crossOrigin: true,
+          attribution: "&copy; OpenStreetMap contributors",
+        }).addTo(map);
+        networkLayerRef.current = L.layerGroup().addTo(map);
+        setMapReady(true);
+        cleanup = () => {
+          networkLayerRef.current = null;
+          mapRef.current = null;
+          map.remove();
+        };
+
+        // Data downloads and parsing happen while the basemap is already appearing.
         const [routes, airportRows] = await Promise.all([fetchRoutes(), fetchAirports()]);
         if (cancelled || !containerRef.current) return;
         const airports = new Map<string, AirportRecord>();
         airportRows.forEach((a) => airports.set(a.icao, a));
 
-        // Count departures in one pass instead of scanning every route per airport.
         const departureCounts = new Map<string, number>();
         routes.forEach((r) => {
           departureCounts.set(r.depIcao, (departureCounts.get(r.depIcao) ?? 0) + 1);
@@ -151,29 +178,10 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
             });
         });
 
-        // Great-circle geometry is stable across filters; calculate it only once per route.
+        // Cache geometry for subsequent filters without blocking map creation.
         const routePaths = new Map<RouteRecord, LatLng[]>();
         routes.forEach((r) => routePaths.set(r, greatCircle(r.dep, r.arr)));
         setMapData({ routes, airports: Array.from(airports.values()), routePaths });
-        const [{ default: L }] = await Promise.all([import("leaflet")]);
-        if (cancelled || !containerRef.current) return;
-        const map = L.map(containerRef.current, {
-          center: [48, 60],
-          zoom: 3,
-          minZoom: 2,
-          maxZoom: 18,
-          worldCopyJump: true,
-          scrollWheelZoom: false,
-          attributionControl: true,
-        });
-        mapRef.current = map;
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          subdomains: ["a", "b", "c"],
-          maxZoom: 19,
-          crossOrigin: true,
-          attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(map);
-        networkLayerRef.current = L.layerGroup().addTo(map);
         setCounts({
           routes: routes.length,
           airports: airports.size,
@@ -181,12 +189,6 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           totalAirports: airports.size,
         });
         setStatus("ready");
-        setMapReady(true);
-        cleanup = () => {
-          networkLayerRef.current = null;
-          mapRef.current = null;
-          map.remove();
-        };
       } catch (err) {
         console.error(err);
         if (!cancelled) setStatus("error");
