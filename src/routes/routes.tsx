@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,7 +12,9 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Card, Section } from "@/components/site/Page";
-import { RouteMap } from "@/components/site/RouteMap";
+const RouteMap = lazy(() =>
+  import("@/components/site/RouteMap").then((module) => ({ default: module.RouteMap })),
+);
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 import heroBg from "@/assets/site/home-hero.jpg";
@@ -200,7 +202,15 @@ function RoutesPage() {
             {/* Map Container */}
             <div className="overflow-hidden rounded-[2rem] border border-border bg-white p-3 shadow-soft">
               <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50 min-h-[420px]">
-                <RouteMap search={q} aircraft={aircraft} />
+                <Suspense
+                  fallback={
+                    <div className="flex h-[520px] w-full items-center justify-center text-sm text-muted-foreground md:h-[620px]">
+                      Preparing interactive route map…
+                    </div>
+                  }
+                >
+                  <RouteMap search={q} aircraft={aircraft} />
+                </Suspense>
               </div>
 
               {/* Bottom Legend Pill Bar */}
