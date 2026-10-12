@@ -238,12 +238,13 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
       // One interactive route layer per flight keeps map hit-testing and redraw work low.
       routes.forEach((r) => {
         const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
-        const line = L.polyline(path, {
-          color: "#A48656",
-          weight: 1.4,
-          opacity: 0.78,
-        }).addTo(networkLayerRef.current!);
-        line.bindPopup(routePopup(r), popupOptions);
+        const hit = L.polyline(path, { color: "#A48656", weight: 12, opacity: 0 }).addTo(networkLayerRef.current!);
+        const line = L.polyline(path, { color: "#A48656", weight: 1.4, opacity: 0.78 }).addTo(networkLayerRef.current!);
+        const popup = routePopup(r);
+        hit.bindPopup(popup, popupOptions);
+        line.bindPopup(popup, popupOptions);
+        hit.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
+        hit.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         line.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
         line.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         bounds.extend(path[0]).extend(path[path.length - 1]);
