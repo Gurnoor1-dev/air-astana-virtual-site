@@ -10,7 +10,7 @@ const HUBS = [
   { icao: "UACC", iata: "NQZ", name: "Astana", country: "Kazakhstan" },
 ] as const;
 
-function greatCircle(from: LatLng, to: LatLng, segments = 48): LatLng[] {
+function greatCircle(from: LatLng, to: LatLng, segments = 28): LatLng[] {
   const [lat1, lon1] = from.map((v) => (v * Math.PI) / 180) as LatLng;
   const [lat2, lon2] = to.map((v) => (v * Math.PI) / 180) as LatLng;
   const a = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
@@ -233,28 +233,15 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         minWidth: 270,
       };
 
-      // Canvas batches route strokes into one renderer and avoids one SVG node per route.
-      const canvasRenderer = L.canvas({ padding: 0.5 });
+      // One interactive route layer per flight keeps map hit-testing and redraw work low.
       routes.forEach((r) => {
         const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
-        // Keep a transparent, wide hit target so route clicks remain as forgiving as before.
-        const hit = L.polyline(path, {
-          color: "#A48656",
-          weight: 12,
-          opacity: 0,
-          renderer: canvasRenderer,
-        }).addTo(networkLayerRef.current!);
         const line = L.polyline(path, {
           color: "#A48656",
           weight: 1.4,
           opacity: 0.78,
-          renderer: canvasRenderer,
         }).addTo(networkLayerRef.current!);
-        const popup = routePopup(r);
-        hit.bindPopup(popup, popupOptions);
-        line.bindPopup(popup, popupOptions);
-        hit.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
-        hit.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
+        line.bindPopup(routePopup(r), popupOptions);
         line.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
         line.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
         bounds.extend(path[0]).extend(path[path.length - 1]);
