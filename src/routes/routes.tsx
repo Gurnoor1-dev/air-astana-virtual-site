@@ -238,12 +238,13 @@ function RoutesPage() {
                   Search Sectors
                 </label>
                 <div className="relative mt-2 flex items-center">
-                  <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground z-10" />
                   <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="ICAO, airport, route…"
-                    className="form-input w-full pl-11 text-sm"
+                    className="form-input w-full text-sm"
+                    style={{ paddingLeft: "2.75rem" }}
                   />
                 </div>
 
