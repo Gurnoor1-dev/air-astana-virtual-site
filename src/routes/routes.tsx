@@ -242,7 +242,7 @@ function RoutesPage() {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="ICAO, airport, route…"
-                    className="form-input w-full pl-10 text-sm"
+                    className="form-input w-full pl-11 text-sm"
                   />
                 </div>
 
