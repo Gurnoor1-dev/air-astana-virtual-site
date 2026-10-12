@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowRight, CheckCircle2, LockKeyhole, Plane, ShieldCheck } from "lucide-react";
-import logo from "@/assets/logo.png";
 import { CREW_API } from "@/lib/crew";
 
 export const Route=createFileRoute("/crew-login")({component:CrewLogin});
@@ -12,8 +11,7 @@ function CrewLogin(){
       <div className="absolute -left-24 top-20 size-72 rounded-full bg-[#d9bd7b]/15 blur-3xl"/>
       <div className="absolute -right-24 bottom-10 size-96 rounded-full bg-primary/5 blur-3xl"/>
       <section className="relative">
-        <img src={logo} alt="Air Astana Virtual" className="h-11 w-auto"/>
-        <div className="mt-14 inline-flex items-center gap-2 rounded-full border border-[#b89358]/25 bg-[#b89358]/8 px-3 py-2 text-[10px] font-black uppercase tracking-[.18em] text-[#8f6e3f]">
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#b89358]/25 bg-[#b89358]/8 px-3 py-2 text-[10px] font-black uppercase tracking-[.18em] text-[#8f6e3f]">
           <span className="size-2 rounded-full bg-emerald-400"/> Secure crew access
         </div>
         <h1 className="mt-6 max-w-2xl text-5xl font-black tracking-[-.07em] sm:text-7xl">Welcome back to your <span className="text-[#d9bd7b]">flight deck.</span></h1>
