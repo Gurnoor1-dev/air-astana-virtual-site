@@ -90,50 +90,80 @@ export type AirportRecord = {
   moreToKnow: string;
 };
 
+const csvPromises = new Map<string, Promise<CsvRow[]>>();
+let routesPromise: Promise<RouteRecord[]> | undefined;
+let airportsPromise: Promise<AirportRecord[]> | undefined;
+
+/** Share in-flight and completed static CSV reads across the page and map. */
 async function fetchCsvFile(filename: string): Promise<CsvRow[]> {
-  const response = await fetch(`/data/${filename}`, {
-    headers: { accept: "text/csv" },
-  });
-  if (!response.ok) {
-    throw new Error(`Could not load ${filename}`);
+  const cached = csvPromises.get(filename);
+  if (cached) return cached;
+
+  const request = (async () => {
+    const response = await fetch(`/data/${filename}`, {
+      headers: { accept: "text/csv" },
+    });
+    if (!response.ok) throw new Error(`Could not load ${filename}`);
+    return parseCsv(await response.text());
+  })();
+  csvPromises.set(filename, request);
+  try {
+    return await request;
+  } catch (error) {
+    csvPromises.delete(filename);
+    throw error;
   }
-  return parseCsv(await response.text());
 }
 
-/** Route and airport data is loaded directly from the published CSV assets. */
-export async function fetchRoutes(): Promise<RouteRecord[]> {
-  const rows = await fetchCsvFile("routes.csv");
-  return rows.flatMap((row) => {
-    const dep = parseCoordinates(row["dep_coordinates"]);
-    const arr = parseCoordinates(row["arr_coordinates"]);
-    if (!dep || !arr || !row["dep_icao"] || !row["arr_icao"]) return [];
+/** Parse the published route CSV once; both schedule and map reuse this result. */
+export function fetchRoutes(): Promise<RouteRecord[]> {
+  if (!routesPromise) {
+    routesPromise = fetchCsvFile("routes.csv").then((rows) =>
+      rows.flatMap((row) => {
+        const dep = parseCoordinates(row["dep_coordinates"]);
+        const arr = parseCoordinates(row["arr_coordinates"]);
+        if (!dep || !arr || !row["dep_icao"] || !row["arr_icao"]) return [];
 
-    return [{
-      routeId: row["route_id"] || row["route_no"],
-      routeNo: row["route_no"],
-      depIcao: row["dep_icao"].toUpperCase(),
-      arrIcao: row["arr_icao"].toUpperCase(),
-      depAirport: row["dep_airport"],
-      arrAirport: row["arr_airport"],
-      aircraft: row["aircraft_used"],
-      dep,
-      arr,
-    }];
-  });
+        return [{
+          routeId: row["route_id"] || row["route_no"],
+          routeNo: row["route_no"],
+          depIcao: row["dep_icao"].toUpperCase(),
+          arrIcao: row["arr_icao"].toUpperCase(),
+          depAirport: row["dep_airport"],
+          arrAirport: row["arr_airport"],
+          aircraft: row["aircraft_used"],
+          dep,
+          arr,
+        }];
+      }),
+    ).catch((error) => {
+      routesPromise = undefined;
+      throw error;
+    });
+  }
+  return routesPromise;
 }
 
-export async function fetchAirports(): Promise<AirportRecord[]> {
-  const rows = await fetchCsvFile("airports.csv");
-  return rows.flatMap((row) => {
-    const coords = parseCoordinates(row["airport_coordinates"]);
-    if (!coords || !row["airport_icao"]) return [];
+/** Parse the published airport CSV once for every consumer in this page session. */
+export function fetchAirports(): Promise<AirportRecord[]> {
+  if (!airportsPromise) {
+    airportsPromise = fetchCsvFile("airports.csv").then((rows) =>
+      rows.flatMap((row) => {
+        const coords = parseCoordinates(row["airport_coordinates"]);
+        if (!coords || !row["airport_icao"]) return [];
 
-    return [{
-      name: row["airport_name"],
-      icao: row["airport_icao"].toUpperCase(),
-      coords,
-      flights: row["flights_from_this_airport"],
-      moreToKnow: row["more_to_know"],
-    }];
-  });
+        return [{
+          name: row["airport_name"],
+          icao: row["airport_icao"].toUpperCase(),
+          coords,
+          flights: row["flights_from_this_airport"],
+          moreToKnow: row["more_to_know"],
+        }];
+      }),
+    ).catch((error) => {
+      airportsPromise = undefined;
+      throw error;
+    });
+  }
+  return airportsPromise;
 }

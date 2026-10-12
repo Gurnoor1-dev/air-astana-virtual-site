@@ -12,7 +12,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Card, Section } from "@/components/site/Page";
-import { RouteMap } from "@/components/site/RouteMap";
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 import heroBg from "@/assets/site/home-hero.jpg";
@@ -22,6 +21,8 @@ import dubai from "@/assets/site/dubai.jpg";
 import london from "@/assets/site/london.jpg";
 import tokyo from "@/assets/site/tokyo.jpg";
 import manila from "@/assets/site/manila.jpg";
+
+import { RouteMap } from "@/components/site/RouteMap";
 
 export const Route = createFileRoute("/routes")({
   head: () => ({

@@ -10,7 +10,7 @@ const HUBS = [
   { icao: "UACC", iata: "NQZ", name: "Astana", country: "Kazakhstan" },
 ] as const;
 
-function greatCircle(from: LatLng, to: LatLng, segments = 48): LatLng[] {
+function greatCircle(from: LatLng, to: LatLng, segments = 28): LatLng[] {
   const [lat1, lon1] = from.map((v) => (v * Math.PI) / 180) as LatLng;
   const [lat2, lon2] = to.map((v) => (v * Math.PI) / 180) as LatLng;
   const a = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
@@ -108,7 +108,11 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
   const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [counts, setCounts] = useState({ routes: 0, airports: 0, totalRoutes: 0, totalAirports: 0 });
-  const [mapData, setMapData] = useState<{ routes: RouteRecord[]; airports: AirportRecord[] } | null>(null);
+  const [mapData, setMapData] = useState<{
+    routes: RouteRecord[];
+    airports: AirportRecord[];
+    routePaths: Map<RouteRecord, LatLng[]>;
+  } | null>(null);
 
   const selectedHubData = useMemo(() => HUBS.find((h) => h.icao === selectedHub) ?? null, [selectedHub]);
 
@@ -117,30 +121,8 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
     let cleanup: (() => void) | undefined;
     (async () => {
       try {
-        const [routes, airportRows] = await Promise.all([fetchRoutes(), fetchAirports()]);
-        if (cancelled || !containerRef.current) return;
-        const airports = new Map<string, AirportRecord>();
-        airportRows.forEach((a) => airports.set(a.icao, a));
-        routes.forEach((r) => {
-          if (!airports.has(r.depIcao))
-            airports.set(r.depIcao, {
-              icao: r.depIcao,
-              name: r.depAirport,
-              coords: r.dep,
-              flights: String(routes.filter((x) => x.depIcao === r.depIcao).length),
-              moreToKnow: "",
-            });
-          if (!airports.has(r.arrIcao))
-            airports.set(r.arrIcao, {
-              icao: r.arrIcao,
-              name: r.arrAirport,
-              coords: r.arr,
-              flights: String(routes.filter((x) => x.depIcao === r.arrIcao).length),
-              moreToKnow: "",
-            });
-        });
-        setMapData({ routes, airports: Array.from(airports.values()) });
-        const [{ default: L }] = await Promise.all([import("leaflet")]);
+        // Start Leaflet and map tiles immediately; don't wait for CSV downloads first.
+        const { default: L } = await import("leaflet");
         if (cancelled || !containerRef.current) return;
         const map = L.map(containerRef.current, {
           center: [48, 60],
@@ -159,6 +141,47 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           attribution: "&copy; OpenStreetMap contributors",
         }).addTo(map);
         networkLayerRef.current = L.layerGroup().addTo(map);
+        setMapReady(true);
+        cleanup = () => {
+          networkLayerRef.current = null;
+          mapRef.current = null;
+          map.remove();
+        };
+
+        // Data downloads and parsing happen while the basemap is already appearing.
+        const [routes, airportRows] = await Promise.all([fetchRoutes(), fetchAirports()]);
+        if (cancelled || !containerRef.current) return;
+        const airports = new Map<string, AirportRecord>();
+        airportRows.forEach((a) => airports.set(a.icao, a));
+
+        const departureCounts = new Map<string, number>();
+        routes.forEach((r) => {
+          departureCounts.set(r.depIcao, (departureCounts.get(r.depIcao) ?? 0) + 1);
+        });
+
+        routes.forEach((r) => {
+          if (!airports.has(r.depIcao))
+            airports.set(r.depIcao, {
+              icao: r.depIcao,
+              name: r.depAirport,
+              coords: r.dep,
+              flights: String(departureCounts.get(r.depIcao) ?? 0),
+              moreToKnow: "",
+            });
+          if (!airports.has(r.arrIcao))
+            airports.set(r.arrIcao, {
+              icao: r.arrIcao,
+              name: r.arrAirport,
+              coords: r.arr,
+              flights: String(departureCounts.get(r.arrIcao) ?? 0),
+              moreToKnow: "",
+            });
+        });
+
+        // Cache geometry for subsequent filters without blocking map creation.
+        const routePaths = new Map<RouteRecord, LatLng[]>();
+        routes.forEach((r) => routePaths.set(r, greatCircle(r.dep, r.arr)));
+        setMapData({ routes, airports: Array.from(airports.values()), routePaths });
         setCounts({
           routes: routes.length,
           airports: airports.size,
@@ -166,12 +189,6 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
           totalAirports: airports.size,
         });
         setStatus("ready");
-        setMapReady(true);
-        cleanup = () => {
-          networkLayerRef.current = null;
-          mapRef.current = null;
-          map.remove();
-        };
       } catch (err) {
         console.error(err);
         if (!cancelled) setStatus("error");
@@ -218,8 +235,9 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
         minWidth: 270,
       };
 
+      // One interactive route layer per flight keeps map hit-testing and redraw work low.
       routes.forEach((r) => {
-        const path = greatCircle(r.dep, r.arr);
+        const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
         const hit = L.polyline(path, { color: "#A48656", weight: 12, opacity: 0 }).addTo(networkLayerRef.current!);
         const line = L.polyline(path, { color: "#A48656", weight: 1.4, opacity: 0.78 }).addTo(networkLayerRef.current!);
         const popup = routePopup(r);
