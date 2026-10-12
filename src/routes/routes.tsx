@@ -12,9 +12,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { Card, Section } from "@/components/site/Page";
-const RouteMap = lazy(() =>
-  import("@/components/site/RouteMap").then((module) => ({ default: module.RouteMap })),
-);
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 
 import heroBg from "@/assets/site/home-hero.jpg";
@@ -24,6 +21,10 @@ import dubai from "@/assets/site/dubai.jpg";
 import london from "@/assets/site/london.jpg";
 import tokyo from "@/assets/site/tokyo.jpg";
 import manila from "@/assets/site/manila.jpg";
+
+const RouteMap = lazy(() =>
+  import("@/components/site/RouteMap").then((module) => ({ default: module.RouteMap })),
+);
 
 export const Route = createFileRoute("/routes")({
   head: () => ({
