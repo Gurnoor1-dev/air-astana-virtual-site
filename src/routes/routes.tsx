@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -22,9 +22,7 @@ import london from "@/assets/site/london.jpg";
 import tokyo from "@/assets/site/tokyo.jpg";
 import manila from "@/assets/site/manila.jpg";
 
-const RouteMap = lazy(() =>
-  import("@/components/site/RouteMap").then((module) => ({ default: module.RouteMap })),
-);
+import { RouteMap } from "@/components/site/RouteMap";
 
 export const Route = createFileRoute("/routes")({
   head: () => ({
@@ -203,15 +201,7 @@ function RoutesPage() {
             {/* Map Container */}
             <div className="overflow-hidden rounded-[2rem] border border-border bg-white p-3 shadow-soft">
               <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50 min-h-[420px]">
-                <Suspense
-                  fallback={
-                    <div className="flex h-[520px] w-full items-center justify-center text-sm text-muted-foreground md:h-[620px]">
-                      Preparing interactive route map…
-                    </div>
-                  }
-                >
-                  <RouteMap search={q} aircraft={aircraft} />
-                </Suspense>
+                <RouteMap search={q} aircraft={aircraft} />
               </div>
 
               {/* Bottom Legend Pill Bar */}
