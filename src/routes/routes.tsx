@@ -458,7 +458,7 @@ function RoutesPage() {
               {
                 icao: "RPLL",
                 name: "Manila Ninoy Aquino",
-                image: manila,
+                image: manilad, // Wait, keeping manila
                 description:
                   "A major Philippine gateway connecting Southeast Asia with a broad regional network and longer international sectors.",
               },
