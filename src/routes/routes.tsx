@@ -67,6 +67,18 @@ const SIMBRIEF_AIRCRAFT: Record<string, string> = {
   "757-200": "B752",
 };
 
+function estimatedBlockTime(route: RouteRecord) {
+  const rad = (n: number) => (n * Math.PI) / 180;
+  const [lat1, lon1] = route.dep, [lat2, lon2] = route.arr;
+  const dLat = rad(lat2 - lat1), dLon = rad(lon2 - lon1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLon / 2) ** 2;
+  const distanceNm = 3440.065 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const cruiseKnots = route.aircraft === "787-9" ? 485 : route.aircraft === "757-200" ? 440 : 435;
+  const minutes = Math.max(30, Math.round((distanceNm / cruiseKnots * 60 + 35) / 15) * 15);
+  const hours = Math.floor(minutes / 60), remainder = minutes % 60;
+  return hours ? `${hours}h ${String(remainder).padStart(2, "0")}m` : `${remainder} min`;
+}
+
 function simBriefUrl(route: RouteRecord) {
   const params = new URLSearchParams({
     orig: route.depIcao,
@@ -314,7 +326,7 @@ function RoutesPage() {
           description="A detailed view of the routes available to our pilots. Browse the schedule, check the aircraft and find a sector that suits your next flight."
         >
           <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-soft">
-            <div className="hidden grid-cols-[1fr_1.2fr_1.2fr_.8fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70 sm:grid">
+            <div className="hidden grid-cols-[.8fr_1.1fr_1.1fr_.7fr_.7fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70 sm:grid">
               <div>Flight</div>
               <div>Departure</div>
               <div>Arrival</div>
@@ -323,7 +335,7 @@ function RoutesPage() {
             {paginatedRoutes.map((r, i) => (
               <div
                 key={r.routeId}
-                className={`grid gap-3 px-5 py-5 sm:grid-cols-[1fr_1.2fr_1.2fr_.8fr] sm:items-center sm:gap-4 sm:px-6 ${
+                className={`grid gap-3 px-5 py-5 sm:grid-cols-[.8fr_1.1fr_1.1fr_.7fr_.7fr] sm:items-center sm:gap-4 sm:px-6 ${
                   i ? "border-t border-border" : ""
                 } transition hover:bg-muted/30`}
               >
