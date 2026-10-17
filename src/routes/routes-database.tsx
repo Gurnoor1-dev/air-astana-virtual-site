@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { fetchRoutes, type RouteRecord } from "@/lib/csv";
 import { Section } from "@/components/site/Page";
-import { LockKeyhole, Search, Plane, Clock3, LogOut, ShieldCheck } from "lucide-react";
+import { LockKeyhole, Search, Plane, Clock3, LogOut, ShieldCheck, Star, Award } from "lucide-react";
 
 const ACCESS_ENDPOINT = "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/routes-database-access";
 const SESSION_KEY = "routes-database-session";
@@ -12,13 +12,85 @@ export const Route = createFileRoute("/routes-database")({
   component: RoutesDatabasePage,
 });
 
-function blockMinutes(r: RouteRecord) {
+type BlockTime = { minutes: number; source: "Published schedule" | "Planning estimate" };
+
+// Published examples are route-direction-specific and can change by season.
+// ALA–FRA is based on Air Astana KC221 schedules; ALA–LHR is based on Air Astana's published non-stop schedule.
+const PUBLISHED_BLOCK_TIMES: Record<string, number> = {
+  "UAAA-EDDF": 505, // 8h 25m — KC221 schedule
+  "EDDF-UAAA": 435, // 7h 15m — Air Astana-operated return schedule
+  "UAAA-EGLL": 575, // 9h 35m — Air Astana non-stop schedule
+};
+
+function blockTime(r: RouteRecord): BlockTime {
+  const published = PUBLISHED_BLOCK_TIMES[`${r.depIcao}-${r.arrIcao}`];
+  if (published) return { minutes: published, source: "Published schedule" };
+
   const rad = (n: number) => n * Math.PI / 180;
   const [a, b] = r.dep; const [c, d] = r.arr;
   const x = Math.sin(rad(c-a)/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
   const nm = 3440.065 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
   const speed = r.aircraft === "787-9" ? 485 : r.aircraft === "757-200" ? 440 : 435;
-  return Math.max(30, Math.round((nm / speed * 60 + 35) / 15) * 15);
+  return {
+    minutes: Math.max(30, Math.round((nm / speed * 60 + 35) / 5) * 5),
+    source: "Planning estimate",
+  };
+}
+
+type RankInfo = {
+  rank: string;
+  minHours: string;
+  stripes: number;
+  isSenior?: boolean;
+  isElite?: boolean;
+  perk: string;
+};
+
+function rankForRoute(r: RouteRecord): RankInfo {
+  const codes = [r.depIcao, r.arrIcao];
+  const distanceNm = (() => {
+    const rad = (n: number) => n * Math.PI / 180;
+    const [a, b] = r.dep; const [c, d] = r.arr;
+    const x = Math.sin(rad(c-a)/2)**2 + Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(rad(d-b)/2)**2;
+    return 3440.065 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+  })();
+
+  const kazakhstan = new Set(["UAAA", "UACC", "UATE", "UATT", "UATG", "UAUU", "UAOO", "UAII", "UARR", "UASK"]);
+  const centralAsia = new Set(["UAFM", "UAFO", "UTDD", "UTTT"]);
+  const caucasus = new Set(["UBBB", "UGTB", "UGSB"]);
+  const europe = new Set(["LTFM", "LTAI", "LTFE", "EHAM", "EDDF", "EGLL", "LFPG", "LYPG"]);
+  const asia = new Set(["ZBAA", "ZGGG", "ZSPD", "ZWWW", "ZJSY", "RKSI", "VIDP", "VABB", "OTHH", "OMDB", "OEJN", "OEMA", "VRMM", "VTBS", "VTSP", "VVDN", "VVCR", "VVPQ", "WMKK", "WADD", "VCBI", "RJAA", "RJTT", "RPLL"]);
+  const bothKazakhstan = codes.every(code => kazakhstan.has(code));
+  const touchesCentralAsia = codes.some(code => centralAsia.has(code));
+  const touchesCaucasusOrEurope = codes.some(code => caucasus.has(code) || europe.has(code));
+  const touchesAsia = codes.some(code => asia.has(code));
+
+  // Long-range privilege takes precedence for routes beyond the network's long-haul threshold.
+  if (distanceNm >= 3500) return { rank: "Captain", minHours: "150h", stripes: 4, perk: "Long-range operations" };
+  if (bothKazakhstan) return { rank: "Cadet", minHours: "0h", stripes: 0, perk: "Domestic network" };
+  if (touchesCentralAsia) return { rank: "Second Officer", minHours: "10h", stripes: 1, perk: "Central Asia" };
+  if (touchesCaucasusOrEurope) return { rank: "First Officer", minHours: "30h", stripes: 2, perk: "Caucasus & Europe" };
+  if (touchesAsia) return { rank: "Senior First Officer", minHours: "75h", stripes: 3, perk: "Asia network" };
+  return { rank: "First Officer", minHours: "30h", stripes: 2, perk: "International network" };
+}
+
+function RankStripes({ rank }: { rank: RankInfo }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5">
+      <div className={`relative flex h-9 w-[76px] shrink-0 items-center justify-end gap-1 rounded-xl px-2.5 shadow-inner ${rank.isElite ? "bg-gradient-to-r from-[#a48656] via-[#2a3b66] to-[#1c2b4f]" : "bg-gradient-to-r from-[#263b67] to-[#1c2b4f]"}`}>
+        {(rank.isElite || rank.isSenior) && <Star className="mr-auto size-3.5 fill-amber-100 text-amber-100" />}
+        {rank.stripes === 0 ? (
+          <span className="w-full text-center text-[9px] font-extrabold uppercase tracking-wider text-white">Cadet</span>
+        ) : Array.from({ length: rank.stripes }).map((_, i) => (
+          <span key={i} className={`h-6 w-1.5 rounded-sm ${rank.isElite ? "bg-amber-100" : "bg-white"}`} />
+        ))}
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs font-extrabold leading-tight text-slate-900">{rank.rank}</div>
+        <div className="mt-0.5 text-[10px] font-semibold text-slate-500">{rank.minHours} required</div>
+      </div>
+    </div>
+  );
 }
 
 function duration(n: number) { 
@@ -74,7 +146,7 @@ function RoutesDatabasePage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return routes.filter(r => [r.routeNo, r.routeId, r.depIcao, r.arrIcao, r.depAirport, r.arrAirport, r.aircraft].join(" ").toLowerCase().includes(q));
+    return routes.filter(r => [r.routeNo, r.routeId, r.depIcao, r.arrIcao, r.depAirport, r.arrAirport, r.aircraft, rankForRoute(r).rank, rankForRoute(r).perk].join(" ").toLowerCase().includes(q));
   }, [routes, query]);
 
   if (!ready) return null;
@@ -150,13 +222,13 @@ function RoutesDatabasePage() {
               <>
                 {/* Search & Logout Toolbar */}
                 <div className="mb-6 flex flex-col gap-3 sm:flex-row items-center justify-between">
-                  <div className="relative w-full sm:max-w-md">
-                    <Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                  <div className="relative w-full min-w-0 sm:max-w-xl">
+                    <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 z-10 size-4 -translate-y-1/2 text-slate-400" />
                     <input 
                       value={query} 
                       onChange={e => setQuery(e.target.value)} 
                       placeholder="Search flight number, airport, or aircraft..." 
-                      className="form-input w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1c2b4f]/20 focus:border-[#1c2b4f] text-sm transition-all"
+                      className="form-input !w-full !min-w-0 !pl-12 !pr-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#1c2b4f]/20 focus:border-[#1c2b4f] text-sm transition-all"
                     />
                   </div>
                   <button 
@@ -171,45 +243,60 @@ function RoutesDatabasePage() {
                 <div className="mb-3 flex items-center gap-2 text-xs font-bold text-slate-500 px-1">
                   <Plane className="size-4 text-[#a48656]" />
                   <span>Showing {filtered.length} of {routes.length} sectors</span>
-                  <span className="ml-auto inline-flex items-center gap-1.5 text-slate-400">
-                    <Clock3 className="size-3.5" /> Estimated block time
+                  <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-slate-500 ring-1 ring-slate-200">
+                    <Clock3 className="size-3.5 text-[#a48656]" /> Scheduled / estimated time
                   </span>
                 </div>
 
                 {/* Database Table Container */}
                 <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-100">
                   {/* Table Header */}
-                  <div className="hidden grid-cols-[.7fr_1fr_1fr_.8fr_.75fr] gap-3 bg-[#1c2b4f] px-6 py-4 text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/85 md:grid">
+                  <div className="hidden grid-cols-[.72fr_1fr_1fr_.72fr_1.12fr_.68fr] gap-4 bg-gradient-to-r from-[#172541] via-[#1c2b4f] to-[#263b60] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/80 xl:grid">
                     <div>Flight</div>
                     <div>Departure</div>
                     <div>Arrival</div>
                     <div>Aircraft</div>
-                    <div>Block Time</div>
+                    <div>Rank unlocked</div>
+                    <div>Block time</div>
                   </div>
 
                   {/* Table Body */}
                   <div className="divide-y divide-slate-100">
                     {filtered.map((r) => (
-                      <div key={r.routeId} className="grid gap-3 px-6 py-4 md:grid-cols-[.7fr_1fr_1fr_.8fr_.75fr] md:items-center hover:bg-slate-50/80 transition-colors">
-                        <div>
-                          <div className="font-extrabold text-[#a48656] text-base">{r.routeNo}</div>
-                          <div className="text-xs text-slate-400 font-mono">{r.routeId}</div>
+                      <div key={r.routeId} className="group grid gap-3 border-l-2 border-l-transparent px-4 py-4 transition-all hover:border-l-[#a48656] hover:bg-[#f8f9fc] sm:px-6 xl:grid-cols-[.72fr_1fr_1fr_.72fr_1.12fr_.68fr] xl:items-center xl:gap-4">
+                        <div className="flex items-center justify-between gap-3 xl:block">
+                          <div>
+                            <div className="font-extrabold text-[#a48656] text-base tracking-tight">{r.routeNo}</div>
+                            <div className="mt-0.5 text-[11px] text-slate-400 font-mono">Sector {r.routeId}</div>
+                          </div>
+                          <span className="xl:hidden rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700">{r.aircraft}</span>
                         </div>
-                        <div>
-                          <div className="font-extrabold text-slate-900">{r.depIcao}</div>
-                          <div className="text-xs text-slate-500 truncate max-w-[200px]">{r.depAirport}</div>
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Departure</div>
+                          <div className="mt-0.5 font-black tracking-wide text-slate-900">{r.depIcao}</div>
+                          <div className="truncate text-xs text-slate-500" title={r.depAirport}>{r.depAirport}</div>
                         </div>
-                        <div>
-                          <div className="font-extrabold text-slate-900">{r.arrIcao}</div>
-                          <div className="text-xs text-slate-500 truncate max-w-[200px]">{r.arrAirport}</div>
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Arrival</div>
+                          <div className="mt-0.5 font-black tracking-wide text-slate-900">{r.arrIcao}</div>
+                          <div className="truncate text-xs text-slate-500" title={r.arrAirport}>{r.arrAirport}</div>
                         </div>
-                        <div>
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-xs font-bold">
-                            {r.aircraft}
-                          </span>
+                        <div className="hidden xl:block">
+                          <span className="inline-flex items-center rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-bold text-slate-700">{r.aircraft}</span>
                         </div>
-                        <div className="font-extrabold tabular-nums text-slate-900">
-                          {duration(blockMinutes(r))}
+                        <div className="rounded-xl border border-slate-100 bg-white p-2.5 shadow-sm xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none">
+                          <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 xl:hidden">Rank unlocked</div>
+                          <RankStripes rank={rankForRoute(r)} />
+                        </div>
+                        <div className="flex items-center justify-between gap-3 xl:block">
+                          <div>
+                            <div className="font-black tabular-nums text-slate-900">{duration(blockTime(r).minutes)}</div>
+                            <div className={`mt-1 inline-flex items-center gap-1 text-[10px] font-bold ${blockTime(r).source === "Published schedule" ? "text-emerald-700" : "text-slate-400"}`}>
+                              {blockTime(r).source === "Published schedule" ? <ShieldCheck className="size-3" /> : <Clock3 className="size-3" />}
+                              {blockTime(r).source}
+                            </div>
+                          </div>
+                          <span className="xl:hidden rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-bold text-slate-700">{r.aircraft}</span>
                         </div>
                       </div>
                     ))}
@@ -224,9 +311,10 @@ function RoutesDatabasePage() {
                 </div>
 
                 {/* Footer disclaimer */}
-                <p className="mt-4 text-xs text-slate-400 leading-relaxed px-1">
-                  * Rounded planning estimates based on direct route distance and typical aircraft performance profiles; these are not verified published schedules for real-world commercial operations.
-                </p>
+                <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white/80 p-4 text-xs leading-relaxed text-slate-500 sm:flex-row sm:items-start">
+                  <Clock3 className="mt-0.5 size-4 shrink-0 text-[#a48656]" />
+                  <p><strong className="text-slate-700">Block time note:</strong> Published schedule values are marked individually where a public scheduled duration was verified. Other sectors are clearly labelled planning estimates derived from route distance and typical aircraft performance; wind, routing, season and airline schedules can change actual times.</p>
+                </div>
               </>
             )}
           </Section>
