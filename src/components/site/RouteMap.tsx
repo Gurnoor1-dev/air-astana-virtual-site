@@ -146,10 +146,10 @@ export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; a
   useEffect(() => {
     const globe = globeRef.current;
     if (!globe) return;
-    globe.arcsData(globeMode ? filteredRoutes.map((route) => ({
+    globe.arcsData(showCodeshare ? filteredRoutes.map((route) => ({
       ...route, startLat: route.dep[0], startLng: route.dep[1], endLat: route.arr[0], endLng: route.arr[1],
     })) : []);
-  }, [globeMode, filteredRoutes]);
+  }, [showCodeshare, filteredRoutes]);
 
   const routeCount = filteredRoutes.length;
   const airportCount = visibleAirports.length;
