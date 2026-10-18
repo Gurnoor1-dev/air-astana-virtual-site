@@ -1,517 +1,231 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchAirports, fetchRoutes, type AirportRecord, type RouteRecord } from "@/lib/csv";
 
-type LatLng = [number, number];
-type LeafletMap = import("leaflet").Map;
-type LeafletLayerGroup = import("leaflet").LayerGroup;
-
 const HUBS = [
-  { icao: "UAAA", iata: "ALA", name: "Almaty", country: "Kazakhstan" },
-  { icao: "UACC", iata: "NQZ", name: "Astana", country: "Kazakhstan" },
+  { icao: "UAAA", iata: "ALA", name: "Almaty", country: "Kazakhstan", lat: 43.3521, lng: 77.0405 },
+  { icao: "UACC", iata: "NQZ", name: "Astana", country: "Kazakhstan", lat: 51.0222, lng: 71.4669 },
 ] as const;
 
-function greatCircle(from: LatLng, to: LatLng, segments = 28): LatLng[] {
-  const [lat1, lon1] = from.map((v) => (v * Math.PI) / 180) as LatLng;
-  const [lat2, lon2] = to.map((v) => (v * Math.PI) / 180) as LatLng;
-  const a = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
-  const b = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
-  const dot = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
-  const omega = Math.acos(dot);
-  if (omega < 1e-6) return [from, to];
-  const sinOmega = Math.sin(omega);
-  return Array.from({ length: segments + 1 }, (_, i) => {
-    const t = i / segments,
-      s1 = Math.sin((1 - t) * omega) / sinOmega,
-      s2 = Math.sin(t * omega) / sinOmega,
-      x = s1 * a[0] + s2 * b[0],
-      y = s1 * a[1] + s2 * b[1],
-      z = s1 * a[2] + s2 * b[2];
-    return [(Math.atan2(z, Math.hypot(x, y)) * 180) / Math.PI, (Math.atan2(y, x) * 180) / Math.PI];
-  });
-}
-
-function escapeHtml(value: string) {
-  return value.replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c] ?? c));
-}
-
-function routePopup(r: RouteRecord) {
-  return `
-    <div class="kc-route-card">
-      <div class="kc-card-header">
-        <span class="kc-header-tag">FLIGHT DETAILS</span>
-        <span class="kc-aircraft-badge">${escapeHtml(r.aircraft || "Air Astana Fleet")}</span>
-      </div>
-      
-      <div class="kc-route-main">
-        <div class="kc-airport-node">
-          <span class="kc-icao">${escapeHtml(r.depIcao)}</span>
-          <span class="kc-airport-name" title="${escapeHtml(r.depAirport)}">${escapeHtml(r.depAirport)}</span>
-        </div>
-        
-        <div class="kc-flight-path">
-          <div class="kc-line"></div>
-          <div class="kc-plane-icon">✈</div>
-        </div>
-        
-        <div class="kc-airport-node right">
-          <span class="kc-icao">${escapeHtml(r.arrIcao)}</span>
-          <span class="kc-airport-name" title="${escapeHtml(r.arrAirport)}">${escapeHtml(r.arrAirport)}</span>
-        </div>
-      </div>
-
-      <div class="kc-card-footer">
-        <div class="kc-info-block">
-          <span class="kc-label">Route No</span>
-          <span class="kc-value">${escapeHtml(r.routeNo || "KC-GLOBAL")}</span>
-        </div>
-        <div class="kc-info-block right">
-          <span class="kc-label">Operator</span>
-          <span class="kc-value">Air Astana</span>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function airportPopup(a: AirportRecord) {
-  return `
-    <div class="kc-route-card">
-      <div class="kc-card-header">
-        <span class="kc-header-tag">AIRPORT STATION</span>
-        <span class="kc-aircraft-badge gold">${escapeHtml(a.flights)} ROUTES</span>
-      </div>
-      
-      <div class="kc-airport-header-single">
-        <div class="kc-icao-lg">${escapeHtml(a.icao)}</div>
-        <div class="kc-airport-fullname">${escapeHtml(a.name)}</div>
-      </div>
-
-      ${
-        a.moreToKnow
-          ? `
-        <div class="kc-card-extra">
-          <span class="kc-label">Station Information</span>
-          <p class="kc-extra-text">${escapeHtml(a.moreToKnow)}</p>
-        </div>
-      `
-          : ""
-      }
-    </div>
-  `;
-}
+type GlobeRoute = RouteRecord & { startLat: number; startLng: number; endLat: number; endLng: number };
+type GlobePoint = { lat: number; lng: number; size: number; color: string; name: string; icao: string; flights: string; isHub: boolean };
 
 export function RouteMap({ search = "", aircraft = "ALL" }: { search?: string; aircraft?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
-  const networkLayerRef = useRef<LeafletLayerGroup | null>(null);
+  const globeRef = useRef<any>(null);
   const [selectedHub, setSelectedHub] = useState("ALL");
-  const [mapReady, setMapReady] = useState(false);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  const [counts, setCounts] = useState({ routes: 0, airports: 0, totalRoutes: 0, totalAirports: 0 });
-  const [mapData, setMapData] = useState<{
-    routes: RouteRecord[];
-    airports: AirportRecord[];
-    routePaths: Map<RouteRecord, LatLng[]>;
-  } | null>(null);
-
-  const selectedHubData = useMemo(() => HUBS.find((h) => h.icao === selectedHub) ?? null, [selectedHub]);
+  const [routes, setRoutes] = useState<RouteRecord[]>([]);
+  const [airports, setAirports] = useState<AirportRecord[]>([]);
+  const [showCodeshare, setShowCodeshare] = useState(true);
+  const [globeMode, setGlobeMode] = useState(true);
+  const [selectedRoute, setSelectedRoute] = useState<RouteRecord | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    let cleanup: (() => void) | undefined;
-    (async () => {
+    let globe: any;
+    let resizeObserver: ResizeObserver | undefined;
+    const mount = async () => {
       try {
-        // Start Leaflet and map tiles immediately; don't wait for CSV downloads first.
-        const { default: L } = await import("leaflet");
+        const [{ default: Globe }, data] = await Promise.all([
+          import("globe.gl"),
+          Promise.all([fetchRoutes(), fetchAirports()]),
+        ]);
         if (cancelled || !containerRef.current) return;
-        const map = L.map(containerRef.current, {
-          center: [48, 60],
-          zoom: 3,
-          minZoom: 2,
-          maxZoom: 18,
-          worldCopyJump: true,
-          scrollWheelZoom: false,
-          attributionControl: true,
-        });
-        mapRef.current = map;
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          subdomains: ["a", "b", "c"],
-          maxZoom: 19,
-          crossOrigin: true,
-          attribution: "&copy; OpenStreetMap contributors",
-        }).addTo(map);
-        networkLayerRef.current = L.layerGroup().addTo(map);
-        setMapReady(true);
-        cleanup = () => {
-          networkLayerRef.current = null;
-          mapRef.current = null;
-          map.remove();
-        };
+        setRoutes(data[0]);
+        setAirports(data[1]);
 
-        // Data downloads and parsing happen while the basemap is already appearing.
-        const [routes, airportRows] = await Promise.all([fetchRoutes(), fetchAirports()]);
-        if (cancelled || !containerRef.current) return;
-        const airports = new Map<string, AirportRecord>();
-        airportRows.forEach((a) => airports.set(a.icao, a));
-
-        const departureCounts = new Map<string, number>();
-        routes.forEach((r) => {
-          departureCounts.set(r.depIcao, (departureCounts.get(r.depIcao) ?? 0) + 1);
+        globe = Globe()(containerRef.current)
+          .backgroundColor("#071426")
+          .showAtmosphere(true)
+          .atmosphereColor("#56b4e9")
+          .atmosphereAltitude(0.18)
+          .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-night.jpg")
+          .bumpImageUrl("https://unpkg.com/three-globe/example/img/earth-topology.png")
+          .showGraticules(true)
+          .arcColor((d: GlobeRoute) => [selectedHub !== "ALL" ? "#65c7f3" : "#d6b36a", "#65c7f3"])
+          .arcAltitude((d: GlobeRoute) => {
+            const distance = Math.hypot(d.endLat - d.startLat, d.endLng - d.startLng);
+            return Math.min(0.42, Math.max(0.12, distance / 150));
+          })
+          .arcStroke(0.55)
+          .arcDashLength(0.45)
+          .arcDashGap(0.18)
+          .arcDashAnimateTime(1800)
+          .arcsTransitionDuration(500)
+          .pointLat("lat")
+          .pointLng("lng")
+          .pointAltitude((d: GlobePoint) => d.isHub ? 0.035 : 0.012)
+          .pointRadius((d: GlobePoint) => d.size)
+          .pointColor((d: GlobePoint) => d.color)
+          .pointLabel((d: GlobePoint) => `<div style="font-family:system-ui;padding:8px 10px;color:#f8fafc;background:#10233d;border:1px solid #3b5c78;border-radius:10px"><b>${d.icao} · ${d.name}</b><div style="font-size:11px;color:#b9cde0;margin-top:3px">${d.flights} network routes</div></div>`)
+          .onPointClick((d: GlobePoint) => {
+            const match = routes.find((r) => r.depIcao === d.icao || r.arrIcao === d.icao);
+            if (match) setSelectedRoute(match);
+            globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.7 }, 900);
+          })
+          .onArcClick((d: GlobeRoute) => setSelectedRoute(d));
+        globe.controls().autoRotate = true;
+        globe.controls().autoRotateSpeed = 0.32;
+        globe.controls().enableDamping = true;
+        globe.controls().dampingFactor = 0.08;
+        globe.pointOfView({ lat: 38, lng: 64, altitude: 2.35 }, 0);
+        globeRef.current = globe;
+        resizeObserver = new ResizeObserver(() => {
+          if (containerRef.current && globe) {
+            globe.width(containerRef.current.clientWidth);
+            globe.height(containerRef.current.clientHeight);
+          }
         });
-
-        routes.forEach((r) => {
-          if (!airports.has(r.depIcao))
-            airports.set(r.depIcao, {
-              icao: r.depIcao,
-              name: r.depAirport,
-              coords: r.dep,
-              flights: String(departureCounts.get(r.depIcao) ?? 0),
-              moreToKnow: "",
-            });
-          if (!airports.has(r.arrIcao))
-            airports.set(r.arrIcao, {
-              icao: r.arrIcao,
-              name: r.arrAirport,
-              coords: r.arr,
-              flights: String(departureCounts.get(r.arrIcao) ?? 0),
-              moreToKnow: "",
-            });
-        });
-
-        // Cache geometry for subsequent filters without blocking map creation.
-        const routePaths = new Map<RouteRecord, LatLng[]>();
-        routes.forEach((r) => routePaths.set(r, greatCircle(r.dep, r.arr)));
-        setMapData({ routes, airports: Array.from(airports.values()), routePaths });
-        setCounts({
-          routes: routes.length,
-          airports: airports.size,
-          totalRoutes: routes.length,
-          totalAirports: airports.size,
-        });
+        resizeObserver.observe(containerRef.current);
+        globe.width(containerRef.current.clientWidth);
+        globe.height(containerRef.current.clientHeight);
         setStatus("ready");
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error("Could not initialize route globe", error);
         if (!cancelled) setStatus("error");
       }
-    })();
+    };
+    void mount();
     return () => {
       cancelled = true;
-      cleanup?.();
+      resizeObserver?.disconnect();
+      if (globe) {
+        globe._destructor?.();
+        if (containerRef.current) containerRef.current.innerHTML = "";
+      }
+      globeRef.current = null;
     };
   }, []);
 
+  const filteredRoutes = useMemo(() => {
+    const query = search.trim().toUpperCase();
+    return routes.filter((route) => {
+      const hubMatch = selectedHub === "ALL" || route.depIcao === selectedHub || route.arrIcao === selectedHub;
+      const aircraftMatch = aircraft === "ALL" || route.aircraft === aircraft;
+      const haystack = [route.routeNo, route.depIcao, route.arrIcao, route.depAirport, route.arrAirport, route.aircraft].join(" ").toUpperCase();
+      return hubMatch && aircraftMatch && (!query || haystack.includes(query));
+    });
+  }, [routes, search, selectedHub, aircraft]);
+
+  const visibleAirports = useMemo(() => {
+    const map = new Map<string, AirportRecord>();
+    airports.forEach((airport) => map.set(airport.icao, airport));
+    const count = new Map<string, number>();
+    filteredRoutes.forEach((route) => {
+      count.set(route.depIcao, (count.get(route.depIcao) ?? 0) + 1);
+      if (!map.has(route.arrIcao)) map.set(route.arrIcao, {
+        icao: route.arrIcao, name: route.arrAirport, coords: route.arr, flights: "0", moreToKnow: "",
+      });
+      if (!map.has(route.depIcao)) map.set(route.depIcao, {
+        icao: route.depIcao, name: route.depAirport, coords: route.dep, flights: "0", moreToKnow: "",
+      });
+    });
+    return Array.from(map.values()).filter((airport) => {
+      if (selectedHub !== "ALL") return filteredRoutes.some((r) => r.depIcao === airport.icao || r.arrIcao === airport.icao);
+      return filteredRoutes.some((r) => r.depIcao === airport.icao || r.arrIcao === airport.icao);
+    }).map((airport) => ({ ...airport, flights: String(count.get(airport.icao) ?? airport.flights ?? "0") }));
+  }, [airports, filteredRoutes, selectedHub]);
+
   useEffect(() => {
-    if (!mapData || !mapRef.current || !networkLayerRef.current) return;
-    let cancelled = false;
-    (async () => {
-      const { default: L } = await import("leaflet");
-      if (cancelled || !mapRef.current || !networkLayerRef.current) return;
-      const hubIcaos = new Set(HUBS.map((h) => h.icao));
-      const searchText = search.trim().toUpperCase();
-      const routes = mapData.routes.filter((r) => {
-        const hubMatch = selectedHub === "ALL" || r.depIcao === selectedHub || r.arrIcao === selectedHub;
-        const aircraftMatch = aircraft === "ALL" || r.aircraft === aircraft;
-        const text = [r.routeNo, r.depIcao, r.arrIcao, r.depAirport, r.arrAirport, r.aircraft].join(" ").toUpperCase();
-        return hubMatch && aircraftMatch && (!searchText || text.includes(searchText));
-      });
-      const routeAirports = new Set<string>();
-      routes.forEach((r) => {
-        routeAirports.add(r.depIcao);
-        routeAirports.add(r.arrIcao);
-      });
-      const airportMap = new Map(mapData.airports.map((a) => [a.icao, a]));
-      const visibleAirports =
-        selectedHub === "ALL"
-          ? Array.from(airportMap.values())
-          : Array.from(airportMap.values()).filter((a) => routeAirports.has(a.icao));
+    const globe = globeRef.current;
+    if (!globe) return;
+    const routeData: GlobeRoute[] = filteredRoutes.map((route) => ({
+      ...route, startLat: route.dep[0], startLng: route.dep[1], endLat: route.arr[0], endLng: route.arr[1],
+    }));
+    const hubCodes = new Set(HUBS.map((hub) => hub.icao));
+    const points: GlobePoint[] = visibleAirports.map((airport) => ({
+      lat: airport.coords[0], lng: airport.coords[1],
+      size: hubCodes.has(airport.icao) ? 0.55 : 0.22,
+      color: hubCodes.has(airport.icao) ? "#f4c96b" : "#6ecbfa",
+      name: airport.name, icao: airport.icao, flights: airport.flights,
+      isHub: hubCodes.has(airport.icao),
+    }));
+    globe.arcsData(routeData).pointsData(points);
+  }, [filteredRoutes, visibleAirports, selectedHub]);
 
-      networkLayerRef.current.clearLayers();
-      const bounds = L.latLngBounds([]);
+  useEffect(() => {
+    const globe = globeRef.current;
+    if (!globe) return;
+    globe.arcsData(globeMode ? filteredRoutes.map((route) => ({
+      ...route, startLat: route.dep[0], startLng: route.dep[1], endLat: route.arr[0], endLng: route.arr[1],
+    })) : []);
+  }, [globeMode, filteredRoutes]);
 
-      const popupOptions: import("leaflet").PopupOptions = {
-        closeButton: true,
-        className: "custom-leaflet-popup",
-        maxWidth: 310,
-        minWidth: 270,
-      };
-
-      // One interactive route layer per flight keeps map hit-testing and redraw work low.
-      routes.forEach((r) => {
-        const path = mapData.routePaths.get(r) ?? [r.dep, r.arr];
-        const hit = L.polyline(path, { color: "#A48656", weight: 12, opacity: 0 }).addTo(networkLayerRef.current!);
-        const line = L.polyline(path, { color: "#A48656", weight: 1.4, opacity: 0.78 }).addTo(networkLayerRef.current!);
-        const popup = routePopup(r);
-        hit.bindPopup(popup, popupOptions);
-        line.bindPopup(popup, popupOptions);
-        hit.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
-        hit.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
-        line.on("mouseover", () => line.setStyle({ weight: 2.8, opacity: 1 }));
-        line.on("mouseout", () => line.setStyle({ weight: 1.4, opacity: 0.78 }));
-        bounds.extend(path[0]).extend(path[path.length - 1]);
-      });
-
-      visibleAirports.forEach((a) => {
-        const isHub = hubIcaos.has(a.icao);
-        L.circleMarker(a.coords, {
-          radius: isHub ? 5.5 : 3,
-          color: "#A48656",
-          weight: isHub ? 2 : 1.5,
-          fillColor: isHub ? "#A48656" : "#ffffff",
-          fillOpacity: 1,
-        })
-          .addTo(networkLayerRef.current!)
-          .bindPopup(airportPopup(a), popupOptions);
-        bounds.extend(a.coords);
-      });
-
-      if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [44, 44], maxZoom: selectedHub === "ALL" ? 4 : 7 });
-      setCounts((c) => ({ ...c, routes: routes.length, airports: visibleAirports.length }));
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [mapData, mapReady, selectedHub, search, aircraft]);
+  const routeCount = filteredRoutes.length;
+  const airportCount = visibleAirports.length;
 
   return (
-    <div className="relative z-0 overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_24px_70px_-38px_rgba(20,25,40,0.35)]">
-      {/* Font & Leaflet Pop-up Custom Styles */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
-
-        /* Leaflet popup overrides */
-        .custom-leaflet-popup .leaflet-popup-content-wrapper {
-          padding: 0 !important;
-          background: transparent !important;
-          box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.4) !important;
-          border-radius: 1rem !important;
-          overflow: hidden !important;
-        }
-        .custom-leaflet-popup .leaflet-popup-content {
-          margin: 0 !important;
-          width: 100% !important;
-          font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-        }
-        .custom-leaflet-popup .leaflet-popup-tip {
-          background: #17213a !important;
-        }
-        .custom-leaflet-popup a.leaflet-popup-close-button {
-          color: rgba(255, 255, 255, 0.7) !important;
-          padding: 10px 10px 0 0 !important;
-          font-size: 18px !important;
-          transition: color 0.2s ease;
-          z-index: 10;
-        }
-        .custom-leaflet-popup a.leaflet-popup-close-button:hover {
-          color: #ffffff !important;
-        }
-
-        /* Card component styling */
-        .kc-route-card {
-          background: #ffffff;
-          border: 1px solid rgba(23, 33, 58, 0.12);
-          border-radius: 1rem;
-          overflow: hidden;
-          font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-        }
-        .kc-card-header {
-          background: #17213a;
-          padding: 10px 14px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-        .kc-header-tag {
-          font-size: 9px;
-          font-weight: 800;
-          letter-spacing: 0.14em;
-          color: #a48656;
-          text-transform: uppercase;
-        }
-        .kc-aircraft-badge {
-          background: rgba(255, 255, 255, 0.12);
-          color: #f8fafc;
-          font-size: 10px;
-          font-weight: 700;
-          padding: 3px 8px;
-          border-radius: 9999px;
-          letter-spacing: 0.02em;
-        }
-        .kc-aircraft-badge.gold {
-          background: #a48656;
-          color: #ffffff;
-        }
-        .kc-route-main {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 14px;
-          background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-          border-bottom: 1px dashed rgba(23, 33, 58, 0.12);
-        }
-        .kc-airport-node {
-          display: flex;
-          flex-direction: column;
-          max-width: 42%;
-        }
-        .kc-airport-node.right {
-          align-items: flex-end;
-          text-align: right;
-        }
-        .kc-icao {
-          font-size: 20px;
-          font-weight: 900;
-          color: #17213a;
-          letter-spacing: -0.02em;
-          line-height: 1;
-        }
-        .kc-airport-name {
-          font-size: 10px;
-          font-weight: 600;
-          color: #64748b;
-          margin-top: 4px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100px;
-        }
-        .kc-flight-path {
-          flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          position: relative;
-          margin: 0 8px;
-        }
-        .kc-line {
-          position: absolute;
-          width: 100%;
-          height: 2px;
-          background: #e2e8f0;
-          top: 50%;
-          transform: translateY(-50%);
-        }
-        .kc-plane-icon {
-          position: relative;
-          z-index: 1;
-          background: #ffffff;
-          padding: 2px 6px;
-          border-radius: 9999px;
-          color: #a48656;
-          font-size: 11px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-          border: 1px solid #e2e8f0;
-        }
-        .kc-card-footer {
-          display: flex;
-          justify-content: space-between;
-          padding: 12px 14px;
-          background: #ffffff;
-        }
-        .kc-info-block {
-          display: flex;
-          flex-direction: column;
-        }
-        .kc-info-block.right {
-          align-items: flex-end;
-        }
-        .kc-label {
-          font-size: 9px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: #94a3b8;
-        }
-        .kc-value {
-          font-size: 12px;
-          font-weight: 800;
-          color: #17213a;
-          margin-top: 2px;
-        }
-        .kc-airport-header-single {
-          padding: 16px 14px;
-          background: #ffffff;
-        }
-        .kc-icao-lg {
-          font-size: 24px;
-          font-weight: 900;
-          color: #17213a;
-          letter-spacing: -0.03em;
-        }
-        .kc-airport-fullname {
-          font-size: 12px;
-          font-weight: 600;
-          color: #475569;
-          margin-top: 2px;
-        }
-        .kc-card-extra {
-          padding: 10px 14px 14px 14px;
-          border-top: 1px solid #f1f5f9;
-          background: #f8fafc;
-        }
-        .kc-extra-text {
-          font-size: 11px;
-          color: #475569;
-          margin-top: 4px;
-          line-height: 1.4;
-        }
-      `}</style>
-
-      <div className="border-b border-black/5 bg-[linear-gradient(135deg,rgba(164,134,86,0.10),rgba(255,255,255,0.96)_48%,rgba(245,247,250,0.96))] p-3 sm:p-4">
-        <div className="mb-2 flex items-center justify-between gap-3 px-1">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-primary">Network hubs</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Filter the map by operating hub</p>
-          </div>
-          <span className="hidden rounded-full border border-primary/15 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary sm:inline-flex">
-            {selectedHubData ? selectedHubData.iata : "Global network"}
-          </span>
+    <section className="overflow-hidden rounded-[1.75rem] border border-[#1d3853] bg-[#071426] text-white shadow-[0_28px_90px_-42px_rgba(2,10,24,0.85)]">
+      <div className="flex flex-col gap-4 border-b border-white/10 bg-gradient-to-r from-[#0d2239] via-[#102c48] to-[#0a1a2e] p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[.24em] text-[#e0bd70]">Air Astana · Route network</p>
+          <h3 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">Explore our world</h3>
+          <p className="mt-1 text-xs text-slate-300">Interactive route globe centered on Kazakhstan</p>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <button
-            type="button"
-            aria-pressed={selectedHub === "ALL"}
-            onClick={() => setSelectedHub("ALL")}
-            className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold transition-all duration-200 ${
-              selectedHub === "ALL"
-                ? "brand-gradient text-white shadow-brand"
-                : "border-black/10 bg-white text-foreground hover:border-primary/30 hover:bg-primary/5"
-            }`}
-          >
-            All Hubs
-          </button>
-          {HUBS.map((h) => (
-            <button
-              key={h.icao}
-              type="button"
-              aria-pressed={selectedHub === h.icao}
-              onClick={() => setSelectedHub(h.icao)}
-              className={`shrink-0 rounded-full border px-4 py-2.5 text-xs font-semibold transition-all duration-200 ${
-                selectedHub === h.icao
-                  ? "brand-gradient text-white shadow-brand"
-                  : "border-black/10 bg-white text-foreground hover:border-primary/30 hover:bg-primary/5"
-              }`}
-              title={`${h.name} — ${h.country}`}
-            >
-              {h.name} <span className="ml-1 opacity-70">({h.iata})</span>
+        <div className="flex flex-wrap gap-2">
+          {HUBS.map((hub) => (
+            <button key={hub.icao} type="button" onClick={() => setSelectedHub(selectedHub === hub.icao ? "ALL" : hub.icao)}
+              aria-pressed={selectedHub === hub.icao}
+              className={`rounded-full border px-3.5 py-2 text-xs font-bold transition ${selectedHub === hub.icao ? "border-[#e0bd70] bg-[#e0bd70] text-[#071426]" : "border-white/15 bg-white/5 text-slate-100 hover:border-sky-300/70"}`}>
+              {hub.name} <span className="opacity-70">({hub.iata})</span>
             </button>
           ))}
+          <button type="button" onClick={() => setSelectedHub("ALL")} className={`rounded-full border px-3.5 py-2 text-xs font-bold transition ${selectedHub === "ALL" ? "border-sky-300 bg-sky-300 text-[#071426]" : "border-white/15 bg-white/5 text-slate-100 hover:border-sky-300/70"}`}>All network</button>
         </div>
       </div>
-      <div className="relative">
-        <div ref={containerRef} className="h-[520px] w-full md:h-[620px]" />
-        <div className="pointer-events-none absolute left-3 top-3 rounded-xl border border-white/70 bg-white/90 px-3 py-2 text-xs shadow-sm backdrop-blur-md">
-          {status === "loading" && "Loading route network…"}
-          {status === "error" && "Unable to load route network."}
-          {status === "ready" &&
-            `${counts.routes} routes · ${counts.airports} airports${selectedHub !== "ALL" ? ` · ${selectedHubData?.iata ?? selectedHub}` : ""}`}
+      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_250px]">
+        <div className="relative min-h-[420px] bg-[#071426] sm:min-h-[560px]">
+          <div ref={containerRef} className="absolute inset-0 h-full min-h-[420px] w-full sm:min-h-[560px]" />
+          {status !== "ready" && <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#071426]/90 p-6 text-center">
+            <div><div className="mx-auto mb-3 size-8 animate-spin rounded-full border-2 border-sky-300/25 border-t-sky-300" />
+              <p className="text-sm font-bold">{status === "error" ? "The route globe could not load" : "Loading Air Astana network…"}</p>
+              <p className="mt-1 text-xs text-slate-400">{status === "error" ? "Check the route data and network connection, then refresh." : "Preparing routes and airport stations"}</p>
+            </div>
+          </div>}
+          <div className="pointer-events-none absolute left-3 top-3 rounded-xl border border-white/10 bg-[#071426]/80 px-3 py-2 text-xs text-slate-200 backdrop-blur">
+            <span className="font-black text-[#e0bd70]">{routeCount}</span> routes <span className="mx-1 text-white/30">·</span> <span className="font-black text-sky-300">{airportCount}</span> airports
+          </div>
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2">
+            <span className="rounded-full border border-white/10 bg-[#071426]/80 px-3 py-1.5 text-[10px] font-bold text-slate-200 backdrop-blur"><span className="mr-1.5 inline-block size-2 rounded-full bg-[#e0bd70]" />Main hubs</span>
+            <span className="rounded-full border border-white/10 bg-[#071426]/80 px-3 py-1.5 text-[10px] font-bold text-slate-200 backdrop-blur"><span className="mr-1.5 inline-block size-2 rounded-full bg-sky-300" />Destinations</span>
+          </div>
         </div>
+        <aside className="border-t border-white/10 bg-[#0b1b2e] p-4 lg:border-l lg:border-t-0">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+            <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">Visible sectors</p>
+              <p className="mt-1 text-2xl font-black text-white">{routeCount}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/[0.035] p-3">
+              <p className="text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">Destinations</p>
+              <p className="mt-1 text-2xl font-black text-white">{airportCount}</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <p className="text-[10px] font-black uppercase tracking-[.18em] text-[#e0bd70]">Network controls</p>
+            <button type="button" onClick={() => setShowCodeshare((value) => !value)} className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-3 py-3 text-left text-xs font-semibold text-slate-200">
+              <span>Show route arcs</span><span className={`relative h-5 w-9 rounded-full transition ${showCodeshare ? "bg-sky-400" : "bg-slate-600"}`}><span className={`absolute top-0.5 size-4 rounded-full bg-white transition-all ${showCodeshare ? "left-[18px]" : "left-0.5"}`} /></span>
+            </button>
+            <p className="mt-2 text-[11px] leading-relaxed text-slate-400">Drag to rotate the globe, scroll to zoom, and select an airport or route for details.</p>
+          </div>
+          {selectedRoute && <div className="mt-4 rounded-xl border border-[#e0bd70]/30 bg-[#e0bd70]/[.07] p-3">
+            <div className="text-[9px] font-black uppercase tracking-[.16em] text-[#e0bd70]">Selected route</div>
+            <div className="mt-2 text-sm font-black">{selectedRoute.depIcao} <span className="text-sky-300">→</span> {selectedRoute.arrIcao}</div>
+            <div className="mt-1 text-xs text-slate-300">{selectedRoute.depAirport} to {selectedRoute.arrAirport}</div>
+            <div className="mt-2 flex flex-wrap gap-2 text-[10px] font-bold text-slate-300"><span className="rounded-md bg-white/5 px-2 py-1">{selectedRoute.routeNo || "KC network"}</span><span className="rounded-md bg-white/5 px-2 py-1">{selectedRoute.aircraft}</span></div>
+            <button type="button" onClick={() => setSelectedRoute(null)} className="mt-3 text-[10px] font-bold uppercase tracking-wider text-sky-300 hover:text-white">Clear selection</button>
+          </div>}
+          <div className="mt-5 border-t border-white/10 pt-4">
+            <p className="text-[10px] font-black uppercase tracking-[.18em] text-[#e0bd70]">Hubs</p>
+            {HUBS.map((hub) => <button key={hub.icao} type="button" onClick={() => { setSelectedHub(hub.icao); globeRef.current?.pointOfView({ lat: hub.lat, lng: hub.lng, altitude: 1.6 }, 900); }} className="mt-2 flex w-full items-center justify-between rounded-lg px-2 py-2 text-left hover:bg-white/5">
+              <span><span className="block text-xs font-bold text-white">{hub.name}</span><span className="text-[10px] text-slate-400">{hub.country}</span></span><span className="text-xs font-black text-[#e0bd70]">{hub.iata}</span>
+            </button>)}
+          </div>
+        </aside>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-black/5 bg-white px-4 py-3 text-[11px] text-muted-foreground">
-        <span>
-          {counts.totalRoutes} published routes · {counts.totalAirports} airports in the dataset
-        </span>
-        <span className="font-medium text-primary">Click a line or airport for details</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-[#06111f] px-4 py-3 text-[10px] text-slate-400">
+        <span>Route data: published KCVA schedule</span><span>Air Astana virtual operations</span>
       </div>
-    </div>
+    </section>
   );
 }
