@@ -151,21 +151,22 @@ function RoutesPage() {
       `}</style>
 
       <div className="font-jakarta min-h-screen bg-background text-foreground antialiased selection:bg-[#b89358]/20 selection:text-[#b89358]">
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden pt-8 pb-14 sm:pt-14 sm:pb-20 text-center">
+        {/* HERO SECTION — Added robust top padding to completely clear navbar overlap */}
+        <section className="relative overflow-hidden pt-28 pb-16 sm:pt-36 sm:pb-24 text-center">
           <div
-            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-35 sm:opacity-45"
+            className="pointer-events-none absolute inset-0 bg-cover bg-[center_top_20%] bg-no-repeat opacity-25 sm:opacity-35 transition-transform duration-1000 hover:scale-105"
             style={{ backgroundImage: `url(${heroBg})` }}
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/40 via-background/25 to-background" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background" />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[500px] rounded-full bg-[#b89358]/10 blur-[120px]" />
 
           <div className="relative z-10 mx-auto max-w-4xl px-5 sm:px-8 flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-[#b89358]">
-              <span className="size-2 rounded-full bg-[#b89358]" />
-              Network Control
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#b89358]/30 bg-[#b89358]/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#b89358] shadow-sm backdrop-blur-md">
+              <span className="size-2 rounded-full bg-[#b89358] animate-pulse" />
+              Network Control Center
             </div>
 
-            <h1 className="mt-4 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
+            <h1 className="mt-5 text-4xl font-black leading-[1.08] tracking-tight text-foreground sm:text-6xl md:text-7xl">
               Explore the network.
             </h1>
 
@@ -176,30 +177,30 @@ function RoutesPage() {
 
             {/* TOGGLE BAR */}
             <div className="mt-8 flex justify-center w-full">
-              <div className="inline-flex items-center rounded-2xl border border-border bg-white p-1.5 shadow-sm">
+              <div className="inline-flex items-center rounded-2xl border border-border/80 bg-white/80 p-1.5 shadow-md backdrop-blur-xl">
                 <button
                   type="button"
                   onClick={() => setNetworkTab("standard")}
-                  className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition sm:text-sm ${
+                  className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all sm:text-sm ${
                     networkTab === "standard"
-                      ? "brand-gradient text-white shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "brand-gradient text-white shadow-md shadow-primary/20 scale-[1.02]"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   }`}
                 >
-                  <Plane className="size-3.5" />
+                  <Plane className="size-4" />
                   <span>Air Astana Routes</span>
                 </button>
 
                 <button
                   type="button"
                   disabled
-                  className="flex cursor-not-allowed items-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold text-muted-foreground/60 transition sm:text-sm"
+                  className="flex cursor-not-allowed items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold text-muted-foreground/55 transition-all sm:text-sm"
                   title="Codeshare operations are launching soon"
                 >
-                  <Lock className="size-3" />
+                  <Lock className="size-3.5" />
                   <span>Codeshares</span>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-muted-foreground">
-                    Coming Soon
+                    Soon
                   </span>
                 </button>
               </div>
@@ -209,30 +210,30 @@ function RoutesPage() {
 
         {/* MAP & FILTER CONTROLS */}
         <Section className="!pt-2">
-          <div className="grid gap-6 lg:grid-cols-[1fr_320px] items-start">
+          <div className="grid gap-6 lg:grid-cols-[1fr_340px] items-start">
             {/* Map Container */}
-            <div className="overflow-hidden rounded-[2rem] border border-border bg-white p-3 shadow-soft">
-              <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50 min-h-[420px]">
+            <div className="overflow-hidden rounded-[2rem] border border-border/80 bg-white p-3.5 shadow-xl shadow-slate-200/50">
+              <div className="relative overflow-hidden rounded-[1.5rem] bg-slate-50 min-h-[440px]">
                 <RouteMap search={q} aircraft={aircraft} />
               </div>
 
               {/* Bottom Legend Pill Bar */}
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/30 px-4 py-2.5 text-xs font-semibold text-foreground/80">
+              <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/40 px-4 py-3 text-xs font-semibold text-foreground/80">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-emerald-600" />
+                    <span className="size-2.5 rounded-full bg-emerald-600 shadow-sm shadow-emerald-600/50" />
                     <span className="font-bold">Hub</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-sky-500" />
+                    <span className="size-2.5 rounded-full bg-sky-500 shadow-sm shadow-sky-500/50" />
                     <span className="font-bold">Destination</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="h-0.5 w-3.5 rounded-full bg-[#b89358]" />
+                    <span className="h-0.5 w-4 rounded-full bg-[#b89358]" />
                     <span className="font-bold">Route</span>
                   </div>
                 </div>
-                <div className="text-xs font-black text-muted-foreground">
+                <div className="rounded-full bg-background px-3 py-1 text-xs font-black text-primary shadow-sm border border-border/60">
                   {filtered.length} Direct Routes
                 </div>
               </div>
@@ -240,9 +241,9 @@ function RoutesPage() {
 
             {/* Side Filter Cards */}
             <div className="space-y-4">
-              <Card className="rounded-[1.75rem] p-6 shadow-soft">
-                <div className="kicker flex items-center gap-2">
-                  <SlidersHorizontal className="size-3" />
+              <Card className="rounded-[1.75rem] p-6 shadow-xl shadow-slate-200/50 border border-border/80 bg-white">
+                <div className="kicker flex items-center gap-2 text-[#b89358]">
+                  <SlidersHorizontal className="size-3.5" />
                   <span>Find a flight</span>
                 </div>
 
@@ -255,7 +256,7 @@ function RoutesPage() {
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
                     placeholder="ICAO, airport, route…"
-                    className="form-input w-full text-sm"
+                    className="form-input w-full text-sm rounded-xl border-border/80 focus:border-primary transition shadow-inner"
                     style={{ paddingLeft: "2.75rem" }}
                   />
                 </div>
@@ -269,10 +270,10 @@ function RoutesPage() {
                       key={h}
                       type="button"
                       onClick={() => setHub(h)}
-                      className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
+                      className={`rounded-xl px-2 py-2.5 text-xs font-extrabold transition-all ${
                         hub === h
-                          ? "brand-gradient text-white shadow-brand"
-                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                          ? "brand-gradient text-white shadow-md shadow-primary/20 scale-[1.02]"
+                          : "bg-muted/70 text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
                       {h}
@@ -289,10 +290,10 @@ function RoutesPage() {
                       key={a}
                       type="button"
                       onClick={() => setAircraft(a)}
-                      className={`rounded-xl px-2 py-2 text-xs font-extrabold transition ${
+                      className={`rounded-xl px-2.5 py-2.5 text-xs font-extrabold transition-all truncate ${
                         aircraft === a
-                          ? "brand-gradient text-white shadow-brand"
-                          : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                          ? "brand-gradient text-white shadow-md shadow-primary/20 scale-[1.02]"
+                          : "bg-muted/70 text-muted-foreground hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
                       {a}
@@ -302,15 +303,16 @@ function RoutesPage() {
               </Card>
 
               {/* Total Sectors Badge Card */}
-              <div className="rounded-[1.75rem] brand-gradient p-6 text-white shadow-brand">
-                <RouteIcon className="size-5" />
+              <div className="relative overflow-hidden rounded-[1.75rem] brand-gradient p-6 text-white shadow-xl shadow-primary/25">
+                <div className="absolute -right-6 -bottom-6 size-32 rounded-full bg-white/10 blur-xl pointer-events-none" />
+                <RouteIcon className="size-6 text-white/90" />
                 <div className="mt-6 text-4xl font-black tracking-tight">
                   {filtered.length}
                 </div>
-                <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/75">
+                <div className="mt-1 text-xs font-bold uppercase tracking-[.16em] text-white/80">
                   Sectors Available
                 </div>
-                <p className="mt-4 text-xs leading-5 text-white/80">
+                <p className="mt-4 text-xs leading-relaxed text-white/85">
                   Use the SimBrief dispatch button on any schedule row to open
                   a flight plan with the selected departure, arrival, aircraft and flight number.
                 </p>
@@ -325,8 +327,8 @@ function RoutesPage() {
           title="Our published routes"
           description="A detailed view of the routes available to our pilots. Browse the schedule, check the aircraft and find a sector that suits your next flight."
         >
-          <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-soft">
-            <div className="hidden grid-cols-[.8fr_1.1fr_1.1fr_.7fr_.7fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/70 sm:grid">
+          <div className="overflow-hidden rounded-3xl border border-border/80 bg-white shadow-xl shadow-slate-200/50">
+            <div className="hidden grid-cols-[.8fr_1.1fr_1.1fr_.7fr_.7fr] gap-4 bg-[#1c2b4f] px-6 py-4 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/80 sm:grid">
               <div>Flight</div>
               <div>Departure</div>
               <div>Arrival</div>
@@ -336,14 +338,14 @@ function RoutesPage() {
               <div
                 key={r.routeId}
                 className={`grid gap-3 px-5 py-5 sm:grid-cols-[.8fr_1.1fr_1.1fr_.7fr_.7fr] sm:items-center sm:gap-4 sm:px-6 ${
-                  i ? "border-t border-border" : ""
-                } transition hover:bg-muted/30`}
+                  i ? "border-t border-border/60" : ""
+                } transition-colors hover:bg-muted/30`}
               >
                 <div>
                   <div className="text-sm font-black text-primary">
                     {r.routeNo}
                   </div>
-                  <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <div className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                     {r.routeId}
                   </div>
                 </div>
@@ -359,15 +361,15 @@ function RoutesPage() {
                     {r.arrAirport}
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold text-foreground/80">
-                  <span className="rounded-lg bg-muted px-2.5 py-1">
+                <div className="flex flex-wrap items-center gap-2.5 text-xs font-extrabold text-foreground/80">
+                  <span className="rounded-lg bg-muted px-2.5 py-1 text-xs font-bold border border-border/50">
                     {r.aircraft}
                   </span>
                   <a
                     href={simBriefUrl(r)}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#b89358] px-2.5 py-1.5 text-[10px] font-black uppercase tracking-wide text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#a9824b]"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#b89358] px-3 py-1.5 text-[10px] font-black uppercase tracking-wide text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#a9824b] hover:shadow-md"
                     title={`Open SimBrief dispatch for ${r.routeNo}`}
                   >
                     <span>SimBrief</span>
@@ -403,7 +405,7 @@ function RoutesPage() {
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                   disabled={currentPage === 1}
                   aria-label="Previous page"
-                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                  className="flex size-9 items-center justify-center rounded-xl border border-border/80 bg-white text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40 shadow-sm"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -426,10 +428,10 @@ function RoutesPage() {
                         <button
                           type="button"
                           onClick={() => setCurrentPage(page)}
-                          className={`size-9 rounded-xl text-xs font-extrabold transition ${
+                          className={`size-9 rounded-xl text-xs font-extrabold transition-all shadow-sm ${
                             currentPage === page
-                              ? "brand-gradient text-white shadow-brand"
-                              : "border border-border bg-white text-muted-foreground hover:bg-muted hover:text-foreground"
+                              ? "brand-gradient text-white shadow-primary/25 scale-105"
+                              : "border border-border/80 bg-white text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
                         >
                           {page}
@@ -444,7 +446,7 @@ function RoutesPage() {
                   }
                   disabled={currentPage === totalPages}
                   aria-label="Next page"
-                  className="flex size-9 items-center justify-center rounded-xl border border-border bg-white text-muted-foreground transition hover:bg-muted disabled:pointer-events-none disabled:opacity-40"
+                  className="flex size-9 items-center justify-center rounded-xl border border-border/80 bg-white text-muted-foreground transition-all hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-40 shadow-sm"
                 >
                   <ChevronRight className="size-4" />
                 </button>
@@ -459,7 +461,7 @@ function RoutesPage() {
           title="Destinations to explore."
           description="A few destinations from across the network. Search the route database to see what is currently available."
         >
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 icao: "EGLL",
@@ -506,33 +508,33 @@ function RoutesPage() {
             ].map((d) => (
               <div
                 key={d.icao}
-                className="group overflow-hidden rounded-2xl border border-border bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-brand"
+                className="group overflow-hidden rounded-[1.5rem] border border-border/80 bg-white shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/10"
               >
-                <div className="relative h-44 overflow-hidden">
+                <div className="relative h-48 overflow-hidden">
                   <img
                     src={d.image}
                     alt={d.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-5 text-white">
-                    <div className="text-[10px] font-black uppercase tracking-[.18em] text-[#b89358]">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#17213a]/90 via-[#17213a]/30 to-transparent" />
+                  <div className="absolute bottom-4 left-5 right-5 text-white">
+                    <div className="inline-block rounded-md bg-[#b89358]/95 px-2 py-0.5 text-[10px] font-black uppercase tracking-[.18em] text-white backdrop-blur-sm">
                       {d.icao}
                     </div>
-                    <div className="mt-0.5 text-lg font-black tracking-tight">{d.name}</div>
+                    <div className="mt-1.5 text-lg font-black tracking-tight">{d.name}</div>
                   </div>
                 </div>
-                <div className="p-5">
+                <div className="p-6">
                   <p className="text-sm font-normal leading-relaxed text-muted-foreground">
                     {d.description}
                   </p>
                   <button
                     type="button"
                     onClick={() => setQ(d.icao)}
-                    className="mt-4 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-primary transition hover:text-[#b89358]"
+                    className="mt-5 inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-primary transition-colors hover:text-[#b89358]"
                   >
                     <span>Search published sectors</span>
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                    <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
                   </button>
                 </div>
               </div>
@@ -542,12 +544,13 @@ function RoutesPage() {
 
         {/* OPERATIONS BANNER */}
         <section className="mx-auto mb-20 max-w-7xl px-4 sm:px-6">
-          <div className="rounded-[2rem] border border-primary/20 bg-primary/5 p-8 sm:p-12">
-            <div className="kicker flex items-center gap-2">
-              <Sparkles className="size-3.5" />
+          <div className="relative overflow-hidden rounded-[2rem] border border-primary/20 bg-gradient-to-br from-primary/5 via-primary/[0.02] to-transparent p-8 sm:p-12 shadow-lg shadow-primary/5">
+            <div className="absolute -right-12 -top-12 size-48 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+            <div className="kicker flex items-center gap-2 text-[#b89358]">
+              <Sparkles className="size-4" />
               <span>Flight Operations</span>
             </div>
-            <h3 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">
+            <h3 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl text-foreground">
               SimBrief &amp; Flight Dispatch Ready
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
