@@ -26,3 +26,108 @@ body { overflow-y: auto; }
 @keyframes float-slow { 0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-8px,0)} } @keyframes pulse-soft { 0%,100%{opacity:.4;transform:scale(.97)}50%{opacity:.85;transform:scale(1.03)} } @keyframes route-pulse { 0%,100%{opacity:.3}50%{opacity:1} } @keyframes marquee { to{transform:translateX(-50%)} } @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 
 .footer-jakarta { font-family: var(--font-footer); letter-spacing: -.012em; } .footer-jakarta h4 { font-family: var(--font-footer); letter-spacing: .2em; } .footer-jakarta a, .footer-jakarta p, .footer-jakarta span { font-family: var(--font-footer); }
+
+
+/* Public-site visual refresh — Air Astana Virtual */
+:root {
+  --background: #f5f7fb;
+  --foreground: #101b31;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --card-foreground: #101b31;
+  --primary: #b99556;
+  --primary-dark: #8c6c35;
+  --primary-foreground: #ffffff;
+  --muted: #edf1f7;
+  --muted-foreground: #657188;
+  --border: #e0e6ef;
+  --input: #d5deea;
+  --ring: #b99556;
+  --shadow-soft: 0 18px 55px -34px rgba(12, 28, 54, .34);
+  --shadow-brand: 0 20px 55px -25px rgba(185, 149, 86, .42);
+}
+html { scroll-padding-top: 6rem; }
+body {
+  background:
+    radial-gradient(ellipse at 8% 0%, rgba(185,149,86,.065), transparent 28rem),
+    radial-gradient(ellipse at 92% 10%, rgba(42,79,135,.045), transparent 30rem),
+    var(--background);
+}
+.site-main { isolation: isolate; }
+.site-main > * { animation: public-page-enter .48s cubic-bezier(.2,.75,.25,1) both; }
+.page-hero {
+  border-bottom-color: rgba(215,223,235,.8);
+  background-color: #fff;
+  box-shadow: 0 20px 70px -60px rgba(8,20,40,.3);
+}
+.page-hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(185,149,86,.55), rgba(55,91,143,.2), transparent);
+}
+.display-xl, .display-lg {
+  color: #101b31;
+  text-wrap: balance;
+}
+.kicker { color: #9a773d; }
+.premium-card {
+  border-color: rgba(214,222,234,.9);
+  border-radius: 1.5rem;
+  background: linear-gradient(145deg, rgba(255,255,255,.99), rgba(249,251,254,.96));
+  box-shadow: 0 12px 38px -30px rgba(12,28,54,.34);
+}
+.premium-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(185,149,86,.55);
+  box-shadow: 0 28px 65px -38px rgba(12,28,54,.38);
+}
+.brand-gradient {
+  background: linear-gradient(125deg, #0b1830 0%, #1b3155 58%, #2b4771 100%);
+}
+.brand-glow { box-shadow: 0 18px 42px -23px rgba(13,30,57,.65), 0 4px 15px -12px rgba(185,149,86,.8); }
+.form-input {
+  min-height: 3rem;
+  border-radius: .9rem;
+  border-color: #d7dfeb;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 2px 4px rgba(12,28,54,.02);
+}
+.form-input:focus {
+  border-color: #b99556;
+  box-shadow: 0 0 0 4px rgba(185,149,86,.13), 0 5px 18px -12px rgba(12,28,54,.25);
+}
+.site-main a:not([class*="text-"]) { text-underline-offset: 4px; }
+.site-main button, .site-main [role="button"] { -webkit-tap-highlight-color: transparent; }
+.site-main img { max-width: 100%; }
+.site-main section { scroll-margin-top: 6rem; }
+.site-main .rounded-2xl.border,
+.site-main .rounded-3xl.border {
+  border-color: rgba(218,225,236,.92);
+}
+.site-main input:not([type="checkbox"]):not([type="radio"]),
+.site-main select,
+.site-main textarea {
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+.site-main input:focus-visible,
+.site-main select:focus-visible,
+.site-main textarea:focus-visible,
+.site-main button:focus-visible,
+.site-main a:focus-visible {
+  outline: 3px solid rgba(185,149,86,.35);
+  outline-offset: 3px;
+}
+.footer-jakarta { margin-top: 5rem; }
+@keyframes public-page-enter {
+  from { opacity: .01; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 640px) {
+  .premium-card { border-radius: 1.15rem; padding: 1.15rem; }
+  .footer-jakarta { margin-top: 3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-main > * { animation: none; }
+}
