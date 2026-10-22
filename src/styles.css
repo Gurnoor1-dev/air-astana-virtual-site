@@ -131,3 +131,122 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .site-main > * { animation: none; }
 }
+
+
+/* Bold redesign pass: cinematic aviation editorial system */
+:root {
+  --background: #f3f5f8;
+  --foreground: #0a172b;
+  --primary: #d5b36d;
+  --primary-dark: #a8843e;
+  --border: #dbe2ec;
+  --muted: #e9eef5;
+  --muted-foreground: #59677d;
+}
+body {
+  background: #f3f5f8;
+  background-image: radial-gradient(ellipse at 50% -12%, rgba(213,179,109,.15), transparent 38rem);
+}
+header.fixed { padding: .8rem 1rem 0 !important; }
+header.fixed nav {
+  max-width: 1380px !important;
+  height: 72px !important;
+  border-color: rgba(255,255,255,.15) !important;
+  border-radius: 22px !important;
+  background: rgba(7,17,34,.92) !important;
+  box-shadow: 0 16px 50px -22px rgba(2,10,25,.62) !important;
+  backdrop-filter: blur(22px) saturate(145%);
+}
+header.fixed nav a, header.fixed nav button { transition: color .2s ease, background .2s ease, transform .2s ease; }
+header.fixed nav a:hover { color: #e4c987 !important; }
+.site-main { overflow: clip; }
+.site-main > div > section:first-child,
+.site-main > section:first-child {
+  position: relative;
+}
+.site-main .page-hero {
+  min-height: 330px;
+  display: flex;
+  align-items: stretch;
+  background-color: #08172c !important;
+  background-image: none !important;
+  border: 0;
+  color: #fff;
+}
+.site-main .page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .7;
+  background:
+    radial-gradient(ellipse at 82% 22%, rgba(213,179,109,.19), transparent 25rem),
+    linear-gradient(115deg, #071326 0%, #102748 52%, #0b1930 100%);
+}
+.site-main .page-hero::after {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #d5b36d 24%, #fff1c6 50%, #d5b36d 76%, transparent);
+}
+.site-main .page-hero > div {
+  z-index: 1;
+  width: 100%;
+}
+.site-main .page-hero .display-xl,
+.site-main .page-hero h1,
+.site-main .page-hero h2 { color: #fff !important; }
+.site-main .page-hero p { color: #c1cddd !important; }
+.site-main .page-hero .kicker { color: #e2c47e !important; }
+.site-main .page-hero .kicker-dot { background: #e2c47e; box-shadow: 0 0 16px #e2c47e88; }
+.site-main .page-hero .hero-grid { opacity: .12; }
+.site-main .premium-card,
+.site-main .bg-white.rounded-2xl,
+.site-main .bg-white.rounded-3xl {
+  border: 1px solid #dfe5ee;
+  border-radius: 22px !important;
+  box-shadow: 0 18px 48px -36px rgba(7,22,44,.45);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease;
+}
+.site-main .premium-card:hover,
+.site-main .bg-white.rounded-2xl:hover,
+.site-main .bg-white.rounded-3xl:hover {
+  transform: translateY(-5px);
+  border-color: rgba(185,149,86,.6);
+  box-shadow: 0 28px 55px -35px rgba(7,22,44,.45);
+}
+.site-main .brand-gradient {
+  background: linear-gradient(120deg,#0a172b 0%,#18365c 58%,#285078 100%) !important;
+  border: 1px solid rgba(213,179,109,.36);
+}
+.site-main button[class*="bg-primary"],
+.site-main a[class*="bg-primary"],
+.site-main button[class*="brand-gradient"],
+.site-main a[class*="brand-gradient"] {
+  box-shadow: 0 12px 24px -14px rgba(8,23,44,.65);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.site-main button[class*="brand-gradient"]:hover,
+.site-main a[class*="brand-gradient"]:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  box-shadow: 0 18px 30px -16px rgba(8,23,44,.65);
+}
+.site-main .kicker { letter-spacing: .2em; }
+.site-main h1:not(.page-hero h1) { text-wrap: balance; }
+.site-main .max-w-7xl { max-width: 1320px; }
+.site-main .text-muted-foreground { color: #637087; }
+.site-main .border-border { border-color: #dce3ed; }
+.site-main .form-input { min-height: 52px; border-radius: 12px; }
+.site-main input[type="checkbox"] { accent-color: #b99556; }
+.site-main .rounded-\[2rem\] { border-radius: 1.6rem; }
+.site-main section:not(.page-hero) { position: relative; }
+.site-main section:not(.page-hero) + section { margin-top: 1rem; }
+.footer-jakarta {
+  margin-top: 5rem;
+  border-top: 1px solid rgba(213,179,109,.25);
+  background: radial-gradient(ellipse at 50% 0%, #1b3150 0%, #081426 52%, #050c17 100%) !important;
+}
+@media(max-width:640px) {
+  header.fixed { padding: .55rem .55rem 0 !important; }
+  header.fixed nav { height: 62px !important; border-radius: 17px !important; }
+  .site-main .page-hero { min-height: 290px; }
+  .site-main .page-hero .display-xl { font-size: clamp(2.65rem, 12vw, 4rem); }
+}
