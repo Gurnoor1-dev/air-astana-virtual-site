@@ -56,10 +56,10 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
+  fullPaths: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/0gsj85hdn'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
-  id: '__root__' | '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/crew-center' | '/crew-login' | '/0gsj85hdn'
+  to: '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/0gsj85hdn'
+  id: '__root__' | '/' | '/about' | '/apply' | '/ceo-message' | '/fleet' | '/hubs' | '/ranks' | '/routes' | '/staff' | '/0gsj85hdn'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
