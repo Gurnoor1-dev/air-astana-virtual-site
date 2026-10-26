@@ -76,8 +76,8 @@ function RouteMapExporter() {
   const [error, setError] = useState('')
   const [loadingWorld, setLoadingWorld] = useState(true)
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
-  const [resolution, setResolution] = useState('3840')
-  const [lineColor, setLineColor] = useState('#dff7ff')
+  const [lineColor, setLineColor] = useState('#8dd8e8')
+  const [hexInput, setHexInput] = useState('#8DD8E8')
   const [lineWidth, setLineWidth] = useState(1)
   const svgRef = useRef<SVGSVGElement>(null)
   const W = 1200, H = 620
@@ -93,18 +93,23 @@ function RouteMapExporter() {
     }).catch(() => setError('Could not load the website route CSV. You can still upload a CSV with origin/destination coordinates.'))
   }, [])
   const landPaths = useMemo(() => world ? geometryPaths(world, W, H) : [], [world])
-  const mapBounds = useMemo(() => {
-    if (!routes.length) return { x: 0, y: 0, width: W, height: H }
-    const points = routes.flatMap(r => [project(r.from.lon, r.from.lat, W, H), project(r.to.lon, r.to.lat, W, H)])
-    let minX = Math.min(...points.map(p => p.x)), maxX = Math.max(...points.map(p => p.x))
-    let minY = Math.min(...points.map(p => p.y)), maxY = Math.max(...points.map(p => p.y))
-    // Keep the route network breathable while trimming empty parts of the globe.
-    const padX = Math.max(34, (maxX - minX) * 0.12), padY = Math.max(28, (maxY - minY) * 0.16)
-    minX = Math.max(0, minX - padX); maxX = Math.min(W, maxX + padX)
-    minY = Math.max(0, minY - padY); maxY = Math.min(H, maxY + padY)
-    return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) }
-  }, [routes])
   const hubCodes = useMemo(() => new Set(['UAAA', 'UACC']), [])
+  // Fixed 16:9 composition: anchor on the hubs, then expand enough to contain every endpoint.
+  const mapBounds = useMemo(() => {
+    if (!routes.length) return { x: 0, y: 0, width: W, height: W * 9 / 16 }
+    const projected = routes.flatMap(r => [{ ...project(r.from.lon, r.from.lat, W, H), icao: r.from.icao }, { ...project(r.to.lon, r.to.lat, W, H), icao: r.to.icao }])
+    const hubs = projected.filter(p => hubCodes.has(p.icao || ''))
+    const center = hubs.length ? { x: hubs.reduce((sum, p) => sum + p.x, 0) / hubs.length, y: hubs.reduce((sum, p) => sum + p.y, 0) / hubs.length } : { x: projected.reduce((sum, p) => sum + p.x, 0) / projected.length, y: projected.reduce((sum, p) => sum + p.y, 0) / projected.length }
+    const maxDx = Math.max(1, ...projected.map(p => Math.abs(p.x - center.x)))
+    const maxDy = Math.max(1, ...projected.map(p => Math.abs(p.y - center.y)))
+    const pad = Math.max(24, Math.max(maxDx, maxDy) * 0.12)
+    const width = Math.max((maxDx + pad) * 2, (maxDy + pad) * 2 * 16 / 9)
+    const height = width * 9 / 16
+    return { x: center.x - width / 2, y: center.y - height / 2, width, height }
+  }, [routes, hubCodes])
+  const destinationColor = useMemo(() => { const hex = lineColor.replace('#', ''); const n = parseInt(hex, 16); if (!Number.isFinite(n)) return '#426b76'; const darken = (v: number) => Math.round(v * 0.68); return '#' + [darken((n >> 16) & 255), darken((n >> 8) & 255), darken(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('') }, [lineColor])
+  const applyHex = (value: string) => { const normalized = value.startsWith('#') ? value : '#' + value; setHexInput(value); if (/^#[0-9a-fA-F]{6}$/.test(normalized)) setLineColor(normalized.toLowerCase()) }
+  const setColor = (value: string) => { setLineColor(value); setHexInput(value.toUpperCase()) }
   const destinationColor = useMemo(() => { const hex = lineColor.replace('#', ''); const n = parseInt(hex, 16); const darken = (v: number) => Math.round(v * 0.68); return '#' + [darken((n >> 16) & 255), darken((n >> 8) & 255), darken(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('') }, [lineColor])
   const bg = theme === 'dark' ? '#070b10' : '#ffffff'
   const land = theme === 'dark' ? '#202b35' : '#f0f3f5'
@@ -136,14 +141,16 @@ function RouteMapExporter() {
     if (!svg) return
     const clone = svg.cloneNode(true) as SVGSVGElement
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-    clone.setAttribute('width', resolution)
-    clone.setAttribute('height', String(Math.round(Number(resolution) * H / W)))
+    clone.setAttribute('width', '1920')
+    clone.setAttribute('height', '1080')
+    clone.setAttribute('viewBox', [mapBounds.x, mapBounds.y, mapBounds.width, mapBounds.height].join(' '))
+    clone.setAttribute('preserveAspectRatio', 'xMidYMid meet')
     const blob = new Blob([new XMLSerializer().serializeToString(clone)], { type: 'image/svg+xml;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const img = new Image()
     img.onload = () => {
       const canvas = document.createElement('canvas')
-      canvas.width = Number(resolution); canvas.height = Math.round(Number(resolution) * H / W)
+      canvas.width = 1920; canvas.height = 1080
       const ctx = canvas.getContext('2d')
       if (!ctx) { URL.revokeObjectURL(url); return }
       ctx.fillStyle = bg; ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -164,14 +171,14 @@ function RouteMapExporter() {
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div><div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-teal-800"><Globe2 size={14}/> Air Astana Virtual · Design utility</div>
           <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Route map exporter</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Uses the same published routes.csv as your website by default, or let you upload another coordinate CSV. Political borders, fine flight arcs, subtle destination dots and larger hub markers. The framing automatically fits the route network with comfortable breathing room — no labels.</p></div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Uses your website’s published routes.csv by default, or upload another coordinate CSV. A fixed 1920 × 1080 landscape composition keeps both hubs central and every route destination in frame, with political borders and no labels.</p></div>
         <a href="/" className="text-sm font-semibold text-teal-800 hover:text-teal-600">← Back to website</a>
       </header>
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4"><div><p className="font-semibold">Live preview</p><p className="mt-1 text-xs text-slate-500">{routes.length} routes plotted · 1200 × 620 preview</p></div><button onClick={() => { setRoutes([]); setFileName(''); setError('') }} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-xs font-medium hover:bg-slate-50"><RotateCcw size={14}/> Reset</button></div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4"><div><p className="font-semibold">Live preview</p><p className="mt-1 text-xs text-slate-500">{routes.length} routes plotted · 16:9 landscape composition</p></div><button onClick={() => { setRoutes([]); setFileName(''); setError('') }} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-xs font-medium hover:bg-slate-50"><RotateCcw size={14}/> Reset</button></div>
           <div className="bg-slate-950 p-2 sm:p-4">
-            <svg ref={svgRef} viewBox={`${mapBounds.x} ${mapBounds.y} ${mapBounds.width} ${mapBounds.height}`}  role="img" aria-label="Minimalist route map with country borders and destination dots" className="block h-auto w-full" style={{ background: bg }}>
+            <svg ref={svgRef} viewBox={`${mapBounds.x} ${mapBounds.y} ${mapBounds.width} ${mapBounds.height}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Minimalist route map with country borders and destination dots" className="block h-auto w-full" style={{ background: bg }}>
               <rect width={W} height={H} fill={bg}/>
               {Array.from({length: 7}, (_, i) => <line key={'v'+i} x1={i*W/6} y1="0" x2={i*W/6} y2={H} stroke={coast} strokeOpacity=".12" strokeWidth=".6"/>)}
               {Array.from({length: 5}, (_, i) => <line key={'h'+i} x1="0" y1={i*H/4} x2={W} y2={i*H/4} stroke={coast} strokeOpacity=".12" strokeWidth=".6"/>)}
@@ -195,12 +202,12 @@ function RouteMapExporter() {
             <h2 className="font-semibold">02 / Appearance</h2>
             <label className="mt-4 block text-xs font-medium text-slate-600">Map background</label>
             <div className="mt-2 grid grid-cols-2 gap-2">{(['dark','light'] as const).map(t => <button key={t} onClick={() => setTheme(t)} className={`rounded-xl border px-3 py-2.5 text-sm capitalize ${theme === t ? 'border-teal-700 bg-teal-50 font-semibold text-teal-900' : 'border-slate-200 hover:bg-slate-50'}`}>{t === 'dark' ? 'Black map' : 'White map'}</button>)}</div>
-            <label className="mt-4 block text-xs font-medium text-slate-600">Route line colour</label><input aria-label="Route line colour" type="color" value={lineColor} onChange={e => setLineColor(e.target.value)} className="mt-2 h-10 w-full cursor-pointer rounded-lg border border-slate-200 bg-white p-1"/>
+            <label className="mt-4 block text-xs font-medium text-slate-600">Route line colour</label><div className="mt-2 flex items-center gap-3"><input aria-label="Choose route line colour" type="color" value={lineColor} onChange={e => setColor(e.target.value)} className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-white p-1"/><input aria-label="Route line HEX code" type="text" value={hexInput} onChange={e => applyHex(e.target.value)} onBlur={() => { const v = hexInput.startsWith("#") ? hexInput : "#" + hexInput; if (!/^#[0-9a-fA-F]{6}$/.test(v)) setHexInput(lineColor.toUpperCase()) }} placeholder="#8DD8E8" maxLength={7} spellCheck={false} className="min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-3 font-mono text-sm uppercase outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"/></div>
             <label className="mt-4 flex items-center justify-between text-xs font-medium text-slate-600">Line thickness <span>{lineWidth.toFixed(1)} px</span></label><input aria-label="Line thickness" type="range" min=".4" max="2" step=".1" value={lineWidth} onChange={e => setLineWidth(Number(e.target.value))} className="mt-3 w-full accent-teal-700"/>
-            <label className="mt-4 block text-xs font-medium text-slate-600">Export width</label><select value={resolution} onChange={e => setResolution(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm"><option value="1920">1920 px · Full HD</option><option value="3840">3840 px · 4K</option><option value="5760">5760 px · 6K</option></select>
+            <div className="mt-4 rounded-xl bg-slate-50 px-3 py-3"><p className="text-xs font-medium text-slate-600">Fixed export size</p><p className="mt-1 text-sm font-semibold text-slate-900">1920 × 1080 px · 16:9 Full HD</p><p className="mt-1 text-xs leading-5 text-slate-500">The canvas stays this size. The map framing expands to include every destination while keeping the hubs centred.</p></div>
             <button onClick={() => void exportPng()} disabled={!routes.length || !world} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-40"><ArrowDownToLine size={17}/> Export PNG</button>
           </div>
-          <p className="px-2 text-xs leading-5 text-slate-500">The default map uses the same parsed route data as the live website map. Uploaded CSVs need origin/destination latitude and longitude columns.</p>
+          <p className="px-2 text-xs leading-5 text-slate-500">PNG export is always exactly 1920 × 1080. Hex colour entry is supported; framing expands to keep all destinations visible.</p>
         </aside>
       </section>
     </div>
