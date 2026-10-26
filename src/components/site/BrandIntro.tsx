@@ -21,7 +21,7 @@ export function BrandIntro() {
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-[999] overflow-hidden bg-[#06101d]"
+          className="fixed inset-0 z-[999] overflow-hidden bg-[#191a17]"
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.03 }}
           transition={{ duration: 0.85, ease: [0.4, 0, 0.2, 1] }}
@@ -35,12 +35,12 @@ export function BrandIntro() {
             transition={{ duration: 2.8, ease: "easeOut" }}
             style={{
               background:
-                "radial-gradient(circle at 50% 50%, rgba(226,184,90,0.22), transparent 30%), radial-gradient(circle at 50% 50%, rgba(51,106,159,0.25), transparent 50%), #06101d",
+                "radial-gradient(circle at 50% 50%, rgba(200,250,62,0.22), transparent 30%), radial-gradient(circle at 50% 50%, rgba(200,250,62,0.25), transparent 50%), #191a17",
             }}
           />
 
           {/* Grid Pattern Overlay */}
-          <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:64px_64px]" />
+          <div className="absolute inset-0 opacity-15 [background-image:linear-gradient(rgba(200,250,62,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(200,250,62,0.12)_1px,transparent_1px)] [background-size:64px_64px]" />
 
           {/* Rotating Celestial / Radar Rings */}
           <motion.div
@@ -64,7 +64,7 @@ export function BrandIntro() {
             }}
           />
           <motion.div
-            className="absolute left-1/2 top-1/2 size-[min(38vw,360px)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#e2b85a]/30"
+            className="absolute left-1/2 top-1/2 size-[min(38vw,360px)] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#c8fa3e]/30"
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.4, duration: 1.5, ease: "easeOut" }}
@@ -72,7 +72,7 @@ export function BrandIntro() {
 
           {/* Horizontal Flare Line */}
           <motion.div
-            className="absolute left-1/2 top-1/2 h-px w-[85vw] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#e2b85a] to-transparent shadow-[0_0_12px_#e2b85a]"
+            className="absolute left-1/2 top-1/2 h-px w-[85vw] -translate-x-1/2 bg-gradient-to-r from-transparent via-[#c8fa3e] to-transparent shadow-[0_0_12px_#c8fa3e]"
             initial={{ scaleX: 0, opacity: 0 }}
             animate={{ scaleX: 1, opacity: [0, 1, 0.6] }}
             transition={{ delay: 0.35, duration: 1.6, ease: "easeOut" }}
@@ -108,7 +108,7 @@ export function BrandIntro() {
 
               {/* Divider Line */}
               <motion.div
-                className="mt-7 h-px w-48 bg-gradient-to-r from-transparent via-[#e2b85a] to-transparent shadow-[0_0_8px_#e2b85a]"
+                className="mt-7 h-px w-48 bg-gradient-to-r from-transparent via-[#c8fa3e] to-transparent shadow-[0_0_8px_#c8fa3e]"
                 initial={{ scaleX: 0, opacity: 0 }}
                 animate={{ scaleX: 1, opacity: 1 }}
                 transition={{ delay: 1, duration: 0.8 }}
@@ -121,7 +121,7 @@ export function BrandIntro() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.15, duration: 0.7 }}
               >
-                From the heart of Eurasia
+                FROM THE HEART OF EURASIA
               </motion.p>
             </motion.div>
           </div>
@@ -133,7 +133,7 @@ export function BrandIntro() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.4, duration: 0.6 }}
           >
-            Infinite Flight Virtual Airline
+            AAV / INFINITE FLIGHT
           </motion.div>
 
           {/* Cinematic Light Sweep / Flare Pass */}
