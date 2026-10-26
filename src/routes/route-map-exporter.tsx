@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDownToLine, FileUp, Globe2, LoaderCircle, RotateCcw } from 'lucide-react'
+import { fetchRoutes } from '@/lib/csv'
 
 export const Route = createFileRoute('/route-map-exporter')({ component: RouteMapExporter })
 
@@ -85,6 +86,12 @@ function RouteMapExporter() {
       .then(setWorld).catch(() => setError('Could not load world outlines. Check your connection and refresh.'))
       .finally(() => setLoadingWorld(false))
   }, [])
+  useEffect(() => {
+    fetchRoutes().then(rows => {
+      setRoutes(rows.map(r => ({ from: { lat: r.dep[0], lon: r.dep[1] }, to: { lat: r.arr[0], lon: r.arr[1] } })))
+      setFileName('Published site data · /data/routes.csv')
+    }).catch(() => setError('Could not load the website route CSV. You can still upload a CSV with origin/destination coordinates.'))
+  }, [])
   const landPaths = useMemo(() => world ? geometryPaths(world, W, H) : [], [world])
   const bg = theme === 'dark' ? '#070b10' : '#ffffff'
   const land = theme === 'dark' ? '#202b35' : '#f0f3f5'
@@ -144,7 +151,7 @@ function RouteMapExporter() {
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div><div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-teal-800"><Globe2 size={14}/> Air Astana Virtual · Design utility</div>
           <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Route map exporter</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Turn your route CSV into a minimalist world map. Just coastlines and fine flight arcs — no airport labels or route details.</p></div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Uses the same published routes.csv as your website by default, or let you upload another coordinate CSV. Just coastlines and fine flight arcs — no airport labels or route details.</p></div>
         <a href="/" className="text-sm font-semibold text-teal-800 hover:text-teal-600">← Back to website</a>
       </header>
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
@@ -160,13 +167,13 @@ function RouteMapExporter() {
             </svg>
           </div>
           {loadingWorld && <p className="flex items-center gap-2 px-5 py-3 text-sm text-slate-500"><LoaderCircle className="animate-spin" size={16}/> Loading world outlines…</p>}
-          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-slate-500"><span>{fileName || 'No CSV selected yet'}</span><span>Minimal · label-free · high-resolution PNG</span></div>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-slate-500"><span>{fileName || 'Using published route data'}</span><span>Minimal · label-free · high-resolution PNG</span></div>
         </div>
         <aside className="space-y-4">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
             <h2 className="font-semibold">01 / Import routes</h2>
-            <label className="mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-dashed border-teal-300 bg-teal-50/60 px-4 py-6 text-center hover:bg-teal-50"><FileUp className="text-teal-800" size={24}/><span className="text-sm font-semibold">Choose CSV file</span><span className="text-xs text-slate-500">Your file stays in this browser</span><input type="file" accept=".csv,text/csv" className="sr-only" onChange={e => void onUpload(e.target.files?.[0])}/></label>
-            <p className="mt-3 text-xs leading-5 text-slate-500">Expected columns: origin_lat, origin_lon, destination_lat, destination_lon. Common variants such as from_lat / to_lat are accepted.</p>
+            <label className="mt-4 flex cursor-pointer flex-col items-center gap-2 rounded-2xl border border-dashed border-teal-300 bg-teal-50/60 px-4 py-6 text-center hover:bg-teal-50"><FileUp className="text-teal-800" size={24}/><span className="text-sm font-semibold">Upload another CSV</span><span className="text-xs text-slate-500">Your file stays in this browser</span><input type="file" accept=".csv,text/csv" className="sr-only" onChange={e => void onUpload(e.target.files?.[0])}/></label>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Optional override: origin_lat, origin_lon, destination_lat, destination_lon. The default is your website’s own /data/routes.csv, including its dep_coordinates and arr_coordinates fields.</p>
             {error && <p role="alert" className="mt-3 rounded-xl bg-rose-50 p-3 text-xs leading-5 text-rose-700">{error}</p>}
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -178,7 +185,7 @@ function RouteMapExporter() {
             <label className="mt-4 block text-xs font-medium text-slate-600">Export width</label><select value={resolution} onChange={e => setResolution(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm"><option value="1920">1920 px · Full HD</option><option value="3840">3840 px · 4K</option><option value="5760">5760 px · 6K</option></select>
             <button onClick={() => void exportPng()} disabled={!routes.length || !world} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-800 px-4 py-3 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-40"><ArrowDownToLine size={17}/> Export PNG</button>
           </div>
-          <p className="px-2 text-xs leading-5 text-slate-500">Note: this first version requires latitude/longitude columns in the CSV. Airport-code-only files need an airport coordinate lookup added before their routes can be drawn accurately.</p>
+          <p className="px-2 text-xs leading-5 text-slate-500">The default map uses the same parsed route data as the live website map. Uploaded CSVs need origin/destination latitude and longitude columns.</p>
         </aside>
       </section>
     </div>
