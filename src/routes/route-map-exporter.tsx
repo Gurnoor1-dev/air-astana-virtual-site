@@ -5,11 +5,11 @@ import { fetchRoutes } from '@/lib/csv'
 
 export const Route = createFileRoute('/route-map-exporter')({ component: RouteMapExporter })
 
-type Point = { lat: number; lon: number }
+type Point = { lat: number; lon: number; icao?: string }
 type FlightRoute = { from: Point; to: Point }
-type FeatureCollection = { features: Array<{ geometry: { type: string; coordinates: any } }> }
+type FeatureCollection = { features: Array<{ properties?: Record<string, unknown>; geometry: { type: string; coordinates: any } }> }
 
-const WORLD_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_land.geojson'
+const WORLD_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson'
 const key = (v: string) => v.trim().toLowerCase().replace(/[ _-]/g, '')
 const pick = (row: Record<string, string>, names: string[]) => {
   const found = Object.keys(row).find(k => names.includes(key(k)))
@@ -88,11 +88,24 @@ function RouteMapExporter() {
   }, [])
   useEffect(() => {
     fetchRoutes().then(rows => {
-      setRoutes(rows.map(r => ({ from: { lat: r.dep[0], lon: r.dep[1] }, to: { lat: r.arr[0], lon: r.arr[1] } })))
+      setRoutes(rows.map(r => ({ from: { lat: r.dep[0], lon: r.dep[1], icao: r.depIcao }, to: { lat: r.arr[0], lon: r.arr[1], icao: r.arrIcao } })))
       setFileName('Published site data · /data/routes.csv')
     }).catch(() => setError('Could not load the website route CSV. You can still upload a CSV with origin/destination coordinates.'))
   }, [])
   const landPaths = useMemo(() => world ? geometryPaths(world, W, H) : [], [world])
+  const mapBounds = useMemo(() => {
+    if (!routes.length) return { x: 0, y: 0, width: W, height: H }
+    const points = routes.flatMap(r => [project(r.from.lon, r.from.lat, W, H), project(r.to.lon, r.to.lat, W, H)])
+    let minX = Math.min(...points.map(p => p.x)), maxX = Math.max(...points.map(p => p.x))
+    let minY = Math.min(...points.map(p => p.y)), maxY = Math.max(...points.map(p => p.y))
+    // Keep the route network breathable while trimming empty parts of the globe.
+    const padX = Math.max(34, (maxX - minX) * 0.12), padY = Math.max(28, (maxY - minY) * 0.16)
+    minX = Math.max(0, minX - padX); maxX = Math.min(W, maxX + padX)
+    minY = Math.max(0, minY - padY); maxY = Math.min(H, maxY + padY)
+    return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) }
+  }, [routes])
+  const hubCodes = useMemo(() => new Set(['UAAA', 'UACC']), [])
+  const destinationColor = useMemo(() => { const hex = lineColor.replace('#', ''); const n = parseInt(hex, 16); const darken = (v: number) => Math.round(v * 0.68); return '#' + [darken((n >> 16) & 255), darken((n >> 8) & 255), darken(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('') }, [lineColor])
   const bg = theme === 'dark' ? '#070b10' : '#ffffff'
   const land = theme === 'dark' ? '#202b35' : '#f0f3f5'
   const coast = theme === 'dark' ? '#53616d' : '#b5c0c8'
@@ -100,7 +113,7 @@ function RouteMapExporter() {
     if (!file) return
     setError('')
     setFileName(file.name)
-    const parsed = parseCsv(await file.text())
+    const parsed = parseCsv(await file.text()).map(r => ({ ...r, from: { ...r.from }, to: { ...r.to } }))
     if (!parsed.length) {
       setRoutes([])
       setError('No usable routes found. CSV needs origin and destination latitude/longitude columns (for example origin_lat, origin_lon, destination_lat, destination_lon).')
@@ -151,23 +164,25 @@ function RouteMapExporter() {
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div><div className="mb-3 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[.18em] text-teal-800"><Globe2 size={14}/> Air Astana Virtual · Design utility</div>
           <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Route map exporter</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Uses the same published routes.csv as your website by default, or let you upload another coordinate CSV. Just coastlines and fine flight arcs — no airport labels or route details.</p></div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600 md:text-base">Uses the same published routes.csv as your website by default, or let you upload another coordinate CSV. Political borders, fine flight arcs, subtle destination dots and larger hub markers. The framing automatically fits the route network with comfortable breathing room — no labels.</p></div>
         <a href="/" className="text-sm font-semibold text-teal-800 hover:text-teal-600">← Back to website</a>
       </header>
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4"><div><p className="font-semibold">Live preview</p><p className="mt-1 text-xs text-slate-500">{routes.length} routes plotted · 1200 × 620 preview</p></div><button onClick={() => { setRoutes([]); setFileName(''); setError('') }} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-xs font-medium hover:bg-slate-50"><RotateCcw size={14}/> Reset</button></div>
           <div className="bg-slate-950 p-2 sm:p-4">
-            <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Minimalist world map showing flight routes" className="block h-auto w-full" style={{ background: bg }}>
+            <svg ref={svgRef} viewBox={`${mapBounds.x} ${mapBounds.y} ${mapBounds.width} ${mapBounds.height}`}  role="img" aria-label="Minimalist route map with country borders and destination dots" className="block h-auto w-full" style={{ background: bg }}>
               <rect width={W} height={H} fill={bg}/>
               {Array.from({length: 7}, (_, i) => <line key={'v'+i} x1={i*W/6} y1="0" x2={i*W/6} y2={H} stroke={coast} strokeOpacity=".12" strokeWidth=".6"/>)}
               {Array.from({length: 5}, (_, i) => <line key={'h'+i} x1="0" y1={i*H/4} x2={W} y2={i*H/4} stroke={coast} strokeOpacity=".12" strokeWidth=".6"/>)}
-              {landPaths.map((d, i) => <path key={i} d={d} fill={land} stroke={coast} strokeWidth=".55" fillRule="evenodd" />)}
-              {routes.map((r, i) => <path key={i} d={routePath(r)} fill="none" stroke={lineColor} strokeOpacity=".8" strokeWidth={lineWidth} strokeLinecap="round" />)}
+              {landPaths.map((d, i) => <path key={i} d={d} fill={land} stroke={coast} strokeWidth=".75" fillRule="evenodd" />)}
+              {routes.map((r, i) => <path key={'route'+i} d={routePath(r)} fill="none" stroke={lineColor} strokeOpacity=".82" strokeWidth={lineWidth} strokeLinecap="round" />)}
+              {routes.map((r, i) => { const p = project(r.to.lon, r.to.lat, W, H); const hub = hubCodes.has(r.to.icao || '') || hubCodes.has(r.from.icao || ''); return <g key={'destination'+i}><circle cx={p.x} cy={p.y} r={hub ? 4.8 : 2.8} fill={hub ? lineColor : destinationColor} stroke={bg} strokeWidth={hub ? 1.2 : .6} /></g> })}
+              {Array.from(new Map(routes.flatMap(r => [r.from, r.to]).filter(p => hubCodes.has(p.icao || '')).map(p => [p.icao, p])).values()).map(p => { const q = project(p.lon, p.lat, W, H); return <circle key={p.icao} cx={q.x} cy={q.y} r={6.2} fill={lineColor} stroke={bg} strokeWidth={1.5} /> })}
             </svg>
           </div>
           {loadingWorld && <p className="flex items-center gap-2 px-5 py-3 text-sm text-slate-500"><LoaderCircle className="animate-spin" size={16}/> Loading world outlines…</p>}
-          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-slate-500"><span>{fileName || 'Using published route data'}</span><span>Minimal · label-free · high-resolution PNG</span></div>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-slate-500"><span>{fileName || 'Using published route data'}</span><span>Country borders · label-free · high-resolution PNG</span></div>
         </div>
         <aside className="space-y-4">
           <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
