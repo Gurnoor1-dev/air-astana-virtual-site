@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Quote, Sparkles, HeartHandshake, Compass, Plane, ArrowDownRight } from "lucide-react";
-import { Section } from "@/components/site/Page";
 import heroBg from "@/assets/site/home-hero.jpg";
 
 export const Route = createFileRoute("/ceo-message")({
@@ -45,7 +44,7 @@ function CEOMessage() {
         <div className="absolute -left-24 top-56 size-72 rounded-full bg-[#00a6a6]/10 blur-[90px]"/>
       </div>
 
-      <Section>
+      <>
         <div className="mx-auto max-w-6xl px-4 pt-28 sm:px-8 sm:pt-36">
           <div className="grid items-end gap-10 pb-12 md:grid-cols-[1fr_auto] md:pb-16">
             <div className="max-w-4xl">
@@ -92,7 +91,7 @@ function CEOMessage() {
             </aside>
           </div>
         </div>
-      </Section>
+      </>
     </main>
   );
 }
