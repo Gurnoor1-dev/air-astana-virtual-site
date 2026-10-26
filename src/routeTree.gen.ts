@@ -15,8 +15,6 @@ import { Route as HubsRouteImport } from './routes/hubs'
 import { Route as RanksRouteImport } from './routes/ranks'
 import { Route as RoutesRouteImport } from './routes/routes'
 import { Route as StaffRouteImport } from './routes/staff'
-import { Route as CrewCenterRouteImport } from './routes/crew-center'
-import { Route as CrewLoginRouteImport } from './routes/crew-login'
 import { Route as HiddenOperationsRouteImport } from './routes/0gsj85hdn'
 
 const IndexRoute = IndexRouteImport.update({ id: '/', path: '/', getParentRoute: () => rootRouteImport } as any)
@@ -28,8 +26,6 @@ const HubsRoute = HubsRouteImport.update({ id: '/hubs', path: '/hubs', getParent
 const RanksRoute = RanksRouteImport.update({ id: '/ranks', path: '/ranks', getParentRoute: () => rootRouteImport } as any)
 const RoutesRoute = RoutesRouteImport.update({ id: '/routes', path: '/routes', getParentRoute: () => rootRouteImport } as any)
 const StaffRoute = StaffRouteImport.update({ id: '/staff', path: '/staff', getParentRoute: () => rootRouteImport } as any)
-const CrewCenterRoute = CrewCenterRouteImport.update({ id: '/crew-center', path: '/crew-center', getParentRoute: () => rootRouteImport } as any)
-const CrewLoginRoute = CrewLoginRouteImport.update({ id: '/crew-login', path: '/crew-login', getParentRoute: () => rootRouteImport } as any)
 const HiddenOperationsRoute = HiddenOperationsRouteImport.update({ id: '/0gsj85hdn', path: '/0gsj85hdn', getParentRoute: () => rootRouteImport } as any)
 
 export interface FileRoutesByFullPath {
@@ -42,8 +38,6 @@ export interface FileRoutesByFullPath {
   '/ranks': typeof RanksRoute
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
-  '/crew-center': typeof CrewCenterRoute
-  '/crew-login': typeof CrewLoginRoute
   '/0gsj85hdn': typeof HiddenOperationsRoute
 }
 export interface FileRoutesByTo extends FileRoutesByFullPath {}
@@ -52,13 +46,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/apply': typeof ApplyRoute
+  '/ceo-message': typeof CEOMessageRoute
   '/fleet': typeof FleetRoute
   '/hubs': typeof HubsRoute
   '/ranks': typeof RanksRoute
   '/routes': typeof RoutesRoute
   '/staff': typeof StaffRoute
-  '/crew-center': typeof CrewCenterRoute
-  '/crew-login': typeof CrewLoginRoute
   '/0gsj85hdn': typeof HiddenOperationsRoute
 }
 export interface FileRouteTypes {
@@ -78,8 +71,6 @@ export interface RootRouteChildren {
   RanksRoute: typeof RanksRoute
   RoutesRoute: typeof RoutesRoute
   StaffRoute: typeof StaffRoute
-  CrewCenterRoute: typeof CrewCenterRoute
-  CrewLoginRoute: typeof CrewLoginRoute
   HiddenOperationsRoute: typeof HiddenOperationsRoute
 }
 
@@ -89,14 +80,11 @@ declare module '@tanstack/react-router' {
     '/about': { id: '/about'; path: '/about'; fullPath: '/about'; preLoaderRoute: typeof AboutRouteImport; parentRoute: typeof rootRouteImport }
     '/apply': { id: '/apply'; path: '/apply'; fullPath: '/apply'; preLoaderRoute: typeof ApplyRouteImport; parentRoute: typeof rootRouteImport }
     '/ceo-message': { id: '/ceo-message'; path: '/ceo-message'; fullPath: '/ceo-message'; preLoaderRoute: typeof CEOMessageRouteImport; parentRoute: typeof rootRouteImport }
-    '/ceo-message': { id: '/ceo-message'; path: '/ceo-message'; fullPath: '/ceo-message'; preLoaderRoute: typeof CEOMessageRouteImport; parentRoute: typeof rootRouteImport }
     '/fleet': { id: '/fleet'; path: '/fleet'; fullPath: '/fleet'; preLoaderRoute: typeof FleetRouteImport; parentRoute: typeof rootRouteImport }
     '/hubs': { id: '/hubs'; path: '/hubs'; fullPath: '/hubs'; preLoaderRoute: typeof HubsRouteImport; parentRoute: typeof rootRouteImport }
     '/ranks': { id: '/ranks'; path: '/ranks'; fullPath: '/ranks'; preLoaderRoute: typeof RanksRouteImport; parentRoute: typeof rootRouteImport }
     '/routes': { id: '/routes'; path: '/routes'; fullPath: '/routes'; preLoaderRoute: typeof RoutesRouteImport; parentRoute: typeof rootRouteImport }
     '/staff': { id: '/staff'; path: '/staff'; fullPath: '/staff'; preLoaderRoute: typeof StaffRouteImport; parentRoute: typeof rootRouteImport }
-    '/crew-center': { id: '/crew-center'; path: '/crew-center'; fullPath: '/crew-center'; preLoaderRoute: typeof CrewCenterRouteImport; parentRoute: typeof rootRouteImport }
-    '/crew-login': { id: '/crew-login'; path: '/crew-login'; fullPath: '/crew-login'; preLoaderRoute: typeof CrewLoginRouteImport; parentRoute: typeof rootRouteImport }
   }
 }
 
@@ -110,8 +98,6 @@ const rootRouteChildren: RootRouteChildren = {
   RanksRoute,
   RoutesRoute,
   StaffRoute,
-  CrewCenterRoute,
-  CrewLoginRoute,
   HiddenOperationsRoute,
 }
 
