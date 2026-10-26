@@ -110,7 +110,6 @@ function RouteMapExporter() {
   const destinationColor = useMemo(() => { const hex = lineColor.replace('#', ''); const n = parseInt(hex, 16); if (!Number.isFinite(n)) return '#426b76'; const darken = (v: number) => Math.round(v * 0.68); return '#' + [darken((n >> 16) & 255), darken((n >> 8) & 255), darken(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('') }, [lineColor])
   const applyHex = (value: string) => { const normalized = value.startsWith('#') ? value : '#' + value; setHexInput(value); if (/^#[0-9a-fA-F]{6}$/.test(normalized)) setLineColor(normalized.toLowerCase()) }
   const setColor = (value: string) => { setLineColor(value); setHexInput(value.toUpperCase()) }
-  const destinationColor = useMemo(() => { const hex = lineColor.replace('#', ''); const n = parseInt(hex, 16); const darken = (v: number) => Math.round(v * 0.68); return '#' + [darken((n >> 16) & 255), darken((n >> 8) & 255), darken(n & 255)].map(v => v.toString(16).padStart(2, '0')).join('') }, [lineColor])
   const bg = theme === 'dark' ? '#070b10' : '#ffffff'
   const land = theme === 'dark' ? '#202b35' : '#f0f3f5'
   const coast = theme === 'dark' ? '#53616d' : '#b5c0c8'
