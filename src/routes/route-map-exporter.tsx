@@ -177,7 +177,7 @@ function RouteMapExporter() {
               {Array.from({length: 5}, (_, i) => <line key={'h'+i} x1="0" y1={i*H/4} x2={W} y2={i*H/4} stroke={coast} strokeOpacity=".12" strokeWidth=".6"/>)}
               {landPaths.map((d, i) => <path key={i} d={d} fill={land} stroke={coast} strokeWidth=".75" fillRule="evenodd" />)}
               {routes.map((r, i) => <path key={'route'+i} d={routePath(r)} fill="none" stroke={lineColor} strokeOpacity=".82" strokeWidth={lineWidth} strokeLinecap="round" />)}
-              {routes.map((r, i) => { const p = project(r.to.lon, r.to.lat, W, H); const hub = hubCodes.has(r.to.icao || '') || hubCodes.has(r.from.icao || ''); return <g key={'destination'+i}><circle cx={p.x} cy={p.y} r={hub ? 4.8 : 2.8} fill={hub ? lineColor : destinationColor} stroke={bg} strokeWidth={hub ? 1.2 : .6} /></g> })}
+              {routes.map((r, i) => { const p = project(r.to.lon, r.to.lat, W, H); return <g key={'destination'+i}><circle cx={p.x} cy={p.y} r={2.8} fill={destinationColor} stroke={bg} strokeWidth={.6} /></g> })}
               {Array.from(new Map(routes.flatMap(r => [r.from, r.to]).filter(p => hubCodes.has(p.icao || '')).map(p => [p.icao, p])).values()).map(p => { const q = project(p.lon, p.lat, W, H); return <circle key={p.icao} cx={q.x} cy={q.y} r={6.2} fill={lineColor} stroke={bg} strokeWidth={1.5} /> })}
             </svg>
           </div>
