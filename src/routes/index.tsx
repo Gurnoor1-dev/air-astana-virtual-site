@@ -1,317 +1,68 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Globe2, Plane, Radio, ShieldCheck, Users, X, Newspaper, Navigation, BarChart3, Calendar } from "lucide-react";
-import { Section, Stat } from "@/components/site/Page";
-import homeHero from '@/assets/site/home-hero.jpg'
+import { ArrowRight, Globe2, Plane, ShieldCheck, Users, X, Newspaper, Navigation, BarChart3, MoveUpRight } from "lucide-react";
+import { Section } from "@/components/site/Page";
+import homeHero from "@/assets/site/home-hero.jpg";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Air Astana Virtual — Infinite Flight" },
-      { name: "description", content: "Air Astana Virtual — a community-driven Infinite Flight virtual airline inspired by Kazakhstan's flag carrier and its Eurasian network." }
-    ]
-  }),
+  head: () => ({ meta: [
+    { title: "Air Astana Virtual — Infinite Flight" },
+    { name: "description", content: "Air Astana Virtual — a community-driven Infinite Flight virtual airline inspired by Kazakhstan's flag carrier and its Eurasian network." }
+  ]}),
   component: Home
 });
 
-const stats = [
-  { value: "2", label: "Primary hubs" },
-  { value: "37", label: "Destinations" },
-  { value: "142", label: "Published sectors" },
-  { value: "5", label: "Aircraft types" }
-];
+const stats = [{value:"2",label:"Primary hubs"},{value:"37",label:"Destinations"},{value:"142",label:"Published sectors"},{value:"5",label:"Aircraft types"}];
 
 function NewsSection() {
-  const [news, setNews] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any>(null);
-
-  useEffect(() => {
-    fetch("https://huqvffdiwqilbpxepfpo.supabase.co/rest/v1/crew_admin_settings?key=eq.public_site_news&select=value&limit=1", {
-      headers: {
-        apikey: "sb_publishable_kf4z7fjeqrd0yrh_jGmWDg_JhWl3J8j",
-        Authorization: "Bearer sb_publishable_kf4z7fjeqrd0yrh_jGmWDg_JhWl3J8j"
-      }
-    })
-      .then(r => r.ok ? r.json() : [])
-      .then(rows => {
-        const v = rows?.[0]?.value;
-        setNews(Array.isArray(v) ? v.filter((x: any) => x?.active !== false) : []);
-      })
-      .catch(() => {});
-  }, []);
-
-  if (!news.length) return null;
-
-  return (
-    <section className="mx-auto max-w-7xl px-4 pb-2 sm:px-6">
-      <div className="mb-5 flex items-end justify-between gap-4">
-        <div>
-          <div className="kicker"><Newspaper className="size-3"/> Latest news</div>
-          <h2 className="mt-2 text-2xl font-black tracking-tight">From the flight deck.</h2>
-        </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        {news.map((n: any) => (
-          <button
-            key={n.id}
-            type="button"
-            onClick={() => setSelected(n)}
-            className="group overflow-hidden rounded-[2rem] border border-border bg-white text-left shadow-soft transition hover:-translate-y-1 hover:shadow-xl"
-          >
-            <div className="aspect-[16/7] overflow-hidden bg-muted">
-              <img src={n.image_url || n.imageUrl || homeHero} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-            </div>
-            <div className="p-6">
-              <h3 className="text-2xl font-black tracking-[-.03em]">{n.headline}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{n.subtext}</p>
-              <div className="mt-5 text-[10px] font-black uppercase tracking-[.16em] text-primary">Click to view more information</div>
-            </div>
-          </button>
-        ))}
-      </div>
-      {selected && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center bg-[#07101f]/70 p-4 backdrop-blur-md" onClick={() => setSelected(null)}>
-          <article className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-[2rem] bg-white shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="relative">
-              <img src={selected.image_url || selected.imageUrl} alt="" className="h-56 w-full object-cover sm:h-72"/>
-              <button type="button" aria-label="Close news" onClick={() => setSelected(null)} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-black/55 text-white backdrop-blur-md">
-                <X className="size-5"/>
-              </button>
-            </div>
-            <div className="max-h-[calc(90vh-18rem)] overflow-y-auto p-7 sm:p-9">
-              <h2 className="text-3xl font-black tracking-[-.04em] sm:text-4xl">{selected.headline}</h2>
-              <p className="mt-3 text-base font-semibold leading-7 text-muted-foreground">{selected.subtext}</p>
-              <div className="mt-6 whitespace-pre-wrap text-sm leading-7 text-foreground/80">{selected.content}</div>
-            </div>
-          </article>
-        </div>
-      )}
-    </section>
-  );
+  const [news,setNews]=useState<any[]>([]),[selected,setSelected]=useState<any>(null);
+  useEffect(()=>{fetch("https://huqvffdiwqilbpxepfpo.supabase.co/rest/v1/crew_admin_settings?key=eq.public_site_news&select=value&limit=1",{headers:{apikey:"sb_publishable_kf4z7fjeqrd0yrh_jGmWDg_JhWl3J8j",Authorization:"Bearer sb_publishable_kf4z7fjeqrd0yrh_jGmWDg_JhWl3J8j"}}).then(r=>r.ok?r.json():[]).then(rows=>{const v=rows?.[0]?.value;setNews(Array.isArray(v)?v.filter((x:any)=>x?.active!==false):[])}).catch(()=>{})},[]);
+  if(!news.length)return null;
+  return <section className="mx-auto max-w-7xl px-4 pb-8 sm:px-6"><div className="mb-7 flex items-end justify-between gap-4"><div><div className="kicker"><Newspaper className="size-3"/> Dispatches / Latest news</div><h2 className="mt-3 text-4xl">From the flight deck.</h2></div><span className="hidden font-mono text-xs text-muted-foreground sm:block">AAV / 01—NEWS</span></div><div className="grid gap-4 md:grid-cols-2">{news.map((n:any,i:number)=><button key={n.id} type="button" onClick={()=>setSelected(n)} className="group grid overflow-hidden rounded-[1.5rem] border border-[#dce9ec] bg-white text-left shadow-[0_16px_45px_-36px_#17465355] transition duration-300 hover:-translate-y-0.5 hover:border-[#a8d8d9] hover:shadow-[0_22px_55px_-36px_#17465366] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#00a6a6] sm:grid-cols-[.9fr_1.1fr]"><div className="relative min-h-48 overflow-hidden bg-[#eaf3f5]"><img src={n.image_url||n.imageUrl||homeHero} alt="" className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"/><span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 font-sans text-[9px] font-bold uppercase tracking-[.12em] text-[#087f88] shadow-sm backdrop-blur">BRIEF / 0{i+1}</span></div><div className="flex flex-col justify-between p-5 sm:p-6"><div><h3 className="text-2xl leading-tight">{n.headline}</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">{n.subtext}</p></div><span className="mt-7 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider">Open dispatch <MoveUpRight className="size-3"/></span></div></button>)}</div>{selected&&<div className="fixed inset-0 z-[250] flex items-center justify-center bg-[#123f4b]/80 p-4 backdrop-blur-md" onClick={()=>setSelected(null)}><article className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-[2rem] border border-white/50 bg-white shadow-[0_30px_100px_-35px_#071f2a99]" onClick={e=>e.stopPropagation()}><div className="relative"><img src={selected.image_url||selected.imageUrl||homeHero} alt="" className="h-56 w-full object-cover sm:h-72"/><button type="button" aria-label="Close news" onClick={()=>setSelected(null)} className="absolute right-4 top-4 grid size-10 place-items-center rounded-full bg-white text-[#123f4b] shadow-lg transition hover:scale-105"><X className="size-5"/></button></div><div className="p-7 sm:p-9"><h2 className="text-4xl">{selected.headline}</h2><p className="mt-3 text-base leading-7 text-muted-foreground">{selected.subtext}</p><div className="mt-6 whitespace-pre-wrap text-sm leading-7">{selected.content}</div></div></article></div>}</section>
 }
 
-function Home() {
-  return (
-    <div>
-      <section className="relative overflow-hidden bg-[#08111f]">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <img
-            src={homeHero}
-            alt="Air Astana aircraft"
-            className="h-full w-full object-cover opacity-45"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,#07101fe8_0%,#0a1627d9_43%,#0a16278c_68%,#07101f52_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,#d7a94a35,transparent_28%),radial-gradient(circle_at_18%_88%,#2f78b755,transparent_30%)]" />
-        </div>
-
-        <div className="relative z-10 mx-auto grid min-h-[650px] max-w-7xl items-start gap-10 px-4 pt-28 pb-16 sm:px-6 sm:pt-32 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:gap-14 lg:py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white/85 backdrop-blur-md">
-              <span className="size-2 rounded-full bg-[#d7a94a] shadow-[0_0_14px_#d7a94a]"/> Infinite Flight Virtual Airline
-            </div>
-            <h1 className="mt-6 text-5xl font-black leading-[.94] tracking-[-.055em] text-white sm:text-6xl lg:text-7xl">
-              From the heart of <span className="text-[#e2b85a]">Eurasia.</span>
-            </h1>
-
-            <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-white/78 sm:text-lg">
-              Air Astana Virtual is an Infinite Flight community built around the Air Astana network in Eurasia. Fly published KC sectors from Almaty and Astana, choose from five aircraft types, record your flights and build your pilot career alongside the crew.
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/apply" className="inline-flex items-center gap-2 rounded-xl bg-[#e2b85a] px-5 py-3 text-sm font-extrabold text-[#101827] shadow-[0_12px_35px_-12px_#e2b85a] transition hover:-translate-y-0.5 hover:bg-[#f0ca70]">
-                Join the crew <ArrowRight className="size-4"/>
-              </Link>
-              <Link to="/routes" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/[0.08] px-5 py-3 text-sm font-extrabold text-white backdrop-blur-md transition hover:bg-white/[0.14]">
-                Explore routes <ArrowRight className="size-4"/>
-              </Link>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">142 published sectors</span>
-              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">37 destinations</span>
-              <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/80 backdrop-blur-sm">2 primary hubs</span>
-            </div>
-          </div>
-
-          <div className="relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/15 bg-[#101d31]/80 p-6 text-white shadow-[0_28px_90px_-35px_rgba(0,0,0,.75)] backdrop-blur-md sm:p-8">
-            <div className="absolute inset-0 opacity-35" style={{backgroundImage:"radial-gradient(circle at 75% 20%,#a4865655,transparent 32%),linear-gradient(90deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%),linear-gradient(0deg,transparent 49.8%,#ffffff12 50%,transparent 50.2%)",backgroundSize:"auto,56px 56px,56px 56px"}}/>
-            <div className="relative flex h-full min-h-[308px] flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-bold uppercase tracking-[.2em] text-white/75">Air Astana Virtual</div>
-                <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white/85">Operational</span>
-              </div>
-              <div className="grid items-center gap-6 sm:grid-cols-[1fr_auto]">
-                <div>
-                  <div className="text-[10px] font-extrabold uppercase tracking-[.18em] text-white/55">Route network</div>
-                  <div className="mt-2 text-4xl font-black tracking-[-.06em]">142 sectors</div>
-                  <p className="mt-2 max-w-xs text-sm leading-6 text-white/70">From two Kazakhstan hubs to destinations across Central Asia, Europe and Asia.</p>
-                  <Link to="/routes" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-extrabold text-[#17213a] shadow-lg">Browse the network <ArrowRight className="size-3.5"/></Link>
-                </div>
-                <div className="hidden size-36 items-center justify-center rounded-full border border-white/15 bg-white/5 sm:flex">
-                  <div className="flex size-24 items-center justify-center rounded-full border border-primary/40 bg-primary/10">
-                    <Plane className="size-12 rotate-[-12deg] text-white" strokeWidth={1.2}/>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
-                <div>
-                  <div className="text-xl font-black">ALA</div>
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-white/55">Almaty hub</div>
-                </div>
-                <div>
-                  <div className="text-xl font-black">NQZ</div>
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-white/55">Astana hub</div>
-                </div>
-                <div>
-                  <div className="text-xl font-black">KC</div>
-                  <div className="text-[9px] font-bold uppercase tracking-widest text-white/55">IATA</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 border-y border-white/10 bg-[#0b1626]/95 backdrop-blur-sm">
-          <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 overflow-hidden px-4 py-5 sm:px-6">
-            <span className="shrink-0 text-[10px] font-extrabold uppercase tracking-[.18em] text-white/45">Our hubs</span>
-            <div className="flex gap-8">
-              <span className="text-xs font-black tracking-[.2em] text-white/80">ALA · ALMATY</span>
-              <span className="text-xs font-black tracking-[.2em] text-white/80">NQZ · ASTANA</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Section className="!py-10 sm:!py-14">
-        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-border bg-white md:grid-cols-4">
-          {stats.map(stat => (
-            <div key={stat.label} className="border-b border-border p-6 last:border-0 md:border-b-0 md:border-r md:last:border-0 sm:p-8">
-              <Stat {...stat}/>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <NewsSection/>
-
-      <Section eyebrow="Why Fly With Us" title="More than a flight log." description="A focused virtual airline experience built around the things that make every sector worth flying: structure, progress and crew.">
-        <div className="grid gap-4 md:grid-cols-3">
-          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-[#f7f8fa] p-7 transition duration-500 hover:-translate-y-1 hover:border-[#d7a94a]/45 hover:shadow-[0_28px_70px_-34px_rgba(23,33,58,.38)] sm:p-9">
-            <div className="absolute -right-14 -top-14 size-44 rounded-full border border-[#17213a]/[.06] transition duration-700 group-hover:scale-125" />
-            <div className="absolute bottom-0 left-0 h-1 w-0 bg-[#d7a94a] transition-all duration-500 group-hover:w-full" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-[#17213a]/45">01 · Operations</span>
-                  <Navigation className="size-5 text-[#17213a]/55 transition duration-300 group-hover:-translate-y-0.5 group-hover:rotate-12 group-hover:text-[#d7a94a]" />
-                </div>
-                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em] text-[#17213a]">Fly with a real plan.</h3>
-                <p className="mt-4 max-w-sm text-sm leading-7 text-[#687386]">Published sectors, aircraft assignments and clear flight details give every Infinite Flight sortie an airline-style purpose.</p>
-              </div>
-              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[#17213a]/55"><span className="size-1.5 rounded-full bg-[#d7a94a]" /> Structured flying</div>
-            </div>
-          </article>
-
-          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-[#17213a] p-7 text-white transition duration-500 hover:-translate-y-1 hover:shadow-[0_30px_75px_-34px_rgba(23,33,58,.6)] sm:p-9">
-            <div className="absolute -bottom-20 -right-10 size-52 rounded-full border border-white/10" />
-            <div className="absolute -bottom-10 -right-2 size-32 rounded-full border border-[#d7a94a]/20" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-white/45">02 · Progress</span>
-                  <BarChart3 className="size-5 text-[#e2b85a]" />
-                </div>
-                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em]">Every sector moves you forward.</h3>
-                <p className="mt-4 max-w-sm text-sm leading-7 text-white/65">Log your flights, build hours and climb the ranks. Your flying becomes a visible career, not just another session.</p>
-              </div>
-              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-white/50"><span className="size-1.5 rounded-full bg-[#e2b85a]" /> Pilot progression</div>
-            </div>
-          </article>
-
-          <article className="group relative min-h-[330px] overflow-hidden rounded-[2rem] border border-[#dfe4eb] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:border-[#17213a]/20 hover:shadow-[0_28px_70px_-34px_rgba(23,33,58,.32)] sm:p-9">
-            <div className="absolute right-0 top-0 h-full w-1/2 bg-[linear-gradient(135deg,transparent_35%,rgba(226,184,90,.09)_100%)] opacity-0 transition duration-500 group-hover:opacity-100" />
-            <div className="relative flex h-full flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-black uppercase tracking-[.22em] text-[#17213a]/45">03 · Crew</span>
-                  <Calendar className="size-5 text-[#17213a]/55 transition duration-300 group-hover:rotate-6 group-hover:text-[#d7a94a]" />
-                </div>
-                <h3 className="mt-16 max-w-xs text-3xl font-black leading-[.98] tracking-[-.055em] text-[#17213a]">Don't fly the network alone.</h3>
-                <p className="mt-4 max-w-sm text-sm leading-7 text-[#687386]">Join group flights, meet fellow aviators and turn a route network into a crew you actually want to come back to.</p>
-              </div>
-              <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-[.18em] text-[#17213a]/55"><span className="size-1.5 rounded-full bg-[#d7a94a]" /> Community flying</div>
-            </div>
-          </article>
-        </div>
-      </Section>
-
-      <Section eyebrow="The experience" title="A crew centre for Eurasian flying." description="Explore the network, fleet and crew, then find your next flight and take it from there.">
-        <div className="grid gap-4 md:grid-cols-3">
-          <Link to="/routes" className="group premium-card md:col-span-2 min-h-[250px] border-[#1c2b4f]/20 bg-[linear-gradient(145deg,#ffffff_0%,#f6f8fb_62%,#eef2f6_100%)] shadow-[0_18px_50px_-28px_rgba(28,43,79,.42)] transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-[0_24px_60px_-32px_rgba(28,43,79,.55)]">
-            <div className="absolute right-[-4rem] top-[-5rem] size-44 rounded-full bg-[#1c2b4f]/[0.035]"/>
-            <div className="relative flex h-full flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="flex size-11 items-center justify-center rounded-2xl bg-[#1c2b4f] text-white shadow-sm">
-                    <Radio className="size-5"/>
-                  </span>
-                  <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-primary">142 sectors</span>
-                </div>
-                <h3 className="mt-8 text-3xl font-extrabold text-[#17213a]">Explore the network.</h3>
-                <p className="mt-3 max-w-xl text-sm leading-6 text-[#5f6b7d]">Browse published sectors from Almaty and Astana across Central Asia, the Caucasus, Europe and Asia.</p>
-              </div>
-              <div className="mt-8 flex items-center justify-between gap-4">
-                <span className="text-xs font-bold uppercase tracking-[.14em] text-[#5f6b7d]">A320-200 · A321-200 · A321neo · 787-9 · 757-200</span>
-                <span className="inline-flex items-center gap-2 text-sm font-extrabold text-primary">View routes <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span>
-              </div>
-            </div>
-          </Link>
-          
-          <div className="premium-card">
-            <Globe2 className="size-5 text-primary"/>
-            <h3 className="mt-8 text-2xl font-extrabold">Two main hubs.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Almaty and Astana anchor a network at the centre of Eurasia.</p>
-            <Link to="/hubs" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View hubs <ArrowRight className="size-4"/></Link>
-          </div>
-
-          <div className="premium-card">
-            <Plane className="size-5 text-primary"/>
-            <h3 className="mt-8 text-2xl font-extrabold">Five-aircraft fleet.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">A320-200, A321-200, A321neo, 787-9 and 757-200 cover the published network.</p>
-            <Link to="/fleet" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Explore fleet <ArrowRight className="size-4"/></Link>
-          </div>
-
-          <div className="premium-card">
-            <Users className="size-5 text-primary"/>
-            <h3 className="mt-8 text-2xl font-extrabold">Fly with a crew.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">Meet the team, join events and build your pilot career one sector at a time.</p>
-            <Link to="/staff" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">Meet the crew <ArrowRight className="size-4"/></Link>
-          </div>
-
-          <div className="premium-card">
-            <ShieldCheck className="size-5 text-primary"/>
-            <h3 className="mt-8 text-2xl font-extrabold">Progress with purpose.</h3>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">A clear rank structure turns every logged flight into part of a longer journey.</p>
-            <Link to="/ranks" className="mt-7 inline-flex items-center gap-2 text-sm font-extrabold text-primary">View ranks <ArrowRight className="size-4"/></Link>
-          </div>
-        </div>
-      </Section>
-
-      <section className="mx-auto mb-16 max-w-7xl px-4 sm:px-6 sm:mb-20">
-        <div className="overflow-hidden rounded-[2rem] brand-gradient text-white">
-          <div className="relative px-7 py-12 sm:px-12 sm:py-16">
-            <div className="absolute right-[-6rem] top-[-9rem] size-80 rounded-full border border-white/15"/>
-            <div className="relative max-w-2xl">
-              <div className="text-[10px] font-extrabold uppercase tracking-[.2em] text-white/70">Ready for departure?</div>
-              <h2 className="mt-4 text-4xl font-extrabold leading-none tracking-[-.06em] sm:text-5xl">Your next flight starts here.</h2>
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/80">Join Air Astana Virtual, choose a route and make your next Infinite Flight sector part of the network.</p>
-              <Link to="/apply" className="mt-7 inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-extrabold text-[#17213a]">
-                Apply now <ArrowRight className="size-4"/>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+function Home(){
+ return <div className="bg-background text-foreground">
+  <section className="relative isolate overflow-hidden bg-[#e8f5f6]">
+   <div className="absolute inset-0 -z-20"><img src={homeHero} alt="Air Astana aircraft above the clouds" className="h-full w-full object-cover object-center"/><div className="absolute inset-0 bg-gradient-to-r from-[#e8f5f6]/95 via-[#e8f5f6]/78 to-[#e8f5f6]/10 lg:via-[#e8f5f6]/65"/></div>
+   <div className="pointer-events-none absolute -right-28 top-24 -z-10 size-[min(66vw,780px)] rounded-full border border-white/70"/><div className="pointer-events-none absolute -right-8 top-44 -z-10 size-[min(48vw,570px)] rounded-full border border-white/65"/><div className="pointer-events-none absolute -right-5 top-1/2 -z-10 hidden size-3 rounded-full bg-[#00a6a6] shadow-[0_0_30px_#00a6a6] lg:block"/>
+   <div className="mx-auto grid min-h-[700px] max-w-[90rem] items-center gap-10 px-5 pb-20 pt-36 sm:px-8 sm:pt-40 lg:grid-cols-[1.1fr_.9fr]">
+    <div className="max-w-3xl py-6">
+     <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#1d6672]/15 bg-white/55 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[.17em] text-[#286875] shadow-sm backdrop-blur-md"><span className="size-2 rounded-full bg-[#00a6a6]"/> Infinite Flight · Virtual Airline</div>
+     <h1 className="max-w-4xl font-display text-[clamp(3.8rem,8.5vw,8rem)] font-medium leading-[.94] tracking-[-.065em] text-[#173943]">The spirit of <span className="italic text-[#008f96]">Eurasia.</span></h1>
+     <p className="mt-7 max-w-xl text-base leading-8 text-[#385d66] sm:text-lg">Discover the world from Kazakhstan. Air Astana Virtual brings the routes, aircraft and spirit of the region's flag carrier to the Infinite Flight community.</p>
+     <div className="mt-8 flex flex-wrap gap-3"><Link to="/apply" className="group inline-flex items-center gap-3 rounded-full bg-[#007f88] px-6 py-4 text-sm font-bold text-white shadow-[0_14px_34px_-18px_#006b73] transition duration-300 hover:-translate-y-0.5 hover:bg-[#006b73]">Join our crew <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link><Link to="/routes" className="inline-flex items-center gap-3 rounded-full border border-[#286875]/25 bg-white/65 px-6 py-4 text-sm font-bold text-[#214b57] backdrop-blur-sm transition duration-300 hover:-translate-y-0.5 hover:bg-white">Explore destinations <Globe2 className="size-4"/></Link></div>
+     <div className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold tracking-wide text-[#52717a]"><span className="inline-flex items-center gap-2"><span className="size-1.5 rounded-full bg-[#00a6a6]"/> Almaty & Astana hubs</span><span className="inline-flex items-center gap-2"><span className="size-1.5 rounded-full bg-[#00a6a6]"/> Community-led flying</span></div>
     </div>
-  );
+    <div className="relative ml-auto w-full max-w-md self-end lg:mb-2">
+     <div className="rounded-[2rem] border border-white/75 bg-white/65 p-6 shadow-[0_30px_90px_-48px_#164e5c66] backdrop-blur-xl sm:p-8">
+      <div className="flex items-center justify-between gap-4"><span className="text-xs font-bold uppercase tracking-[.14em] text-[#52717a]">Your network, at a glance</span><span className="inline-flex items-center gap-2 rounded-full bg-[#e2f4f2] px-3 py-1.5 text-[10px] font-bold text-[#007f88]"><span className="size-1.5 rounded-full bg-[#00a6a6]"/> Active</span></div>
+      <div className="mt-7"><div className="font-display text-7xl leading-none tracking-tight text-[#173943] sm:text-8xl">142<span className="ml-2 text-2xl italic text-[#008f96]">sectors</span></div><p className="mt-4 max-w-xs text-sm leading-7 text-[#5a747c]">A growing route network connecting Central Asia with Europe and beyond.</p></div>
+      <div className="mt-7 flex items-center gap-3 rounded-2xl bg-[#f0f8f8] p-4"><div className="grid size-11 place-items-center rounded-full bg-white text-[#008f96] shadow-sm"><Plane className="size-5"/></div><div className="min-w-0 flex-1"><div className="text-sm font-bold text-[#214b57]">Choose your next sector</div><div className="mt-1 text-xs text-[#66828a]">Plan · Fly · Log · Progress</div></div><Link aria-label="Browse routes" to="/routes" className="grid size-10 shrink-0 place-items-center rounded-full bg-[#007f88] text-white transition hover:scale-105"><ArrowRight className="size-4"/></Link></div>
+      <div className="mt-6 grid grid-cols-2 gap-3"><div className="rounded-2xl border border-[#dcebed] bg-white/70 p-4"><div className="font-display text-2xl text-[#173943]">ALA</div><div className="mt-1 text-[10px] font-bold uppercase tracking-[.12em] text-[#66828a]">Almaty hub</div></div><div className="rounded-2xl border border-[#dcebed] bg-white/70 p-4"><div className="font-display text-2xl text-[#173943]">NQZ</div><div className="mt-1 text-[10px] font-bold uppercase tracking-[.12em] text-[#66828a]">Astana hub</div></div></div>
+     </div>
+    </div>
+   </div>
+   <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#f7fafb] to-transparent"/>
+  </section>
+  <section className="relative z-10 mx-auto -mt-2 max-w-[90rem] px-4 pb-10 sm:px-8 sm:pb-14"><div className="grid grid-cols-2 overflow-hidden rounded-[2rem] border border-white bg-white/90 shadow-[0_20px_60px_-42px_#17465355] backdrop-blur md:grid-cols-4">{stats.map((stat,i)=><div key={stat.label} className={`relative p-5 sm:p-8 ${i<3?"md:border-r":""} ${i%2===0?"border-r md:border-r":""} ${i<2?"border-b md:border-b-0":""}`}><div className="font-display text-5xl tracking-tight text-[#173943] sm:text-6xl">{stat.value}<span className="ml-1 text-xl text-[#00a6a6]">+</span></div><div className="mt-2 text-[10px] font-bold uppercase tracking-[.12em] text-[#6c858c] sm:text-xs">{stat.label}</div></div>)}</div></section>
+  <NewsSection/>
+  <Section eyebrow="A better way to fly / 01—03" title="A little more than a flight log." description="A welcoming virtual airline experience shaped around great routes, meaningful progress and a crew to share it with.">
+   <div className="grid gap-5 md:grid-cols-3">
+    <article className="group rounded-[2rem] border border-[#e0ebed] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] sm:p-9"><div className="grid size-12 place-items-center rounded-2xl bg-[#e4f5f4] text-[#008f96]"><Navigation className="size-5"/></div><div className="mt-8 text-xs font-bold uppercase tracking-[.14em] text-[#7a969d]">01 · Operations</div><h3 className="mt-3 text-3xl leading-tight text-[#173943]">Every route has a story.</h3><p className="mt-4 text-sm leading-7 text-[#617c83]">Explore published sectors, aircraft assignments and flight details that give every sortie a sense of purpose.</p><Link to="/routes" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Find your route <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link></article>
+    <article className="group rounded-[2rem] bg-gradient-to-br from-[#0a6570] to-[#174653] p-7 text-white shadow-[0_24px_60px_-40px_#17465388] transition duration-500 hover:-translate-y-1 sm:p-9"><div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-[#a9e8e3]"><BarChart3 className="size-5"/></div><div className="mt-8 text-xs font-bold uppercase tracking-[.14em] text-white/55">02 · Progress</div><h3 className="mt-3 text-3xl leading-tight">Your hours mean something.</h3><p className="mt-4 text-sm leading-7 text-white/75">Log flights, build experience and climb the ranks. Each sector becomes part of your pilot journey.</p><Link to="/ranks" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#bce9e7]">Explore pilot ranks <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link></article>
+    <article className="group rounded-[2rem] border border-[#e0ebed] bg-[#edf7f8] p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] sm:p-9"><div className="grid size-12 place-items-center rounded-2xl bg-white text-[#008f96] shadow-sm"><Users className="size-5"/></div><div className="mt-8 text-xs font-bold uppercase tracking-[.14em] text-[#7a969d]">03 · Community</div><h3 className="mt-3 text-3xl leading-tight text-[#173943]">Better together, in the air.</h3><p className="mt-4 text-sm leading-7 text-[#617c83]">Meet fellow aviators, join group flights and turn a route network into a crew you look forward to flying with.</p><Link to="/staff" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Meet the crew <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link></article>
+   </div>
+  </Section>
+  <Section eyebrow="Explore the airline" title="Find your place in the network." description="Everything you need to plan a flight, learn about the fleet and find your next destination.">
+   <div className="grid gap-5 md:grid-cols-6">
+    <Link to="/routes" className="group relative min-h-[300px] overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#d8f0f1] to-[#eef8f8] p-8 md:col-span-4 sm:p-10"><div className="absolute -right-12 -top-16 size-72 rounded-full border border-[#79bdc2]/35 transition duration-700 group-hover:scale-110"/><div className="absolute -right-1 top-0 size-56 rounded-full border border-white/80 transition duration-700 group-hover:translate-x-2"/><div className="relative flex h-full flex-col justify-between"><div className="grid size-12 place-items-center rounded-full bg-white/80 text-[#007f88]"><Globe2 className="size-5"/></div><div className="mt-14 max-w-md"><h3 className="text-4xl text-[#173943] sm:text-5xl">The world, via Kazakhstan.</h3><p className="mt-3 max-w-sm text-sm leading-7 text-[#52717a]">Browse the network and discover where your next flight could take you.</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Explore routes <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span></div></div></Link>
+    <Link to="/fleet" className="group rounded-[2rem] border border-[#e0ebed] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] md:col-span-2 sm:p-8"><div className="grid size-12 place-items-center rounded-2xl bg-[#e4f5f4] text-[#008f96]"><Plane className="size-5"/></div><h3 className="mt-12 text-3xl text-[#173943]">Made for the journey.</h3><p className="mt-3 text-sm leading-7 text-[#617c83]">Five aircraft types, from efficient narrowbodies to the 787-9.</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Discover the fleet <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span></Link>
+    <Link to="/hubs" className="group rounded-[2rem] border border-[#e0ebed] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] md:col-span-2 sm:p-8"><div className="grid size-12 place-items-center rounded-2xl bg-[#e4f5f4] text-[#008f96]"><Globe2 className="size-5"/></div><h3 className="mt-7 text-3xl text-[#173943]">Two hubs. One horizon.</h3><p className="mt-3 text-sm leading-7 text-[#617c83]">Start from Almaty or Astana and follow the network outward.</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Explore hubs <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span></Link>
+    <Link to="/staff" className="group rounded-[2rem] border border-[#e0ebed] bg-white p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] md:col-span-2 sm:p-8"><div className="grid size-12 place-items-center rounded-2xl bg-[#e4f5f4] text-[#008f96]"><Users className="size-5"/></div><h3 className="mt-7 text-3xl text-[#173943]">Meet your crew.</h3><p className="mt-3 text-sm leading-7 text-[#617c83]">Get to know the people behind the virtual airline.</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">Meet the team <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span></Link>
+    <Link to="/ranks" className="group rounded-[2rem] border border-[#e0ebed] bg-[#edf7f8] p-7 transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_60px_-40px_#17465355] md:col-span-2 sm:p-8"><div className="grid size-12 place-items-center rounded-2xl bg-white text-[#008f96]"><ShieldCheck className="size-5"/></div><h3 className="mt-7 text-3xl text-[#173943]">A journey that grows.</h3><p className="mt-3 text-sm leading-7 text-[#617c83]">Build hours and progress through a clear pilot rank structure.</p><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#007f88]">View ranks <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></span></Link>
+   </div>
+  </Section>
+  <section className="mx-auto mb-16 max-w-[90rem] px-4 sm:px-8 sm:mb-24"><div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#0a6570] via-[#14515f] to-[#173943] px-7 py-12 text-white shadow-[0_30px_80px_-44px_#17465388] sm:px-14 sm:py-16"><div className="pointer-events-none absolute -right-16 -top-28 size-[28rem] rounded-full border border-white/15"/><div className="pointer-events-none absolute -right-2 top-0 size-[21rem] rounded-full border border-white/10"/><div className="relative max-w-3xl"><div className="text-[11px] font-bold uppercase tracking-[.18em] text-[#a9e8e3]">Your next chapter takes off here</div><h2 className="mt-5 text-5xl leading-[1.02] tracking-tight sm:text-7xl">Come fly with us.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-white/75 sm:text-base">Choose a route, take your place in the crew and make every Infinite Flight sector part of something bigger.</p><Link to="/apply" className="group mt-8 inline-flex items-center gap-3 rounded-full bg-white px-6 py-4 text-sm font-bold text-[#0c6570] transition duration-300 hover:-translate-y-0.5 hover:bg-[#d9f2f0]">Become a pilot <ArrowRight className="size-4 transition-transform group-hover:translate-x-1"/></Link></div></div></section>
+ </div>
 }

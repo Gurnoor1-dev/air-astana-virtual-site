@@ -106,22 +106,7 @@ function Apply() {
         );
 
       if (decoded.ifcUsername === "__CREW_LOGIN__") {
-        setLoading(true);
-        fetch(
-          "https://huqvffdiwqilbpxepfpo.supabase.co/functions/v1/crew-center?action=resume&ticket=" +
-            encodeURIComponent(ticket)
-        )
-          .then(async (r) => {
-            const d = await r.json();
-            if (!r.ok || !d.ok)
-              throw new Error(d.error || "Crew sign-in expired.");
-            sessionStorage.setItem("aav_crew_session", d.session);
-            window.location.replace("/crew-center");
-          })
-          .catch((e) =>
-            setError(e instanceof Error ? e.message : "Crew sign-in failed.")
-          )
-          .finally(() => setLoading(false));
+        window.location.replace("https://crew-center-air-astana-virtual.vercel.app/");
         return;
       }
     } catch {}
